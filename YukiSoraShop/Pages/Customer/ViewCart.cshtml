@@ -1,0 +1,143 @@
+﻿@page
+@model YukiSoraShop.Pages.Customer.ViewCartModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-shopping-cart text-success"></i> Shopping Cart
+        </h1>
+    </div>
+</div>
+
+@if (Model.CartItems.Any())
+{
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cart Items (@Model.CartItems.Count items)</h5>
+                </div>
+                <div class="card-body p-0">
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <div class="d-flex align-items-center border-bottom p-3">
+                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
+                                 class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">@item.Product.Name</h6>
+                                <p class="text-muted small mb-1">@item.Product.Description</p>
+                                <span class="badge bg-secondary">@item.Product.Category</span>
+                            </div>
+
+                            <div class="text-center me-3">
+                                <form method="post" asp-page-handler="UpdateQuantity" class="d-inline">
+                                    <input type="hidden" name="productId" value="@item.Product.Id" />
+                                    <div class="input-group input-group-sm" style="width: 120px;">
+                                        <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary">-</button>
+                                        <input type="text" class="form-control text-center" value="@item.Quantity" readonly>
+                                        <button type="submit" name="action" value="increase" class="btn btn-outline-secondary">+</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="text-end me-3">
+                                <div class="fw-bold">@item.TotalPrice.ToString("N0") VNĐ</div>
+                                <div class="small text-muted">@item.Product.Price.ToString("N0") VNĐ/item</div>
+                            </div>
+
+                            <form method="post" asp-page-handler="RemoveItem" class="d-inline">
+                                <input type="hidden" name="productId" value="@item.Product.Id" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Remove this item?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal (@Model.TotalItems items):</span>
+                        <span>@Model.TotalAmount.ToString("N0") VNĐ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span class="text-success">Free</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span>@((Model.TotalAmount * 0.1m).ToString("N0")) VNĐ</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-success">@((Model.TotalAmount * 1.1m).ToString("N0")) VNĐ</strong>
+                    </div>
+
+                    <button type="button" class="btn btn-success w-100 mb-2" onclick="alert('Checkout functionality would be implemented here!')">
+                        <i class="fas fa-credit-card"></i> Proceed to Checkout
+                    </button>
+
+                    <a href="/" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Quick Add Demo Items</h6>
+                    <form method="post" asp-page-handler="AddSampleItems" class="d-inline">
+                        <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-plus"></i> Add Sample Products
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                <h3 class="text-muted">Your cart is empty</h3>
+                <p class="text-muted mb-4">Add some products to get started!</p>
+
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag"></i> Start Shopping
+                    </a>
+
+                    <form method="post" asp-page-handler="AddSampleItems" class="d-inline">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="fas fa-plus"></i> Add Demo Items
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Update cart count in navbar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('cartCount').textContent = '@Model.TotalItems';
+        });
+    </script>
+}

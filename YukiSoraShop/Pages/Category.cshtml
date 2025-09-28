@@ -1,0 +1,41 @@
+﻿@page
+@model YukiSoraShop.Pages.CategoryModel
+@{
+    ViewData["Title"] = "Phân loại sản phẩm";
+}
+
+<h2 class="text-center text-primary mb-4">Phân loại sản phẩm</h2>
+
+<!-- Nút phân loại -->
+<div class="d-flex flex-wrap justify-content-center mb-4">
+    @foreach (var cat in Model.Categories)
+    {
+        <a asp-page="/Category" asp-route-category="@cat" class="btn btn-outline-primary m-2 px-4">@cat</a>
+    }
+</div>
+
+<!-- Danh sách sản phẩm -->
+@if (Model.Products.Any())
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="@product.ImageUrl" class="card-img-top img-fluid" alt="@product.Name" />
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">@product.Name</h5>
+                        <p class="card-text text-danger fw-bold">@product.Price.ToString("N0") VNĐ</p>
+                        <a asp-page="/ProductDetail" asp-route-id="@product.Id" class="btn btn-primary w-100">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center mt-4">
+        Vui lòng chọn một phân loại để xem sản phẩm.
+    </div>
+}

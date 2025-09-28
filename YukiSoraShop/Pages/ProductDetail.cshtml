@@ -1,0 +1,26 @@
+﻿@page
+@model YukiSoraShop.Pages.ProductDetailModel
+@{
+ 
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+<div class="row">
+    <div class="col-md-6 text-center">
+        <img src="@Model.Product.ImageUrl" class="img-fluid rounded shadow-sm mb-3" alt="@Model.Product.Name" />
+    </div>
+    <div class="col-md-6">
+        <h2 class="text-primary">@Model.Product.Name</h2>
+        <p class="text-muted">@Model.Product.Description</p>
+        <h4 class="text-danger fw-bold">@Model.Product.Price.ToString("N0") VNĐ</h4>
+        <button class="btn btn-success mt-3 px-4">Thêm vào giỏ hàng</button>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Chất liệu:</strong> @Model.Product.Material</li>
+        <li class="list-group-item"><strong>Kích thước:</strong> @Model.Product.Size</li>
+        <li class="list-group-item"><strong>Giới tính:</strong> @Model.Product.Gender</li>
+        <li class="list-group-item"><strong>Tồn kho:</strong> @Model.Product.StockQuantity sản phẩm</li>
+        <li class="list-group-item"><strong>Đánh giá:</strong> ⭐ @Model.Product.Rating / 5</li>
+        <li class="list-group-item"><strong>Từ khóa:</strong> @string.Join(", ", Model.Product.Tags)</li>
+    </ul>
+</div>
+

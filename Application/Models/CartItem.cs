@@ -1,4 +1,4 @@
-﻿namespace YukiSoraShop.Models
+﻿namespace Application.Models
 {
     public class CartItem
     {

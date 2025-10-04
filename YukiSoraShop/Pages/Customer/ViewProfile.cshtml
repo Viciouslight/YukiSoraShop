@@ -53,23 +53,23 @@
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Address:</strong></div>
                         <div class="col-sm-8">
-                            <i class="fas fa-map-marker-alt text-danger"></i> @Model.CurrentUser.Address
+                            <i class="fas fa-map-marker-alt text-danger"></i> @Model.CurrentUser.PhoneNumber
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Date of Birth:</strong></div>
                         <div class="col-sm-8">
-                            <i class="fas fa-birthday-cake text-warning"></i> @Model.CurrentUser.DateOfBirth.ToString("dd/MM/yyyy")
+                            <i class="fas fa-birthday-cake text-warning"></i> @Model.CurrentUser.PhoneNumber
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Gender:</strong></div>
-                        <div class="col-sm-8">@Model.CurrentUser.Gender</div>
+                        <div class="col-sm-8">@Model.CurrentUser.Address</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Member Since:</strong></div>
                         <div class="col-sm-8">
-                            <i class="fas fa-calendar-alt text-info"></i> @Model.CurrentUser.CreatedAt.ToString("dd/MM/yyyy")
+                            <i class="fas fa-calendar-alt text-info"></i> @Model.CurrentUser.DateOfBirth.ToString("dd/MM/yyyy")
                         </div>
                     </div>
                 </div>

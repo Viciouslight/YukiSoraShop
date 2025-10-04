@@ -1,6 +1,6 @@
-﻿using YukiSoraShop.Models;
+﻿using Application.Models;
 
-namespace YukiSoraShop.Services
+namespace Application.Services.Interfaces
 {
     public interface IProductService
     {

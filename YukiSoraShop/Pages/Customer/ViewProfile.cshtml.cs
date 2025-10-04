@@ -1,8 +1,8 @@
+using Application.Models;
+using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YukiSoraShop.Extensions;
-using YukiSoraShop.Models;
-using YukiSoraShop.Services;
 
 namespace YukiSoraShop.Pages.Customer
 {

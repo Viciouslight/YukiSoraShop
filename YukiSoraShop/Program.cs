@@ -1,4 +1,6 @@
-using YukiSoraShop.Services;
+using Application.Services;
+using Application.Services.Interfaces;
+using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
 
 // Register custom services
 builder.Services.AddSingleton<IUserService, UserService>();

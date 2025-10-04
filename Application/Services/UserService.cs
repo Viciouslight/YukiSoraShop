@@ -1,6 +1,7 @@
-﻿using YukiSoraShop.Models;
+﻿using Application.Models;
+using Application.Services.Interfaces;
 
-namespace YukiSoraShop.Services
+namespace Application.Services
 {
     public class UserService : IUserService
     {

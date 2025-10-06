@@ -25,8 +25,8 @@ namespace YukiSoraShop
             builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
 
             // Register custom services
-            builder.Services.AddSingleton<IUserService, UserService>();
-            builder.Services.AddSingleton<IProductService, ProductService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             var app = builder.Build();
 

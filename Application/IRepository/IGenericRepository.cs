@@ -12,7 +12,7 @@ namespace Application.IRepository
     {
         Task AddAsync(TModel model);
         void Update(TModel model);
-        void Delete(TModel model);
+        void HardDelete(TModel model);
         void SoftDelete(TModel model);
         Task<IEnumerable<TModel>> GetAllAsync();
         Task<TModel> GetByIdAsync(int id);

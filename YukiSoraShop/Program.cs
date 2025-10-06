@@ -2,43 +2,52 @@ using Application.Services;
 using Application.Services.Interfaces;
 using Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container
-builder.Services.AddRazorPages();
-
-// Add session services
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
+namespace YukiSoraShop
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
 
-builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
+            var builder = WebApplication.CreateBuilder(args);
+            // Add services to the container
+            builder.Services.AddRazorPages();
 
-// Register custom services
-builder.Services.AddSingleton<IUserService, UserService>();
-builder.Services.AddSingleton<IProductService, ProductService>();
+            // Add session services
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
-var app = builder.Build();
+            builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
 
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
+            // Register custom services
+            builder.Services.AddSingleton<IUserService, UserService>();
+            builder.Services.AddSingleton<IProductService, ProductService>();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+            app.UseSession();
+            app.UseAuthorization();
+
+            app.MapRazorPages();
+
+
+            app.Run();
+        }
+    }
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-app.UseSession();
-app.UseAuthorization();
-
-app.MapRazorPages();
-
-
-app.Run();

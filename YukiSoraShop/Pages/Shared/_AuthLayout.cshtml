@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - YukiSora Shop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .auth-image-container {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .auth-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .auth-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-content {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .auth-form-container {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            margin: 1rem 0;
+        }
+
+        .auth-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #e9ecef;
+            border-radius: 0 10px 10px 0;
+            color: #6c757d;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .form-check-input:checked {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+
+        .text-decoration-none {
+            color: #6c5ce7;
+        }
+
+        .text-decoration-none:hover {
+            color: #5a4fcf;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-danger {
+            background-color: #ffe6e6;
+            color: #d63031;
+        }
+
+        .alert-success {
+            background-color: #d1f2eb;
+            color: #00b894;
+        }
+
+        @@media (max-width: 991.98px) {
+            .auth-image-container {
+                height: 50vh;
+            }
+            
+            .auth-form-container {
+                margin: 0.5rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -9,10 +9,12 @@ namespace Infrastructure.Repository
     public class GenericRepository<TModel> : IGenericRepository<TModel> where TModel : BaseFullEntity
     {
         protected DbSet<TModel> _dbSet;
+        protected AppDbContext _dbContext;
 
         public GenericRepository(AppDbContext dbContext)
         {
             _dbSet = dbContext.Set<TModel>();
+            _dbContext = dbContext;
         }
 
         public async Task AddAsync(TModel model)
@@ -84,6 +86,11 @@ namespace Infrastructure.Repository
             }
 
             return await query.Where(x => !x.IsDeleted).FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

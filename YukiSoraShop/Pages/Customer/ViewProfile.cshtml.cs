@@ -19,17 +19,42 @@ namespace YukiSoraShop.Pages.Customer
 
         public void OnGet()
         {
-            // Try to get user from session
-            CurrentUser = HttpContext.Session.GetObject<User>("CurrentUser");
-
-            // If no user in session, load default user
-            if (CurrentUser == null)
+            try
             {
-                CurrentUser = _userService.GetUserById(1);
-                if (CurrentUser != null)
+                // Get user info from login session
+                var userEmail = HttpContext.Session.GetString("UserEmail");
+                var userName = HttpContext.Session.GetString("UserName");
+                var userId = HttpContext.Session.GetString("UserId");
+                
+                // Debug: Log session data
+                Console.WriteLine($"Session - Email: {userEmail}, Name: {userName}, ID: {userId}");
+
+                if (!string.IsNullOrEmpty(userEmail) && !string.IsNullOrEmpty(userId))
                 {
-                    HttpContext.Session.SetObject("CurrentUser", CurrentUser);
+                    // Create user object from session data
+                    CurrentUser = new User
+                    {
+                        Id = int.TryParse(userId, out int id) ? id : 1,
+                        FullName = userName ?? "User",
+                        Email = userEmail,
+                        Username = userEmail.Split('@')[0], // Extract username from email
+                        PhoneNumber = HttpContext.Session.GetString("UserPhone") ?? "",
+                        Address = HttpContext.Session.GetString("UserAddress") ?? "",
+                        DateOfBirth = DateTime.Now.AddYears(-25), // Default age
+                        AvatarUrl = "https://via.placeholder.com/150x150/007bff/ffffff?text=" + (userName?.Substring(0, 1).ToUpper() ?? "U")
+                    };
                 }
+                else
+                {
+                    // If not logged in, redirect to login
+                    Response.Redirect("/Auth/Login");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error and redirect to login
+                Console.WriteLine($"Error in ViewProfile: {ex.Message}");
+                Response.Redirect("/Auth/Login");
             }
         }
 

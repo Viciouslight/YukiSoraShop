@@ -18,5 +18,11 @@ namespace Infrastructure.Repository
         {
             _appDbContext = dbContext;
         }
+
+        public async Task<Account?> GetByEmailAsync(string email)
+        {
+            return await _appDbContext.Accounts
+                .FirstOrDefaultAsync(a => a.Email == email && !a.IsDeleted);
+        }
     }
 }

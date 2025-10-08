@@ -23,6 +23,7 @@ namespace YukiSoraShop
             });
 
             builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
+            builder.Services.AddPaymentServices(builder.Configuration);
 
             // Register custom services
             builder.Services.AddScoped<IUserService, UserService>();

@@ -1,8 +1,8 @@
-﻿using Domain.Common;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class Invoice : BaseFullEntity
 {
@@ -18,3 +18,4 @@ public partial class Invoice : BaseFullEntity
 
     public virtual Order Order { get; set; } = null!;
 }
+

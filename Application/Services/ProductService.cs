@@ -1,13 +1,13 @@
-﻿using Application.Models;
+﻿using Application.DTOs;
 using Application.Services.Interfaces;
 
 namespace Application.Services
 {
     public class ProductService : IProductService
     {
-        private static readonly List<Product> _products = new()
+        private static readonly List<ProductDto> _products = new()
         {
-            new Product
+            new ProductDto
             {
                 Id = 1,
                 Name = "iPhone 15 Pro",
@@ -18,7 +18,7 @@ namespace Application.Services
                 Stock = 50,
                 IsAvailable = true
             },
-            new Product
+            new ProductDto
             {
                 Id = 2,
                 Name = "Samsung Galaxy S24",
@@ -29,7 +29,7 @@ namespace Application.Services
                 Stock = 30,
                 IsAvailable = true
             },
-            new Product
+            new ProductDto
             {
                 Id = 3,
                 Name = "MacBook Air M3",
@@ -40,7 +40,7 @@ namespace Application.Services
                 Stock = 20,
                 IsAvailable = true
             },
-            new Product
+            new ProductDto
             {
                 Id = 4,
                 Name = "Dell XPS 13",
@@ -51,7 +51,7 @@ namespace Application.Services
                 Stock = 15,
                 IsAvailable = true
             },
-            new Product
+            new ProductDto
             {
                 Id = 5,
                 Name = "AirPods Pro",
@@ -64,17 +64,17 @@ namespace Application.Services
             }
         };
 
-        public Product? GetProductById(int id)
+        public ProductDto? GetProductById(int id)
         {
             return _products.FirstOrDefault(p => p.Id == id);
         }
 
-        public List<Product> GetAllProducts()
+        public List<ProductDto> GetAllProducts()
         {
             return _products;
         }
 
-        public List<Product> GetProductsByCategory(string category)
+        public List<ProductDto> GetProductsByCategory(string category)
         {
             return _products.Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
         }

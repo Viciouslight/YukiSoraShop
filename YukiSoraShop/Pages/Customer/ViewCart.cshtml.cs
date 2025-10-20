@@ -1,11 +1,13 @@
 using Application.Services.Interfaces;
-using Application.Models;
+using Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YukiSoraShop.Extensions;
 
 namespace YukiSoraShop.Pages.Customer
 {
+    [Authorize]
     public class ViewCartModel : PageModel
     {
         private readonly IProductService _productService;
@@ -15,7 +17,7 @@ namespace YukiSoraShop.Pages.Customer
             _productService = productService;
         }
 
-        public List<CartItem> CartItems { get; set; } = new();
+        public List<CartItemDto> CartItems { get; set; } = new();
         public decimal TotalAmount => CartItems.Sum(item => item.TotalPrice);
         public int TotalItems => CartItems.Sum(item => item.Quantity);
 
@@ -39,7 +41,7 @@ namespace YukiSoraShop.Pages.Customer
                 }
                 else
                 {
-                    CartItems.Add(new CartItem
+                    CartItems.Add(new CartItemDto
                     {
                         Product = product,
                         Quantity = 1
@@ -89,7 +91,7 @@ namespace YukiSoraShop.Pages.Customer
 
         private void LoadCartFromSession()
         {
-            CartItems = HttpContext.Session.GetObject<List<CartItem>>("ShoppingCart") ?? new List<CartItem>();
+            CartItems = HttpContext.Session.GetObject<List<CartItemDto>>("ShoppingCart") ?? new List<CartItemDto>();
         }
 
         private void SaveCartToSession()

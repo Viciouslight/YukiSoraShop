@@ -1,9 +1,9 @@
-﻿using Domain.Common;
+using Domain.Common;
 using Domain.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class Payment : BaseFullEntity
 {
@@ -25,3 +25,4 @@ public partial class Payment : BaseFullEntity
 
     public virtual PaymentMethod PaymentMethod { get; set; } = null!;
 }
+

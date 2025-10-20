@@ -1,4 +1,4 @@
-using Domain.Entities;
+using Application.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -46,6 +46,99 @@ public partial class AppDbContext
                 
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true);
+        });
+
+        // Configure Role entity
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("Roles");
+            
+            entity.Property(e => e.RoleName)
+                .IsRequired()
+                .HasMaxLength(50);
+                
+            entity.HasIndex(e => e.RoleName)
+                .IsUnique()
+                .HasDatabaseName("IX_Roles_RoleName_Unique");
+
+            // Seed default roles
+            entity.HasData(
+                new 
+                { 
+                    Id = 1, 
+                    RoleName = "Customer", 
+                    Description = "Khách hàng", 
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System", 
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new 
+                { 
+                    Id = 2, 
+                    RoleName = "Administrator", 
+                    Description = "Quản trị viên", 
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System", 
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new 
+                { 
+                    Id = 3, 
+                    RoleName = "Moderator", 
+                    Description = "Điều hành viên", 
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System", 
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                }
+            );
+        });
+
+        // Configure Account-Role relationship
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.HasOne(d => d.Role)
+                .WithMany(p => p.Accounts)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Accounts_Roles_RoleId");
+
+            entity.Property(e => e.RoleId)
+                .HasDefaultValue(1); // Default to Customer role
+        });
+
+        // Configure ProductDetail entity
+        modelBuilder.Entity<ProductDetail>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("ProductDetails");
+
+            entity.HasOne(d => d.Product)
+                .WithMany(p => p.ProductDetails)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_ProductDetails_Products_ProductId");
+
+            entity.Property(e => e.Color)
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Size)
+                .HasMaxLength(20);
+
+            entity.Property(e => e.Material)
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Origin)
+                .HasMaxLength(100);
+
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500);
         });
     }
 }

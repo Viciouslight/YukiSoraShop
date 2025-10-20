@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Models
+namespace Application.DTOs
 {
     public class LoginModel
     {
@@ -20,3 +20,4 @@ namespace Application.Models
         public string? ReturnUrl { get; set; }
     }
 }
+

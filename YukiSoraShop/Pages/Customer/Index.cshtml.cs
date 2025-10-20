@@ -1,5 +1,5 @@
 using Application.Services.Interfaces;
-using Application.Models;
+using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -14,7 +14,7 @@ namespace YukiSoraShop.Pages.Customer
             _productService = productService;
         }
 
-        public List<Product> Products { get; set; } = new();
+        public List<ProductDto> Products { get; set; } = new();
 
         public void OnGet()
         {

@@ -1,7 +1,7 @@
 using Domain.Common;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class Category : BaseFullEntity
 {
@@ -13,3 +13,4 @@ public partial class Category : BaseFullEntity
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }
+

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Models
+namespace Application.DTOs
 {
     public class ForgotPasswordModel
     {
@@ -10,3 +10,4 @@ namespace Application.Models
         public string Email { get; set; } = string.Empty;
     }
 }
+

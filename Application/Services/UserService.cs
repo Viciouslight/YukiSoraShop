@@ -1,8 +1,7 @@
 ﻿using Application.Models;
+using Application.DTOs;
 using Application.Services.Interfaces;
 using Application.IRepository;
-using Domain.Entities;
-using Domain.Enums;
 
 namespace Application.Services
 {
@@ -15,12 +14,12 @@ namespace Application.Services
             _accountRepository = accountRepository;
         }
 
-        public User? GetUserById(int id)
+        public UserDto? GetUserById(int id)
         {
             var account = _accountRepository.GetByIdAsync(id).Result;
             if (account == null) return null;
 
-            return new User
+            return new UserDto
             {
                 Id = account.Id,
                 Username = account.UserName,
@@ -31,10 +30,10 @@ namespace Application.Services
             };
         }
 
-        public List<User> GetAllUsers()
+        public List<UserDto> GetAllUsers()
         {
             var accounts = _accountRepository.GetAllAsync().Result;
-            return accounts.Select(account => new User
+            return accounts.Select(account => new UserDto
             {
                 Id = account.Id,
                 Username = account.UserName,
@@ -45,7 +44,7 @@ namespace Application.Services
             }).ToList();
         }
 
-        public async Task<bool> RegisterAsync(Application.Models.RegisterModel model)
+        public async Task<bool> RegisterAsync(RegisterModel model)
         {
             try
             {
@@ -63,7 +62,7 @@ namespace Application.Services
                     Email = model.Email,
                     FullName = model.FullName,
                     PhoneNumber = model.PhoneNumber,
-                    Role = AccountRole.Customer,
+                    RoleId = 1, // Default to Customer role
                     Status = "Active",
                     IsExternal = false,
                     CreatedAt = DateTime.Now,

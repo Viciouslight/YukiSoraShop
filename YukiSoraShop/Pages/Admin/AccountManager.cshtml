@@ -1,0 +1,67 @@
+﻿@page
+@model YukiSoraShop.Pages.Admin.AccountManagerModel
+
+@{
+    ViewData["Title"] = "Quản Lý Tài Khoản";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+        <a asp-page="./Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Thêm Tài Khoản Mới
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Email</th>
+                            <th>Quyền Admin</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Accounts != null)
+                        {
+                            @foreach (var account in Model.Accounts)
+                            {
+                                <tr>
+                                    <td>@account.Id</td>
+                                    <td>@account.Username</td>
+                                    <td>@account.Email</td>
+                                    <td>
+                                        @if (account.IsAdmin)
+                                        {
+                                            <span class="badge bg-primary text-white">Admin</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary text-white">User</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-page="./Edit" asp-route-id="@account.Id" class="btn btn-sm btn-info me-2">Sửa</a>
+                                        <a asp-page="./Details" asp-route-id="@account.Id" class="btn btn-sm btn-secondary me-2">Chi tiết</a>
+                                        <a asp-page="./Delete" asp-route-id="@account.Id" class="btn btn-sm btn-danger">Xóa</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">Không có dữ liệu tài khoản nào được tìm thấy.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

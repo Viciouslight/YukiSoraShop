@@ -1,0 +1,59 @@
+﻿@page
+@model YukiSoraShop.Pages.Admin.ProductManagerModel
+
+@{
+    ViewData["Title"] = "Quản Lý Sản Phẩm";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+        <a asp-page="./ProductManager/Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Thêm Sản Phẩm Mới
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Tồn kho</th>
+                            <th>Danh mục</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Products != null)
+                        {
+                            @foreach (var product in Model.Products)
+                            {
+                                <tr>
+                                    <td>@product.Id</td>
+                                    <td>@product.Name</td>
+                                    <td>@product.Price.ToString("N0") VNĐ</td>
+                                    <td>@product.StockQuantity</td>
+                                    <td>@product.Category</td>
+                                    <td>
+                                        <a asp-page="./ProductManager/Edit" asp-route-id="@product.Id" class="btn btn-sm btn-info me-2">Sửa</a>
+                                        <a asp-page="./ProductManager/Delete" asp-route-id="@product.Id" class="btn btn-sm btn-danger">Xóa</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">Không có dữ liệu sản phẩm nào được tìm thấy.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

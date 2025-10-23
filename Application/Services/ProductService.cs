@@ -1,10 +1,15 @@
 ﻿using Application.DTOs;
+using Application.Models;
 using Application.Services.Interfaces;
+using Application.IRepository;
 
 namespace Application.Services
 {
     public class ProductService : IProductService
     {
+        private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
+
         private static readonly List<ProductDto> _products = new()
         {
             new ProductDto
@@ -64,6 +69,13 @@ namespace Application.Services
             }
         };
 
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        {
+            _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
+        }
+
+        // DTO methods for display (using static data for now)
         public ProductDto? GetProductById(int id)
         {
             return _products.FirstOrDefault(p => p.Id == id);
@@ -77,6 +89,112 @@ namespace Application.Services
         public List<ProductDto> GetProductsByCategory(string category)
         {
             return _products.Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Entity methods for CRUD operations
+        public async Task<List<Product>> GetAllProductsAsync()
+        {
+            try
+            {
+                var products = await _productRepository.GetAllAsync();
+                return products.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting products: {ex.Message}");
+                return new List<Product>();
+            }
+        }
+
+        public async Task<Product?> GetProductEntityByIdAsync(int id)
+        {
+            try
+            {
+                return await _productRepository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting product by id: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<bool> CreateProductAsync(Product product)
+        {
+            try
+            {
+                await _productRepository.AddAsync(product);
+                await _productRepository.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating product: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateProductAsync(Product product)
+        {
+            try
+            {
+                _productRepository.Update(product);
+                await _productRepository.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteProductAsync(int id)
+        {
+            try
+            {
+                var product = await _productRepository.GetByIdAsync(id);
+                if (product != null)
+                {
+                    _productRepository.SoftDelete(product);
+                    await _productRepository.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting product: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Category methods
+        public async Task<List<Category>> GetAllCategoriesAsync()
+        {
+            try
+            {
+                var categories = await _categoryRepository.GetAllAsync();
+                return categories.ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting categories: {ex.Message}");
+                return new List<Category>();
+            }
+        }
+
+        public async Task<Category?> GetCategoryByIdAsync(int id)
+        {
+            try
+            {
+                return await _categoryRepository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting category by id: {ex.Message}");
+                return null;
+            }
         }
     }
 }

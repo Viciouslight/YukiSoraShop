@@ -385,6 +385,16 @@ namespace Infrastructure.Migrations
                     { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Điều hành viên", false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Moderator" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Accounts",
+                columns: new[] { "Id", "CreatedAt", "CreatedBy", "Email", "ExternalProvider", "FullName", "IsDeleted", "IsExternal", "ModifiedAt", "ModifiedBy", "Password", "PhoneNumber", "RoleId", "Status", "UserName" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "admin@gmail.com", null, "Administrator", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "admin123", "0123456789", 2, "Active", "admin@gmail.com" },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "staff@gmail.com", null, "Staff Member", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "staff123", "0123456788", 3, "Active", "staff@gmail.com" },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "customer@gmail.com", null, "Customer User", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "customer123", "0123456787", 1, "Active", "customer@gmail.com" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_RoleId",
                 table: "Accounts",

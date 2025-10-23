@@ -83,6 +83,59 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Accounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            Email = "admin@gmail.com",
+                            FullName = "Administrator",
+                            IsDeleted = false,
+                            IsExternal = false,
+                            ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ModifiedBy = "System",
+                            Password = "admin123",
+                            PhoneNumber = "0123456789",
+                            RoleId = 2,
+                            Status = "Active",
+                            UserName = "admin@gmail.com"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            Email = "staff@gmail.com",
+                            FullName = "Staff Member",
+                            IsDeleted = false,
+                            IsExternal = false,
+                            ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ModifiedBy = "System",
+                            Password = "staff123",
+                            PhoneNumber = "0123456788",
+                            RoleId = 3,
+                            Status = "Active",
+                            UserName = "staff@gmail.com"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedBy = "System",
+                            Email = "customer@gmail.com",
+                            FullName = "Customer User",
+                            IsDeleted = false,
+                            IsExternal = false,
+                            ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ModifiedBy = "System",
+                            Password = "customer123",
+                            PhoneNumber = "0123456787",
+                            RoleId = 1,
+                            Status = "Active",
+                            UserName = "customer@gmail.com"
+                        });
                 });
 
             modelBuilder.Entity("Application.Models.Cart", b =>

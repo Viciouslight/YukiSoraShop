@@ -111,6 +111,64 @@ public partial class AppDbContext
 
             entity.Property(e => e.RoleId)
                 .HasDefaultValue(1); // Default to Customer role
+
+            // Seed default accounts
+            entity.HasData(
+                new 
+                { 
+                    Id = 1, 
+                    UserName = "admin@gmail.com",
+                    FullName = "Administrator",
+                    Email = "admin@gmail.com",
+                    Password = "admin123",
+                    PhoneNumber = "0123456789",
+                    RoleId = 2, // Administrator role
+                    Status = "Active",
+                    IsExternal = false,
+                    ExternalProvider = (string)null,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System", 
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new 
+                { 
+                    Id = 2, 
+                    UserName = "staff@gmail.com",
+                    FullName = "Staff Member",
+                    Email = "staff@gmail.com",
+                    Password = "staff123",
+                    PhoneNumber = "0123456788",
+                    RoleId = 3, // Moderator role
+                    Status = "Active",
+                    IsExternal = false,
+                    ExternalProvider = (string)null,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System", 
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new 
+                { 
+                    Id = 3, 
+                    UserName = "customer@gmail.com",
+                    FullName = "Customer User",
+                    Email = "customer@gmail.com",
+                    Password = "customer123",
+                    PhoneNumber = "0123456787",
+                    RoleId = 1, // Customer role
+                    Status = "Active",
+                    IsExternal = false,
+                    ExternalProvider = (string)null,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System", 
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                }
+            );
         });
 
         // Configure ProductDetail entity

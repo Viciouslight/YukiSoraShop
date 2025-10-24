@@ -2,108 +2,154 @@
 @using YukiSoraShop.Pages.Customer
 @model YukiSoraShop.Pages.Customer.IndexModel
 @{
-	ViewData["Title"] = "Home";
+    ViewData["Title"] = "YukiSora Technology";
+    Layout = "~/Pages/Shared/_AuthLayout.cshtml";
 }
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
+<div class="container-fluid px-0">
 
-<div class="row">
-	<div class="col-12">
-		<h1 class="mb-4">Welcome to YukiSoraShop</h1>
-		<p class="lead">Khám phá thế giới điện thoại thông minh và quản lý giỏ hàng của bạn!</p>
-	</div>
-</div>
+    <!-- Hero Section -->
+    <section class="hero-section d-flex align-items-center justify-content-center text-center position-relative" style="height: 90vh; background: url('/images/jewelry-hero.jpg') center/cover no-repeat;">
+        <div class="overlay position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(0,0,0,0.5);"></div>
+        <div class="hero-content position-relative text-white">
+            <h1 class="display-3 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">YukiSora Technology</h1>
+            <p class="lead mb-4" style="font-weight: 300;">Khám phá công nghệ, sự lụa chọn luôn thuộc về bạn!</p>
+            <a href="#featured-products" class="btn btn-light btn-lg px-5 rounded-pill shadow-sm">Khám phá ngay</a>
+        </div>
+    </section>
 
-<div class="row">
-	<div class="col-md-6 mb-4">
-		<div class="card h-100">
-			<div class="card-body text-center">
-				<i class="fas fa-user fa-3x text-primary mb-3"></i>
-				<h5 class="card-title">Khu vực khách hàng</h5>
-				<p class="card-text">Truy cập hồ sơ, giỏ hàng và các tính năng khách hàng.</p>
-				@{
-					var userEmail = HttpContext.Session.GetString("UserEmail");
-				}
-				@if (string.IsNullOrEmpty(userEmail))
-				{
-					<a href="/Auth/Login" class="btn btn-primary">Đăng nhập để truy cập</a>
-				}
-				else
-				{
-					<a href="/Customer/ViewProfile" class="btn btn-primary">Go to Customer Area</a>
-				}
-			</div>
-		</div>
-	</div>
-	<div class="col-md-6 mb-4">
-		<div class="card h-100">
-			<div class="card-body text-center">
-				<i class="fas fa-shopping-cart fa-3x text-success mb-3"></i>
-				<h5 class="card-title">Quick Cart Access</h5>
-				<p class="card-text">View your shopping cart directly from here.</p>
-				<a href="/Customer/ViewCart" class="btn btn-success">Go to Cart</a>
-			</div>
-		</div>
-	</div>
-</div>
+    <!-- About Section -->
+    <section class="py-5 bg-light text-center">
+        <div class="container">
+            <h2 class="fw-bold mb-4" style="font-family: 'Playfair Display', serif;">Vẻ Đẹp Bắt Nguồn Từ Sự Tinh Tế</h2>
+            <p class="text-muted mx-auto" style="max-width: 700px;">
+                Mỗi sản phẩm tại YukiSora đều được chế tác tỉ mỉ từ những bàn tay tài hoa, kết hợp giữa nghệ thuật và phong cách hiện đại,
+                mang đến vẻ đẹp vừa sang trọng vừa ý nghĩa. Ngoài ra hiệu năng sử dụng và sức mạnh của từng sản phẩm đều luôn làm mọi khách hàng hài lòng
+            </p>
+        </div>
+    </section>
 
-<div class="row mt-5">
-	<div class="col-12">
-		<h2 class="mb-4">Featured Products</h2>
-	</div>
-</div>
+    <!-- Quick Access Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4 hover-lift">
+                        <i class="fas fa-user-circle fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold mb-2">Khu vực khách hàng</h5>
+                        <p class="text-muted mb-4">Xem hồ sơ, đơn hàng và những sản phẩm yêu thích của bạn.</p>
+                        @{
+                            var userEmail = HttpContext.Session.GetString("UserEmail");
+                        }
+                        @if (string.IsNullOrEmpty(userEmail))
+                        {
+                            <a href="/Auth/Login" class="btn btn-outline-dark px-4 rounded-pill">Đăng nhập</a>
+                        }
+                        else
+                        {
+                            <a href="/Customer/ViewProfile" class="btn btn-outline-dark px-4 rounded-pill">Vào khu vực khách hàng</a>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4 hover-lift">
+                        <i class="fas fa-gem fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold mb-2">Giỏ hàng của bạn</h5>
+                        <p class="text-muted mb-4">Xem lại các sản phẩm bạn yêu thích và sẵn sàng sở hữu.</p>
+                        <a href="/Customer/ViewCart" class="btn btn-outline-dark px-4 rounded-pill">Xem giỏ hàng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<div class="row">
-	@if (Model.Products != null && Model.Products.Any())
-	{
-		@foreach (var product in Model.Products)
-		{
-			<div class="col-md-4 mb-4">
-				<div class="card h-100">
-					<img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;">
-					<div class="card-body d-flex flex-column">
-						<h5 class="card-title">@product.Name</h5>
-						<p class="card-text flex-grow-1">@product.Description</p>
-						<div class="mt-auto">
-							<p class="card-text">
-								<strong class="text-success">@product.Price.ToString("N0") VNĐ</strong>
-							</p>
-							<button class="btn btn-outline-primary btn-sm" onclick="addToCart(@product.Id, '@product.Name', @product.Price)">
-								Add to Cart
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		}
-	}
-	else
-	{
-		<div class="col-12">
-			<div class="alert alert-info">
-				<p>No products available at the moment.</p>
-				<a href="/Customer" class="btn btn-primary">Visit Customer Area</a>
-			</div>
-		</div>
-	}
+    <!-- Featured Products Section -->
+    <section id="featured-products" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold" style="font-family: 'Playfair Display', serif;">Bộ Sưu Tập Nổi Bật</h2>
+                <p class="text-muted">Khám phá những thiết kế được yêu thích nhất của chúng tôi</p>
+            </div>
+
+            <div class="row g-4">
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card border-0 shadow-sm h-100 text-center hover-lift">
+                                <img src="@product.ImageUrl" class="card-img-top rounded-top" alt="@product.Name" style="height: 250px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">@product.Name</h5>
+                                    <p class="text-muted small">@product.Description</p>
+                                    <p class="text-warning fw-bold mb-3">@product.Price.ToString("N0") VNĐ</p>
+                                    <button class="btn btn-dark btn-sm px-3 rounded-pill" onclick="addToCart(@product.Id, '@product.Name', @product.Price)">
+                                        <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning border-0 shadow-sm">
+                            Hiện chưa có sản phẩm nào trong bộ sưu tập.
+                            <a href="/Customer" class="btn btn-outline-dark ms-2">Quay lại</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5 text-center bg-dark text-white">
+        <div class="container">
+            <h3 class="fw-bold mb-3">Tham gia cộng đồng YukiSora Technology</h3>
+            <p class="text-light mb-4">Đăng ký ngay để nhận ưu đãi độc quyền và khám phá bộ sưu tập mới nhất.</p>
+            <a href="/Auth/Register" class="btn btn-warning btn-lg px-5 rounded-pill">Đăng ký ngay</a>
+        </div>
+    </section>
+
 </div>
 
 @section Scripts {
-	<script>
-		function addToCart(id, name, price) {
-			// Simulate adding to cart
-			let currentCount = parseInt(document.getElementById('cartCount')?.textContent || '0');
-			if (document.getElementById('cartCount')) {
-				document.getElementById('cartCount').textContent = currentCount + 1;
-			}
+    <script>
+        function addToCart(id, name, price) {
+            let currentCount = parseInt(document.getElementById('cartCount')?.textContent || '0');
+            if (document.getElementById('cartCount')) {
+                document.getElementById('cartCount').textContent = currentCount + 1;
+            }
+            alert(`Đã thêm "${name}" vào giỏ hàng!`);
+        }
 
-			alert(`Added "${name}" to cart!`);
-		}
-	</script>
-} 
+        // Hover lift animation
+        document.querySelectorAll('.hover-lift').forEach(el => {
+            el.addEventListener('mouseenter', () => el.classList.add('shadow-lg', 'translate-up'));
+            el.addEventListener('mouseleave', () => el.classList.remove('shadow-lg', 'translate-up'));
+        });
+    </script>
+
+    <style>
+        .translate-up {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .hero-section .overlay {
+            backdrop-filter: brightness(60%);
+        }
+
+        .hero-section .hero-content h1,
+        .hero-section .hero-content p {
+            animation: fadeInUp 1s ease;
+        }
+    </style>
+}

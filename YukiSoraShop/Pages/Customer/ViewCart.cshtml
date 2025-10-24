@@ -1,143 +1,224 @@
 ﻿@page
 @model YukiSoraShop.Pages.Customer.ViewCartModel
 @{
-    ViewData["Title"] = "Shopping Cart";
+    ViewData["Title"] = "Tech Cart - YukiSoraShop";
+    Layout = "~/Pages/Shared/_AuthLayout.cshtml";
 }
 
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-shopping-cart text-success"></i> Shopping Cart
-        </h1>
-    </div>
-</div>
+<div class="container py-5">
 
-@if (Model.CartItems.Any())
-{
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Cart Items (@Model.CartItems.Count items)</h5>
-                </div>
-                <div class="card-body p-0">
-                    @foreach (var item in Model.CartItems)
-                    {
-                        <div class="d-flex align-items-center border-bottom p-3">
-                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
-                                 class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+    <h1 class="text-center mb-5 fw-bold text-light">
+        <i class="fas fa-shopping-cart me-2 text-cyan"></i> Giỏ hàng của bạn
+    </h1>
 
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1">@item.Product.Name</h6>
-                                <p class="text-muted small mb-1">@item.Product.Description</p>
-                                <span class="badge bg-secondary">@item.Product.Category</span>
-                            </div>
-
-                            <div class="text-center me-3">
-                                <form method="post" asp-page-handler="UpdateQuantity" class="d-inline">
-                                    <input type="hidden" name="productId" value="@item.Product.Id" />
-                                    <div class="input-group input-group-sm" style="width: 120px;">
-                                        <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary">-</button>
-                                        <input type="text" class="form-control text-center" value="@item.Quantity" readonly>
-                                        <button type="submit" name="action" value="increase" class="btn btn-outline-secondary">+</button>
+    @if (Model.CartItems.Any())
+    {
+        <div class="row g-4">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="tech-card p-0">
+                    <div class="tech-card-header">
+                        <h5 class="m-0 text-cyan">Sản phẩm trong giỏ (@Model.CartItems.Count)</h5>
+                    </div>
+                    <div class="tech-card-body p-0">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="cart-item d-flex align-items-center justify-content-between p-3 border-bottom border-dark-subtle">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
+                                         class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="text-white mb-1">@item.Product.Name</h6>
+                                        <p class="text-muted small mb-1">@item.Product.Description</p>
+                                        <span class="badge bg-cyan text-dark">@item.Product.Category</span>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
 
-                            <div class="text-end me-3">
-                                <div class="fw-bold">@item.TotalPrice.ToString("N0") VNĐ</div>
-                                <div class="small text-muted">@item.Product.Price.ToString("N0") VNĐ/item</div>
-                            </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <!-- Quantity -->
+                                    <form method="post" asp-page-handler="UpdateQuantity" class="d-inline">
+                                        <input type="hidden" name="productId" value="@item.Product.Id" />
+                                        <div class="input-group input-group-sm" style="width: 110px;">
+                                            <button type="submit" name="action" value="decrease" class="btn btn-outline-cyan">-</button>
+                                            <input type="text" class="form-control text-center bg-dark text-light border-cyan" value="@item.Quantity" readonly>
+                                            <button type="submit" name="action" value="increase" class="btn btn-outline-cyan">+</button>
+                                        </div>
+                                    </form>
 
-                            <form method="post" asp-page-handler="RemoveItem" class="d-inline">
-                                <input type="hidden" name="productId" value="@item.Product.Id" />
-                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Remove this item?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                                    <!-- Price -->
+                                    <div class="text-end">
+                                        <div class="fw-bold text-cyan">@item.TotalPrice.ToString("N0") VNĐ</div>
+                                        <div class="small text-muted">@item.Product.Price.ToString("N0") VNĐ/item</div>
+                                    </div>
+
+                                    <!-- Remove -->
+                                    <form method="post" asp-page-handler="RemoveItem" class="d-inline">
+                                        <input type="hidden" name="productId" value="@item.Product.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle glow-red"
+                                                onclick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="col-lg-4">
+                <div class="tech-card">
+                    <div class="tech-card-header">
+                        <h5 class="text-cyan m-0">Tổng quan đơn hàng</h5>
+                    </div>
+                    <div class="tech-card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tạm tính:</span>
+                            <span>@Model.TotalAmount.ToString("N0") VNĐ</span>
                         </div>
-                    }
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Vận chuyển:</span>
+                            <span class="text-success">Miễn phí</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Thuế (10%):</span>
+                            <span>@((Model.TotalAmount * 0.1m).ToString("N0")) VNĐ</span>
+                        </div>
+                        <hr class="border-cyan">
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Tổng cộng:</strong>
+                            <strong class="text-cyan">@((Model.TotalAmount * 1.1m).ToString("N0")) VNĐ</strong>
+                        </div>
+
+                        <button type="button" class="btn btn-cyan w-100 mb-2 glow"
+                                onclick="alert('Checkout functionality coming soon!')">
+                            <i class="fas fa-credit-card me-2"></i> Thanh toán
+                        </button>
+
+                        <a href="/" class="btn btn-outline-light w-100">
+                            <i class="fas fa-arrow-left me-2"></i> Tiếp tục mua hàng
+                        </a>
+                    </div>
+                </div>
+
+                <div class="tech-card mt-3">
+                    <div class="tech-card-body text-center">
+                        <h6 class="mb-3 text-light">Thêm sản phẩm mẫu</h6>
+                        <form method="post" asp-page-handler="AddSampleItems" class="d-inline">
+                            <button type="submit" class="btn btn-outline-cyan w-100 glow">
+                                <i class="fas fa-plus"></i> Add Sample Products
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-5x text-cyan mb-4"></i>
+            <h3 class="text-light">Giỏ hàng trống</h3>
+            <p class="text-muted mb-4">Hãy chọn vài món công nghệ yêu thích nhé!</p>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Order Summary</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal (@Model.TotalItems items):</span>
-                        <span>@Model.TotalAmount.ToString("N0") VNĐ</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping:</span>
-                        <span class="text-success">Free</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Tax:</span>
-                        <span>@((Model.TotalAmount * 0.1m).ToString("N0")) VNĐ</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <strong>Total:</strong>
-                        <strong class="text-success">@((Model.TotalAmount * 1.1m).ToString("N0")) VNĐ</strong>
-                    </div>
-
-                    <button type="button" class="btn btn-success w-100 mb-2" onclick="alert('Checkout functionality would be implemented here!')">
-                        <i class="fas fa-credit-card"></i> Proceed to Checkout
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/" class="btn btn-cyan glow">
+                    <i class="fas fa-shopping-bag me-2"></i> Bắt đầu mua sắm
+                </a>
+                <form method="post" asp-page-handler="AddSampleItems" class="d-inline">
+                    <button type="submit" class="btn btn-outline-cyan glow">
+                        <i class="fas fa-plus me-2"></i> Thêm sản phẩm mẫu
                     </button>
-
-                    <a href="/" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-arrow-left"></i> Continue Shopping
-                    </a>
-                </div>
-            </div>
-
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6 class="card-title">Quick Add Demo Items</h6>
-                    <form method="post" asp-page-handler="AddSampleItems" class="d-inline">
-                        <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="fas fa-plus"></i> Add Sample Products
-                        </button>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
-    </div>
-}
-else
-{
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center py-5">
-                <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-                <h3 class="text-muted">Your cart is empty</h3>
-                <p class="text-muted mb-4">Add some products to get started!</p>
-
-                <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <a href="/" class="btn btn-primary">
-                        <i class="fas fa-shopping-bag"></i> Start Shopping
-                    </a>
-
-                    <form method="post" asp-page-handler="AddSampleItems" class="d-inline">
-                        <button type="submit" class="btn btn-outline-secondary">
-                            <i class="fas fa-plus"></i> Add Demo Items
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+    }
+</div>
 
 @section Scripts {
     <script>
-        // Update cart count in navbar
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('cartCount').textContent = '@Model.TotalItems';
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) {
+                cartCount.textContent = '@Model.TotalItems';
+            }
         });
     </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at top left, #111 0%, #000 100%);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .text-cyan {
+            color: #00e0ff !important;
+        }
+
+        .bg-cyan {
+            background-color: #00e0ff !important;
+        }
+
+        .border-cyan {
+            border-color: rgba(0, 224, 255, 0.4) !important;
+        }
+
+        .tech-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            color: #ddd;
+            box-shadow: 0 0 15px rgba(0, 224, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+            .tech-card:hover {
+                box-shadow: 0 0 20px rgba(0, 224, 255, 0.15);
+                transform: translateY(-3px);
+            }
+
+        .tech-card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tech-card-body {
+            padding: 1.25rem;
+        }
+
+        .btn-cyan {
+            background: linear-gradient(90deg, #00e0ff, #007bff);
+            color: #fff;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-cyan:hover {
+                background: linear-gradient(90deg, #00bcd4, #0056b3);
+            }
+
+        .btn-outline-cyan {
+            border: 1px solid #00e0ff;
+            color: #00e0ff;
+        }
+
+            .btn-outline-cyan:hover {
+                background-color: #00e0ff;
+                color: #000;
+            }
+
+        .glow {
+            box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+        }
+
+        .glow-red:hover {
+            box-shadow: 0 0 10px rgba(255, 80, 80, 0.6);
+        }
+
+        .cart-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+    </style>
 }

@@ -16,57 +16,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    @{
-                        var userEmail = Context.Session.GetString("UserEmail");
-                        var userName = Context.Session.GetString("UserName");
-                    }
-                    
-                    @if (string.IsNullOrEmpty(userEmail))
-                    {
-                        <!-- Chưa đăng nhập -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Auth/Login">
-                                <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Auth/Register">
-                                <i class="fas fa-user-plus"></i> Đăng ký
-                            </a>
-                        </li>
-                    }
-                    else
-                    {
-                        <!-- Đã đăng nhập -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user"></i> @userName
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Customer/ViewProfile">
-                                    <i class="fas fa-user-circle"></i> Profile
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/Auth/Logout">
-                                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                                </a></li>
-                            </ul>
-                        </li>
-                    }
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Customer/ViewCart">
-                            <i class="fas fa-shopping-cart"></i> Cart
-                            <span class="badge bg-danger" id="cartCount">0</span>
-                        </a>
-                    </li>
-                </ul>
+                @await Html.PartialAsync("_Navigation")
             </div>
         </div>
     </nav>

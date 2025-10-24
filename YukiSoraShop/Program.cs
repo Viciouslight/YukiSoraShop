@@ -40,6 +40,8 @@ namespace YukiSoraShop
             // Register custom services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<YukiSoraShop.Services.Interfaces.IAuthorizationService, YukiSoraShop.Services.AuthorizationService>();
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 

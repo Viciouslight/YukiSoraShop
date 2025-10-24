@@ -1,0 +1,96 @@
+@using YukiSoraShop.Services.Interfaces
+@inject IAuthorizationService AuthService
+
+@{
+    var userEmail = Context.Session.GetString("UserEmail");
+    var userName = Context.Session.GetString("UserName");
+}
+
+<ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+    </li>
+    
+    @if (!string.IsNullOrEmpty(userEmail))
+    {
+        @if (AuthService.IsAdmin())
+        {
+            <!-- Admin Menu - Dashboard only -->
+            <li class="nav-item">
+                <a class="nav-link" href="/Admin/Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+        }
+        else if (AuthService.IsStaff())
+        {
+            <!-- Staff Menu - Product Management -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-box"></i> Quản lý sản phẩm
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/Staff/Products">
+                        <i class="fas fa-list"></i> Danh sách sản phẩm
+                    </a></li>
+                    <li><a class="dropdown-item" href="/Staff/Products/Create">
+                        <i class="fas fa-plus"></i> Thêm sản phẩm
+                    </a></li>
+                    <li><a class="dropdown-item" href="/Staff/Categories">
+                        <i class="fas fa-tags"></i> Quản lý danh mục
+                    </a></li>
+                </ul>
+            </li>
+        }
+    }
+</ul>
+
+<ul class="navbar-nav">
+    @if (string.IsNullOrEmpty(userEmail))
+    {
+        <!-- Chưa đăng nhập -->
+        <li class="nav-item">
+            <a class="nav-link" href="/Auth/Login">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/Auth/Register">
+                <i class="fas fa-user-plus"></i> Đăng ký
+            </a>
+        </li>
+    }
+    else
+    {
+        <!-- Đã đăng nhập -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="fas fa-user"></i> @userName
+                @if (AuthService.IsAdmin())
+                {
+                    <span class="badge bg-danger ms-1">Admin</span>
+                }
+                else if (AuthService.IsStaff())
+                {
+                    <span class="badge bg-warning ms-1">Staff</span>
+                }
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/Customer/ViewProfile">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/Auth/Logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a></li>
+            </ul>
+        </li>
+    }
+    
+    <li class="nav-item">
+        <a class="nav-link" href="/Customer/ViewCart">
+            <i class="fas fa-shopping-cart"></i> Cart
+            <span class="badge bg-danger" id="cartCount">0</span>
+        </a>
+    </li>
+</ul>

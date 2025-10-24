@@ -14,7 +14,7 @@ namespace Infrastructure
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
-            services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(config.GetConnectionString("ClothingShop_DB")));
+            services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(config.GetConnectionString("YukiSoraShop_DB")));
 
             #region repo config
             services.AddScoped<IAccountRepository, AccountRepository>();

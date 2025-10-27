@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domain.Entities;
+using Application.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -34,9 +34,19 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<Category> Categories { get; set; }
+
     public virtual DbSet<Account> Accounts { get; set; }
 
-    
+    public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<ProductDetail> ProductDetails { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        OnModelCreatingPartial(modelBuilder);
+    }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

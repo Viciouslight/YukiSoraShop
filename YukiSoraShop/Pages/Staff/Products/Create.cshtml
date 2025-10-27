@@ -1,0 +1,101 @@
+@page
+@model YukiSoraShop.Pages.Staff.Products.CreateModel
+@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-plus text-primary"></i> Thêm sản phẩm mới
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i> Thông tin sản phẩm
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Product.ProductName" class="form-label">Tên sản phẩm *</label>
+                            <input asp-for="Product.ProductName" class="form-control" placeholder="Nhập tên sản phẩm" />
+                            <span asp-validation-for="Product.ProductName" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Product.Price" class="form-label">Giá *</label>
+                            <input asp-for="Product.Price" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                            <span asp-validation-for="Product.Price" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Product.StockQuantity" class="form-label">Số lượng *</label>
+                            <input asp-for="Product.StockQuantity" class="form-control" type="number" placeholder="0" />
+                            <span asp-validation-for="Product.StockQuantity" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Product.CategoryId" class="form-label">Danh mục *</label>
+                            <select asp-for="Product.CategoryId" class="form-select" asp-items="Model.CategoryOptions">
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                            <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Product.Description" class="form-label">Mô tả</label>
+                        <textarea asp-for="Product.Description" class="form-control" rows="4" placeholder="Mô tả chi tiết về sản phẩm"></textarea>
+                        <span asp-validation-for="Product.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu sản phẩm
+                        </button>
+                        <a href="/Staff/Products" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-lightbulb"></i> Gợi ý
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Điền đầy đủ thông tin bắt buộc</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Chọn danh mục phù hợp</small>
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success"></i>
+                        <small>Kiểm tra giá và số lượng</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -20,6 +20,7 @@ namespace Application
         IPaymentMethodRepository PaymentMethodRepository { get; }
         IPaymentRepository PaymentRepository { get; }
         IProductRepository ProductRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
 
         public Task<int> SaveChangesAsync();
         IDbContextTransaction BeginTransaction();

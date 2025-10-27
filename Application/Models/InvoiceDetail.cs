@@ -1,8 +1,8 @@
-﻿using Domain.Common;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class InvoiceDetail : BaseFullEntity
 {
@@ -20,3 +20,4 @@ public partial class InvoiceDetail : BaseFullEntity
 
     public virtual Invoice Invoice { get; set; } = null!;
 }
+

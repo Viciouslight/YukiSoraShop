@@ -13,6 +13,19 @@ namespace YukiSoraShop
             // Add services to the container
             builder.Services.AddRazorPages();
 
+            // Add Authentication services
+            builder.Services.AddAuthentication("CookieAuth")
+                .AddCookie("CookieAuth", options =>
+                {
+                    options.LoginPath = "/Auth/Login";
+                    options.LogoutPath = "/Auth/Logout";
+                    options.AccessDeniedPath = "/Auth/Login";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                    options.SlidingExpiration = true;
+                });
+
+            builder.Services.AddAuthorization();
+
             // Add session services
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
@@ -28,6 +41,8 @@ namespace YukiSoraShop
             // Register custom services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<YukiSoraShop.Services.Interfaces.IAuthorizationService, YukiSoraShop.Services.AuthorizationService>();
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
@@ -43,6 +58,8 @@ namespace YukiSoraShop
 
             app.UseRouting();
             app.UseSession();
+            
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapRazorPages();

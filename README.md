@@ -39,36 +39,20 @@ Mở file `YukiSoraShop/appsettings.json` và cập nhật connection string:
 
 #### Tạo Database và Migration
 
-1. **Mở Terminal/Command Prompt** tại thư mục gốc của project
-
+1. **Mở Terminal (View -> Terminal)
 2. **Chạy lệnh migration để tạo database:**
 
 ```bash
-# Di chuyển vào thư mục Infrastructure
-cd Infrastructure
+
 
 # Tạo migration (nếu chưa có)
-dotnet ef migrations add InitialCreate
+dotnet ef migrations add InitialCreate --project Infrastructure --startup-project YukiSoraShop
+
 
 # Cập nhật database với migration
-dotnet ef database update
+dotnet ef database update --project Infrastructure --startup-project YukiSoraShop
 ```
 
-**Lưu ý:** Nếu gặp lỗi "No executable found matching command 'ef'", hãy cài đặt Entity Framework tools:
-
-```bash
-dotnet tool install --global dotnet-ef
-```
-
-3. **Hoặc chạy từ thư mục YukiSoraShop:**
-
-```bash
-# Di chuyển vào thư mục YukiSoraShop
-cd YukiSoraShop
-
-# Cập nhật database
-dotnet ef database update --project ../Infrastructure
-```
 
 ### 3. Chạy ứng dụng
 

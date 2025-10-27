@@ -1,9 +1,8 @@
-﻿using Domain.Common;
-using Domain.Enums;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class Account : BaseFullEntity
 {
@@ -17,7 +16,7 @@ public partial class Account : BaseFullEntity
 
     public string? PhoneNumber { get; set; }
 
-    public AccountRole Role { get; set; } = AccountRole.Customer;
+    public int RoleId { get; set; }
 
     public string? Status { get; set; }
 
@@ -25,7 +24,10 @@ public partial class Account : BaseFullEntity
 
     public string? ExternalProvider { get; set; }
 
+    public virtual Role Role { get; set; } = null!;
+
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }
+

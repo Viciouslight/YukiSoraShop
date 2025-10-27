@@ -1,0 +1,101 @@
+@page
+@model YukiSoraShop.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt text-primary"></i> Admin Dashboard
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@Model.TotalUsers</h4>
+                        <p class="card-text">Tổng người dùng</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@Model.TotalProducts</h4>
+                        <p class="card-text">Tổng sản phẩm</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-box fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@Model.TotalOrders</h4>
+                        <p class="card-text">Tổng đơn hàng</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shopping-bag fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">@Model.TotalRevenue.ToString("C0")</h4>
+                        <p class="card-text">Tổng doanh thu</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-dollar-sign fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line text-primary"></i> Thống kê tổng quan
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Chào mừng bạn đến với trang quản trị YukiSora Shop!</p>
+                <p>Trang này hiển thị các thống kê tổng quan về hệ thống. Bạn có thể xem thông tin về người dùng, sản phẩm, đơn hàng và doanh thu.</p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Lưu ý:</strong> Đây là trang dành riêng cho quản trị viên. Chỉ có quyền xem thống kê, không có chức năng CRUD.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

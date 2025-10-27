@@ -35,7 +35,7 @@ namespace YukiSoraShop
                 options.Cookie.IsEssential = true;
             });
 
-            builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
+            builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPaymentServices(builder.Configuration);
 
             // Register custom services

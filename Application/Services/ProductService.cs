@@ -9,6 +9,7 @@ namespace Application.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ILogger<ProductService> _logger;
 
         private static readonly List<ProductDto> _products = new()
         {
@@ -69,10 +70,11 @@ namespace Application.Services
             }
         };
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, ILogger<ProductService> logger)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _logger = logger;
         }
 
         // DTO methods for display (using static data for now)
@@ -101,7 +103,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting products: {ex.Message}");
+                _logger.LogError(ex, "Error getting products");
                 return new List<Product>();
             }
         }
@@ -114,7 +116,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting product by id: {ex.Message}");
+                _logger.LogError(ex, "Error getting product by id {ProductId}", id);
                 return null;
             }
         }
@@ -129,7 +131,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating product: {ex.Message}");
+                _logger.LogError(ex, "Error creating product {ProductName}", product.ProductName);
                 return false;
             }
         }
@@ -144,7 +146,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating product: {ex.Message}");
+                _logger.LogError(ex, "Error updating product {ProductId}", product.Id);
                 return false;
             }
         }
@@ -164,7 +166,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting product: {ex.Message}");
+                _logger.LogError(ex, "Error deleting product {ProductId}", id);
                 return false;
             }
         }
@@ -179,7 +181,7 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting categories: {ex.Message}");
+                _logger.LogError(ex, "Error getting categories");
                 return new List<Category>();
             }
         }
@@ -192,9 +194,9 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting category by id: {ex.Message}");
+                _logger.LogError(ex, "Error getting category by id {CategoryId}", id);
                 return null;
             }
-        }
     }
+}
 }

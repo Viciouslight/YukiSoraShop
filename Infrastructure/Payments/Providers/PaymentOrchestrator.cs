@@ -6,6 +6,7 @@ using Domain.Enums;
 using Infrastructure.Payments.Providers.VnPay;
 using Infrastructure.Payments.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +21,19 @@ namespace Infrastructure.Payments.Providers
         private readonly IHttpContextAccessor _http;
         private readonly IPaymentGateway _gateway; // VnPayGateway
         private readonly IUnitOfWork _uow;
+        private readonly ILogger<PaymentOrchestrator> _logger;
 
-        public PaymentOrchestrator(IHttpContextAccessor http, IPaymentGateway gateway, IUnitOfWork uow)
+        public PaymentOrchestrator(IHttpContextAccessor http, IPaymentGateway gateway, IUnitOfWork uow, ILogger<PaymentOrchestrator> logger)
         {
             _http = http;
             _gateway = gateway;
             _uow = uow;
+            _logger = logger;
         }
 
         public async Task<PaymentCheckoutDto> CreateCheckoutAsync(CreatePaymentCommand command, CancellationToken ct = default)
         {
+            _logger.LogInformation("Creating VNPay checkout for order {OrderId}", command.OrderId);
             var order = await _uow.OrderRepository.GetByIdAsync(command.OrderId);
             if (order is null) throw new InvalidOperationException("Order not found.");
             if (order.GrandTotal is null) order.GrandTotal = order.Subtotal + order.ShippingFee;
@@ -63,12 +67,14 @@ namespace Infrastructure.Payments.Providers
             );
 
             await _uow.SaveChangesAsync();
+            _logger.LogInformation("Generated checkout URL for order {OrderId}", order.Id);
             return checkout;
         }
 
         public async Task<PaymentResultDto> HandleCallbackAsync(IQueryCollection query, CancellationToken ct = default)
         {
             var result = await _gateway.ParseAndValidateCallbackAsync(query, ct);
+            _logger.LogInformation("Received VNPay callback for order {OrderId}, success={Success}", result.OrderId, result.IsSuccess);
 
             var order = await _uow.OrderRepository.GetByIdAsync(result.OrderId);
             if (order is null) return result;
@@ -98,9 +104,11 @@ namespace Infrastructure.Payments.Providers
             {
                 order.Status = "Paid";
                 await _uow.SaveChangesAsync();
+                _logger.LogWarning("Payment failed for order {OrderId}: {Message}", result.OrderId, result.Message);
 
                 // 👉 Tạo invoice ngay sau khi thanh toán thành công (idempotent)
                 await _invoiceService.CreateInvoiceFromOrder(order.Id, ct);
+                _logger.LogInformation("Order {OrderId} marked as paid and invoice created", order.Id);
             }
             else
             {

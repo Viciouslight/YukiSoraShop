@@ -41,6 +41,7 @@ namespace YukiSoraShop
             // Register custom services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<YukiSoraShop.Services.Interfaces.IAuthorizationService, YukiSoraShop.Services.AuthorizationService>();
             // HttpContextAccessor is already registered in payment DI; remove duplicate
 

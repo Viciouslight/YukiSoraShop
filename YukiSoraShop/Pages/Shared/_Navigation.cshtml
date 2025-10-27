@@ -1,4 +1,4 @@
-@using YukiSoraShop.Services.Interfaces
+﻿@using YukiSoraShop.Services.Interfaces
 @inject IAuthorizationService AuthService
 
 @{
@@ -27,17 +27,17 @@
             <!-- Staff Menu - Product Management -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-box"></i> Quản lý sản phẩm
+                    <i class="fas fa-box"></i> Quáº£n lÃ½ sáº£n pháº©m
                 </a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/Staff/Products">
-                        <i class="fas fa-list"></i> Danh sách sản phẩm
+                        <i class="fas fa-list"></i> Danh sÃ¡ch sáº£n pháº©m
                     </a></li>
                     <li><a class="dropdown-item" href="/Staff/Products/Create">
-                        <i class="fas fa-plus"></i> Thêm sản phẩm
+                        <i class="fas fa-plus"></i> ThÃªm sáº£n pháº©m
                     </a></li>
                     <li><a class="dropdown-item" href="/Staff/Categories">
-                        <i class="fas fa-tags"></i> Quản lý danh mục
+                        <i class="fas fa-tags"></i> Quáº£n lÃ½ danh má»¥c
                     </a></li>
                 </ul>
             </li>
@@ -48,21 +48,21 @@
 <ul class="navbar-nav">
     @if (string.IsNullOrEmpty(userEmail))
     {
-        <!-- Chưa đăng nhập -->
+        <!-- ChÆ°a Ä‘Äƒng nháº­p -->
         <li class="nav-item">
             <a class="nav-link" href="/Auth/Login">
-                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                <i class="fas fa-sign-in-alt"></i> ÄÄƒng nháº­p
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/Auth/Register">
-                <i class="fas fa-user-plus"></i> Đăng ký
+                <i class="fas fa-user-plus"></i> ÄÄƒng kÃ½
             </a>
         </li>
     }
     else
     {
-        <!-- Đã đăng nhập -->
+        <!-- ÄÃ£ Ä‘Äƒng nháº­p -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 <i class="fas fa-user"></i> @userName
@@ -79,18 +79,22 @@
                 <li><a class="dropdown-item" href="/Customer/ViewProfile">
                     <i class="fas fa-user-circle"></i> Profile
                 </a></li>
+                <li><a class="dropdown-item" href="/Customer/MyOrders">
+                    <i class="fas fa-receipt"></i> Đơn hàng của tôi
+                </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/Auth/Logout">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <i class="fas fa-sign-out-alt"></i> ÄÄƒng xuáº¥t
                 </a></li>
             </ul>
         </li>
     }
     
     <li class="nav-item">
-        <a class="nav-link" href="/Customer/ViewCart">
+        <a class="nav-link" href="/Customer/Cart">
             <i class="fas fa-shopping-cart"></i> Cart
             <span class="badge bg-danger" id="cartCount">0</span>
         </a>
     </li>
 </ul>
+

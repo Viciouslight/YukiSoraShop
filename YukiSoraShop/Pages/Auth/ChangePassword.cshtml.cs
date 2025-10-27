@@ -3,16 +3,19 @@ using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging;
 
 namespace YukiSoraShop.Pages.Auth
 {
     public class ChangePasswordModel : PageModel
     {
         private readonly IUserService _userService;
+        private readonly ILogger<ChangePasswordModel> _logger;
 
-        public ChangePasswordModel(IUserService userService)
+        public ChangePasswordModel(IUserService userService, ILogger<ChangePasswordModel> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -86,7 +89,7 @@ namespace YukiSoraShop.Pages.Auth
             catch (Exception ex)
             {
                 ErrorMessage = "Đã xảy ra lỗi khi đổi mật khẩu. Vui lòng thử lại.";
-                Console.WriteLine($"Error changing password: {ex.Message}");
+                _logger.LogError(ex, "Error changing password for current user");
                 return Page();
             }
         }

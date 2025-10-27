@@ -28,7 +28,7 @@
                 <i class="fas fa-shopping-cart fa-3x text-success mb-3"></i>
                 <h5 class="card-title">View Cart</h5>
                 <p class="card-text">Review your selected items, manage quantities, and proceed to checkout.</p>
-                <a href="/ViewCart" class="btn btn-success">Go to Cart</a>
+                <a href="/Customer/Cart" class="btn btn-success">Go to Cart</a>
             </div>
         </div>
     </div>
@@ -53,9 +53,10 @@
                         <p class="card-text">
                             <strong class="text-success">@product.Price.ToString("N0") VNĐ</strong>
                         </p>
-                        <button class="btn btn-outline-primary btn-sm" onclick="addToCart(@product.Id, '@product.Name', @product.Price)">
-                            Add to Cart
-                        </button>
+                        <form method="post" asp-page-handler="AddToCart" class="d-inline">
+                            <input type="hidden" name="id" value="@product.Id" />
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Add to Cart</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -63,14 +64,5 @@
     }
 </div>
 
-@section Scripts {
-    <script>
-        function addToCart(id, name, price) {
-            // Simulate adding to cart
-            let currentCount = parseInt(document.getElementById('cartCount').textContent);
-            document.getElementById('cartCount').textContent = currentCount + 1;
+@section Scripts { }
 
-            alert(`Added "${name}" to cart!`);
-        }
-    </script>
-}

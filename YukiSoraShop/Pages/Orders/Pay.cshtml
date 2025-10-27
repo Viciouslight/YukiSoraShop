@@ -1,0 +1,50 @@
+﻿@page
+@model YukiSoraShop.Pages.Orders.PayModel
+@{
+    ViewData["Title"] = "Thanh toán đơn hàng";
+}
+
+<h2>Thanh toán đơn hàng</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card" style="padding:1rem;">
+    <form method="post">
+        <input type="hidden" asp-for="OrderId" />
+
+        <div class="mb-3">
+            <label class="form-label">Order ID</label>
+            <input class="form-control" value="@Model.OrderId" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tổng thanh toán</label>
+            <input class="form-control" value="@(Model.GrandTotal?.ToString("N0") ?? "-") VND" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Phương thức/Ngân hàng (tuỳ chọn)</label>
+            <select class="form-select" asp-for="BankCode">
+                <option value="">-- Chọn trên VNPay --</option>
+                <option value="VNPAYQR">VNPAYQR - Quét mã QR</option>
+                <option value="VNBANK">VNBANK - Thẻ ATM nội địa</option>
+                <option value="INTCARD">INTCARD - Thẻ quốc tế</option>
+            </select>
+            <small class="text-muted">Nếu để trống, khách sẽ chọn phương thức trên VNPay.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Danh mục hàng hoá (vnp_OrderType)</label>
+            <input class="form-control" asp-for="OrderTypeCode" />
+            <small class="text-muted">
+                Nhập mã danh mục theo catalog của VNPay (ví dụ: <code>other</code>, <code>fashion</code>, ...). Bắt buộc.
+            </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Thanh toán qua VNPay</button>
+    </form>
+</div>
+

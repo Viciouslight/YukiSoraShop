@@ -3,6 +3,7 @@ using Application.Services.Interfaces;
 using YukiSoraShop.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace YukiSoraShop.Pages.Staff
 {
@@ -10,11 +11,13 @@ namespace YukiSoraShop.Pages.Staff
     {
         private readonly IAuthorizationService _authService;
         private readonly IProductService _productService;
+        private readonly ILogger<ProductsModel> _logger;
 
-        public ProductsModel(IAuthorizationService authService, IProductService productService)
+        public ProductsModel(IAuthorizationService authService, IProductService productService, ILogger<ProductsModel> logger)
         {
             _authService = authService;
             _productService = productService;
+            _logger = logger;
         }
 
         public List<Product> Products { get; set; } = new();
@@ -35,8 +38,7 @@ namespace YukiSoraShop.Pages.Staff
             }
             catch (Exception ex)
             {
-                // Log error
-                Console.WriteLine($"Error loading products: {ex.Message}");
+                _logger.LogError(ex, "Error loading products list");
                 Products = new List<Product>();
             }
 

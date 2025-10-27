@@ -8,13 +8,15 @@ using YukiSoraShop.Extensions;
 namespace YukiSoraShop.Pages.Customer
 {
     [Authorize]
-    public class ViewCartModel : PageModel
+    public class CartModel : PageModel
     {
         private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
 
-        public ViewCartModel(IProductService productService)
+        public CartModel(IProductService productService, IOrderService orderService)
         {
             _productService = productService;
+            _orderService = orderService;
         }
 
         public List<CartItemDto> CartItems { get; set; } = new();
@@ -26,32 +28,7 @@ namespace YukiSoraShop.Pages.Customer
             LoadCartFromSession();
         }
 
-        public IActionResult OnPostAddSampleItems()
-        {
-            LoadCartFromSession();
-
-            // Add sample products to cart
-            var sampleProducts = _productService.GetAllProducts().Take(3);
-            foreach (var product in sampleProducts)
-            {
-                var existingItem = CartItems.FirstOrDefault(item => item.Product.Id == product.Id);
-                if (existingItem != null)
-                {
-                    existingItem.Quantity += 1;
-                }
-                else
-                {
-                    CartItems.Add(new CartItemDto
-                    {
-                        Product = product,
-                        Quantity = 1
-                    });
-                }
-            }
-
-            SaveCartToSession();
-            return RedirectToPage();
-        }
+        
 
         public IActionResult OnPostUpdateQuantity(int productId, string action)
         {
@@ -87,6 +64,36 @@ namespace YukiSoraShop.Pages.Customer
             }
 
             return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostCheckout()
+        {
+            LoadCartFromSession();
+            if (!CartItems.Any())
+            {
+                TempData["Error"] = "Giỏ hàng trống.";
+                return RedirectToPage();
+            }
+
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (!int.TryParse(userIdStr, out var userId) || userId <= 0)
+            {
+                return RedirectToPage("/Auth/Login");
+            }
+
+            var createdBy = HttpContext.Session.GetString("UserName") ?? "customer";
+            var orderItems = CartItems.Select(ci => new OrderItemInput
+            {
+                ProductId = ci.Product.Id,
+                Quantity = ci.Quantity
+            });
+
+            var order = await _orderService.CreateOrderFromCartAsync(userId, orderItems, createdBy);
+
+            // Clear cart after creating order
+            HttpContext.Session.Remove("ShoppingCart");
+
+            return Redirect($"/Orders/Pay?OrderId={order.Id}");
         }
 
         private void LoadCartFromSession()

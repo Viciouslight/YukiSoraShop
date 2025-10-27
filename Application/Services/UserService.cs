@@ -8,7 +8,6 @@ namespace Application.Services
     public class UserService : IUserService
     {
         private readonly IAccountRepository _accountRepository;
-
         public UserService(IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
@@ -81,7 +80,7 @@ namespace Application.Services
 
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }
@@ -101,7 +100,7 @@ namespace Application.Services
 
                 return null;
             }
-            catch
+            catch (Exception)
             {
                 return null;
             }
@@ -124,7 +123,7 @@ namespace Application.Services
 
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }
@@ -136,7 +135,7 @@ namespace Application.Services
             {
                 return await _accountRepository.GetByEmailAsync(email);
             }
-            catch
+            catch (Exception)
             {
                 return null;
             }

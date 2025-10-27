@@ -82,9 +82,8 @@ namespace Application.Services
                 var products = await _productRepository.GetAllAsync();
                 return products.ToList();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error getting products: {ex.Message}");
                 return new List<Product>();
             }
         }
@@ -95,9 +94,8 @@ namespace Application.Services
             {
                 return await _productRepository.GetByIdAsync(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error getting product by id: {ex.Message}");
                 return null;
             }
         }
@@ -110,9 +108,8 @@ namespace Application.Services
                 await _productRepository.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error creating product: {ex.Message}");
                 return false;
             }
         }
@@ -125,9 +122,8 @@ namespace Application.Services
                 await _productRepository.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error updating product: {ex.Message}");
                 return false;
             }
         }
@@ -145,9 +141,8 @@ namespace Application.Services
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error deleting product: {ex.Message}");
                 return false;
             }
         }
@@ -160,9 +155,8 @@ namespace Application.Services
                 var categories = await _categoryRepository.GetAllAsync();
                 return categories.ToList();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error getting categories: {ex.Message}");
                 return new List<Category>();
             }
         }
@@ -173,13 +167,10 @@ namespace Application.Services
             {
                 return await _categoryRepository.GetByIdAsync(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Error getting category by id: {ex.Message}");
                 return null;
             }
         }
-
-
     }
 }

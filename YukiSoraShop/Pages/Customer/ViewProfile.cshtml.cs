@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YukiSoraShop.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace YukiSoraShop.Pages.Customer
 {
@@ -11,10 +12,12 @@ namespace YukiSoraShop.Pages.Customer
     public class ViewProfileModel : PageModel
     {
         private readonly IUserService _userService;
+        private readonly ILogger<ViewProfileModel> _logger;
 
-        public ViewProfileModel(IUserService userService)
+        public ViewProfileModel(IUserService userService, ILogger<ViewProfileModel> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         public UserDto? CurrentUser { get; set; }
@@ -29,7 +32,7 @@ namespace YukiSoraShop.Pages.Customer
                 var userId = HttpContext.Session.GetString("UserId");
                 
                 // Debug: Log session data
-                Console.WriteLine($"Session - Email: {userEmail}, Name: {userName}, ID: {userId}");
+                _logger.LogDebug("Session - Email: {Email}, Name: {Name}, ID: {Id}", userEmail, userName, userId);
 
                 if (!string.IsNullOrEmpty(userEmail) && !string.IsNullOrEmpty(userId))
                 {
@@ -55,7 +58,7 @@ namespace YukiSoraShop.Pages.Customer
             catch (Exception ex)
             {
                 // Log error and redirect to login
-                Console.WriteLine($"Error in ViewProfile: {ex.Message}");
+                _logger.LogError(ex, "Error in ViewProfile");
                 Response.Redirect("/Auth/Login");
             }
         }

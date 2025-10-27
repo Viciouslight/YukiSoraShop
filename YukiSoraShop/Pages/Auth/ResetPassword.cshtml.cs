@@ -1,4 +1,4 @@
-using Application.Models;
+﻿using Application.Models;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -56,7 +56,7 @@ namespace YukiSoraShop.Pages.Auth
                 // Check if reset token exists and is valid
                 if (string.IsNullOrEmpty(sessionToken) || string.IsNullOrEmpty(sessionEmail))
                 {
-                    ErrorMessage = "❌ Reset token không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.";
+                    ErrorMessage = "âŒ Reset token khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng thá»­ láº¡i.";
                     return Page();
                 }
 
@@ -64,34 +64,34 @@ namespace YukiSoraShop.Pages.Auth
                 if (string.IsNullOrEmpty(Input.ResetToken) || 
                     !string.Equals(Input.ResetToken.Trim(), sessionToken, StringComparison.OrdinalIgnoreCase))
                 {
-                    ErrorMessage = $"❌ Mã reset không đúng. Mã bạn nhập: '{Input.ResetToken}', Mã đúng: '{sessionToken}'";
+                    ErrorMessage = $"âŒ MÃ£ reset khÃ´ng Ä‘Ãºng. MÃ£ báº¡n nháº­p: '{Input.ResetToken}', MÃ£ Ä‘Ãºng: '{sessionToken}'";
                     return Page();
                 }
 
                 // Check if email matches
                 if (Input.Email != sessionEmail)
                 {
-                    ErrorMessage = "❌ Email không khớp với yêu cầu reset.";
+                    ErrorMessage = "âŒ Email khÃ´ng khá»›p vá»›i yÃªu cáº§u reset.";
                     return Page();
                 }
 
                 // Check expiry (simple check)
                 if (DateTime.TryParse(sessionExpiry, out var expiry) && DateTime.Now > expiry)
                 {
-                    ErrorMessage = "❌ Mã reset đã hết hạn. Vui lòng yêu cầu mã mới.";
+                    ErrorMessage = "âŒ MÃ£ reset Ä‘Ã£ háº¿t háº¡n. Vui lÃ²ng yÃªu cáº§u mÃ£ má»›i.";
                     return Page();
                 }
 
                 // Validate new password
                 if (Input.NewPassword != Input.ConfirmPassword)
                 {
-                    ErrorMessage = "❌ Mật khẩu mới và xác nhận không khớp.";
+                    ErrorMessage = "âŒ Máº­t kháº©u má»›i vÃ  xÃ¡c nháº­n khÃ´ng khá»›p.";
                     return Page();
                 }
 
                 if (Input.NewPassword.Length < 6)
                 {
-                    ErrorMessage = "❌ Mật khẩu mới phải có ít nhất 6 ký tự.";
+                    ErrorMessage = "âŒ Máº­t kháº©u má»›i pháº£i cÃ³ Ã­t nháº¥t 6 kÃ½ tá»±.";
                     return Page();
                 }
 
@@ -104,21 +104,21 @@ namespace YukiSoraShop.Pages.Auth
                     HttpContext.Session.Remove("ResetEmail");
                     HttpContext.Session.Remove("ResetExpiry");
 
-                    SuccessMessage = "🎉 Mật khẩu đã được đặt lại thành công! Bạn có thể đăng nhập với mật khẩu mới.";
-                    TempData["SuccessMessage"] = "🎉 Mật khẩu đã được đặt lại thành công! Bạn có thể đăng nhập với mật khẩu mới.";
+                    SuccessMessage = "ðŸŽ‰ Máº­t kháº©u Ä‘Ã£ Ä‘Æ°á»£c Ä‘áº·t láº¡i thÃ nh cÃ´ng! Báº¡n cÃ³ thá»ƒ Ä‘Äƒng nháº­p vá»›i máº­t kháº©u má»›i.";
+                    TempData["SuccessMessage"] = "ðŸŽ‰ Máº­t kháº©u Ä‘Ã£ Ä‘Æ°á»£c Ä‘áº·t láº¡i thÃ nh cÃ´ng! Báº¡n cÃ³ thá»ƒ Ä‘Äƒng nháº­p vá»›i máº­t kháº©u má»›i.";
                     TempData["ShowSuccess"] = "true";
                     return RedirectToPage("./Login");
                 }
                 else
                 {
-                    ErrorMessage = "❌ Không thể đặt lại mật khẩu. Vui lòng thử lại.";
+                    ErrorMessage = "âŒ KhÃ´ng thá»ƒ Ä‘áº·t láº¡i máº­t kháº©u. Vui lÃ²ng thá»­ láº¡i.";
                     return Page();
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = "❌ Có lỗi xảy ra. Vui lòng thử lại sau.";
-                Console.WriteLine($"Error in ResetPassword: {ex.Message}");
+                ErrorMessage = "âŒ CÃ³ lá»—i xáº£y ra. Vui lÃ²ng thá»­ láº¡i sau.";
+                
                 return Page();
             }
         }
@@ -144,3 +144,4 @@ namespace YukiSoraShop.Pages.Auth
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }
+

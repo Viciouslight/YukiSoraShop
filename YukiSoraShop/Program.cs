@@ -35,13 +35,15 @@ namespace YukiSoraShop
                 options.Cookie.IsEssential = true;
             });
 
-            builder.Services.AddInfrastructureServicesAsync(builder.Configuration);
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddPaymentServices(builder.Configuration);
 
             // Register custom services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<YukiSoraShop.Services.Interfaces.IAuthorizationService, YukiSoraShop.Services.AuthorizationService>();
-            builder.Services.AddHttpContextAccessor();
+            // HttpContextAccessor is already registered in payment DI; remove duplicate
 
             var app = builder.Build();
 

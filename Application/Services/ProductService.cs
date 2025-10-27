@@ -9,7 +9,6 @@ namespace Application.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly ILogger<ProductService> _logger;
 
         private static readonly List<ProductDto> _products = new()
         {
@@ -70,11 +69,10 @@ namespace Application.Services
             }
         };
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, ILogger<ProductService> logger)
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
-            _logger = logger;
         }
 
         // DTO methods for display (using static data for now)
@@ -101,9 +99,8 @@ namespace Application.Services
                 var products = await _productRepository.GetAllAsync();
                 return products.ToList();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error getting products");
                 return new List<Product>();
             }
         }
@@ -114,9 +111,8 @@ namespace Application.Services
             {
                 return await _productRepository.GetByIdAsync(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error getting product by id {ProductId}", id);
                 return null;
             }
         }
@@ -129,9 +125,8 @@ namespace Application.Services
                 await _productRepository.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error creating product {ProductName}", product.ProductName);
                 return false;
             }
         }
@@ -144,9 +139,8 @@ namespace Application.Services
                 await _productRepository.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error updating product {ProductId}", product.Id);
                 return false;
             }
         }
@@ -164,9 +158,8 @@ namespace Application.Services
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error deleting product {ProductId}", id);
                 return false;
             }
         }
@@ -179,9 +172,8 @@ namespace Application.Services
                 var categories = await _categoryRepository.GetAllAsync();
                 return categories.ToList();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error getting categories");
                 return new List<Category>();
             }
         }
@@ -192,9 +184,8 @@ namespace Application.Services
             {
                 return await _categoryRepository.GetByIdAsync(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error getting category by id {CategoryId}", id);
                 return null;
             }
     }

@@ -42,7 +42,7 @@ namespace YukiSoraShop
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<YukiSoraShop.Services.Interfaces.IAuthorizationService, YukiSoraShop.Services.AuthorizationService>();
-            builder.Services.AddHttpContextAccessor();
+            // HttpContextAccessor is already registered in payment DI; remove duplicate
 
             var app = builder.Build();
 

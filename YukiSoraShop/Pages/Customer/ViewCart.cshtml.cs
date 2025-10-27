@@ -30,32 +30,7 @@ namespace YukiSoraShop.Pages.Customer
             LoadCartFromSession();
         }
 
-        public IActionResult OnPostAddSampleItems()
-        {
-            LoadCartFromSession();
-
-            // Add sample products to cart
-            var sampleProducts = _productService.GetAllProducts().Take(3);
-            foreach (var product in sampleProducts)
-            {
-                var existingItem = CartItems.FirstOrDefault(item => item.Product.Id == product.Id);
-                if (existingItem != null)
-                {
-                    existingItem.Quantity += 1;
-                }
-                else
-                {
-                    CartItems.Add(new CartItemDto
-                    {
-                        Product = product,
-                        Quantity = 1
-                    });
-                }
-            }
-
-            SaveCartToSession();
-            return RedirectToPage();
-        }
+        // Removed sample item adder to clean up demo code
 
         public IActionResult OnPostUpdateQuantity(int productId, string action)
         {

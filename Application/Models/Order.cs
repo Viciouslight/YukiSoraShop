@@ -1,8 +1,8 @@
-﻿using Domain.Common;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class Order : BaseFullEntity
 {
@@ -26,3 +26,4 @@ public partial class Order : BaseFullEntity
 
     public virtual Account Account { get; set; } = null!;
 }
+

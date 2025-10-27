@@ -1,11 +1,13 @@
-using Application.Models;
+using Application.DTOs;
 using Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YukiSoraShop.Extensions;
 
 namespace YukiSoraShop.Pages.Customer
 {
+    [Authorize]
     public class ViewProfileModel : PageModel
     {
         private readonly IUserService _userService;
@@ -15,7 +17,7 @@ namespace YukiSoraShop.Pages.Customer
             _userService = userService;
         }
 
-        public User? CurrentUser { get; set; }
+        public UserDto? CurrentUser { get; set; }
 
         public void OnGet()
         {
@@ -32,7 +34,7 @@ namespace YukiSoraShop.Pages.Customer
                 if (!string.IsNullOrEmpty(userEmail) && !string.IsNullOrEmpty(userId))
                 {
                     // Create user object from session data
-                    CurrentUser = new User
+                    CurrentUser = new UserDto
                     {
                         Id = int.TryParse(userId, out int id) ? id : 1,
                         FullName = userName ?? "User",

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -5,12 +6,16 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class LogoutModel : PageModel
     {
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            // Sign out khỏi authentication
+            await HttpContext.SignOutAsync("CookieAuth");
+            
             // Xóa session
             HttpContext.Session.Clear();
             
-            return Page();
+            TempData["SuccessMessage"] = "Đăng xuất thành công!";
+            return RedirectToPage("/Index");
         }
     }
 }

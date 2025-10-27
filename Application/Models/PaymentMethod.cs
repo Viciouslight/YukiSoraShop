@@ -1,8 +1,8 @@
-﻿using Domain.Common;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class PaymentMethod : BaseFullEntity
 {
@@ -14,3 +14,4 @@ public partial class PaymentMethod : BaseFullEntity
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }
+

@@ -1,8 +1,8 @@
-﻿using Domain.Common;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Domain.Entities;
+namespace Application.Models;
 
 public partial class Cart : BaseFullEntity
 {
@@ -12,3 +12,4 @@ public partial class Cart : BaseFullEntity
 
     public virtual Account Account { get; set; } = null!;
 }
+

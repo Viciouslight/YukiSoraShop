@@ -1,4 +1,4 @@
-using Application.Models;
+using Application.DTOs;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,7 +15,7 @@ namespace YukiSoraShop.Pages.Auth
         }
 
         [BindProperty]
-        public Application.Models.RegisterModel Input { get; set; } = new();
+        public Application.DTOs.RegisterModel Input { get; set; } = new();
 
         public void OnGet()
         {

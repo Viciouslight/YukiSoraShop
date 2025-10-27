@@ -1,4 +1,4 @@
-using Application.Models;
+using Application.DTOs;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,7 +15,7 @@ namespace YukiSoraShop.Pages.Auth
         }
 
         [BindProperty]
-        public Application.Models.ForgotPasswordModel Input { get; set; } = new();
+        public Application.DTOs.ForgotPasswordModel Input { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }

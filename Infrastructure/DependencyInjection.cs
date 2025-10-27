@@ -14,7 +14,7 @@ namespace Infrastructure
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
-            services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(config.GetConnectionString("ClothingShop_DB")));
+            services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(config.GetConnectionString("YukiSoraShop_DB")));
 
             #region repo config
             services.AddScoped<IAccountRepository, AccountRepository>();
@@ -27,6 +27,7 @@ namespace Infrastructure
             services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             #endregion
 
             #region service config

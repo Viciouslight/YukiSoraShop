@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Models
+namespace Application.DTOs
 {
     public class RegisterModel
     {
@@ -35,3 +35,4 @@ namespace Application.Models
         public bool AgreeToTerms { get; set; }
     }
 }
+

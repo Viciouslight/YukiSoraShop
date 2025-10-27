@@ -1,6 +1,6 @@
 ﻿using Application;
 using Application.Payments.Interfaces;
-using Domain.Entities;
+using Application.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -76,3 +76,4 @@ namespace Infrastructure.Payments.Services
         }
     }
 }
+

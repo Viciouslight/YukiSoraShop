@@ -1,17 +1,12 @@
 ﻿using Application;
 using Application.Payments.DTOs;
 using Application.Payments.Interfaces;
-using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Payments.Providers.VnPay;
 using Infrastructure.Payments.Services;
 using Microsoft.AspNetCore.Http;
+using Application.Models;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Payments.Providers
 {
@@ -131,3 +126,4 @@ namespace Infrastructure.Payments.Providers
         }
     }
 }
+

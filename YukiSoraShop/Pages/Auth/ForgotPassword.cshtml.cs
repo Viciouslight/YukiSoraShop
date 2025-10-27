@@ -2,16 +2,19 @@ using Application.DTOs;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace YukiSoraShop.Pages.Auth
 {
     public class ForgotPasswordModel : PageModel
     {
         private readonly IUserService _userService;
+        private readonly ILogger<ForgotPasswordModel> _logger;
 
-        public ForgotPasswordModel(IUserService userService)
+        public ForgotPasswordModel(IUserService userService, ILogger<ForgotPasswordModel> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -50,7 +53,7 @@ namespace YukiSoraShop.Pages.Auth
                 HttpContext.Session.SetString("ResetExpiry", DateTime.Now.AddMinutes(15).ToString());
 
                 // Simulate sending email (in real app, send actual email)
-                Console.WriteLine($"Reset token for {Input.Email}: {resetToken}");
+                _logger.LogInformation("Reset token generated for {Email}: {Token}", Input.Email, resetToken);
                 
                 // Show the reset code directly for demo
                 SuccessMessage = $"✅ Mã khôi phục đã được tạo!<br/><br/>" +
@@ -67,7 +70,7 @@ namespace YukiSoraShop.Pages.Auth
             catch (Exception ex)
             {
                 ErrorMessage = "❌ Có lỗi xảy ra. Vui lòng thử lại sau.";
-                Console.WriteLine($"Error in ForgotPassword: {ex.Message}");
+                _logger.LogError(ex, "Error in ForgotPassword for {Email}", Input?.Email);
                 return Page();
             }
         }

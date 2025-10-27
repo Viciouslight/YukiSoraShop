@@ -118,7 +118,7 @@ namespace YukiSoraShop.Pages.Auth
             catch (Exception ex)
             {
                 ErrorMessage = "❌ Có lỗi xảy ra. Vui lòng thử lại sau.";
-                Console.WriteLine($"Error in ResetPassword: {ex.Message}");
+                _logger.LogError(ex, "Error in ResetPassword for {Email}", Input?.Email);
                 return Page();
             }
         }

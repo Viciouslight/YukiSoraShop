@@ -2,16 +2,19 @@
 using Application.DTOs;
 using Application.Services.Interfaces;
 using Application.IRepository;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services
 {
     public class UserService : IUserService
     {
         private readonly IAccountRepository _accountRepository;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IAccountRepository accountRepository)
+        public UserService(IAccountRepository accountRepository, ILogger<UserService> logger)
         {
             _accountRepository = accountRepository;
+            _logger = logger;
         }
 
         public UserDto? GetUserById(int id)
@@ -79,10 +82,12 @@ namespace Application.Services
                 await _accountRepository.AddAsync(account);
                 await _accountRepository.SaveChangesAsync();
 
+                _logger.LogInformation("User registered: {Email}", model.Email);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error registering user {Email}", model.Email);
                 return false;
             }
         }
@@ -96,13 +101,16 @@ namespace Application.Services
 
                 if (password == account.Password)
                 {
+                    _logger.LogInformation("User login succeeded: {Email}", email);
                     return account;
                 }
 
+                _logger.LogWarning("User login failed (wrong password): {Email}", email);
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error during login for {Email}", email);
                 return null;
             }
         }
@@ -122,10 +130,12 @@ namespace Application.Services
                 _accountRepository.Update(account);
                 await _accountRepository.SaveChangesAsync();
 
+                _logger.LogInformation("Password changed for user: {Email}", email);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error changing password for {Email}", email);
                 return false;
             }
         }
@@ -136,8 +146,9 @@ namespace Application.Services
             {
                 return await _accountRepository.GetByEmailAsync(email);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error getting account by email {Email}", email);
                 return null;
             }
         }

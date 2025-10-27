@@ -4,6 +4,7 @@ using YukiSoraShop.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
@@ -11,11 +12,13 @@ namespace YukiSoraShop.Pages.Staff.Products
     {
         private readonly IAuthorizationService _authService;
         private readonly IProductService _productService;
+        private readonly ILogger<CreateModel> _logger;
 
-        public CreateModel(IAuthorizationService authService, IProductService productService)
+        public CreateModel(IAuthorizationService authService, IProductService productService, ILogger<CreateModel> logger)
         {
             _authService = authService;
             _productService = productService;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -76,7 +79,7 @@ namespace YukiSoraShop.Pages.Staff.Products
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
-                Console.WriteLine($"Error creating product: {ex.Message}");
+                _logger.LogError(ex, "Error creating product {ProductName}", Product?.ProductName);
             }
 
             await LoadCategoryOptions();
@@ -96,7 +99,7 @@ namespace YukiSoraShop.Pages.Staff.Products
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading categories: {ex.Message}");
+                _logger.LogError(ex, "Error loading categories: create page");
                 CategoryOptions = new List<SelectListItem>();
             }
         }

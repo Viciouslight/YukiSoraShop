@@ -1,15 +1,17 @@
 ﻿using Application.DTOs;
 using Application.Models;
+using System.Collections.Generic;
 
 namespace Application.Services.Interfaces
 {
     public interface IProductService
     {
         // DTO methods for display
-        ProductDto? GetProductById(int id);
         List<ProductDto> GetAllProducts();
         List<ProductDto> GetProductsByCategory(string category);
-        
+        List<ProductDto> GetProductsByName(string Name);
+
+
         // Entity methods for CRUD operations
         Task<List<Product>> GetAllProductsAsync();
         Task<Product?> GetProductEntityByIdAsync(int id);

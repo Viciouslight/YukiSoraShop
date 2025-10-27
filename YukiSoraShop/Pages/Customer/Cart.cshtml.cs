@@ -1,7 +1,5 @@
 using Application.Services.Interfaces;
 using Application.DTOs;
-using Application;
-using Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,12 +11,12 @@ namespace YukiSoraShop.Pages.Customer
     public class CartModel : PageModel
     {
         private readonly IProductService _productService;
-        private readonly IUnitOfWork _uow;
+        private readonly IOrderService _orderService;
 
-        public CartModel(IProductService productService, IUnitOfWork uow)
+        public CartModel(IProductService productService, IOrderService orderService)
         {
             _productService = productService;
-            _uow = uow;
+            _orderService = orderService;
         }
 
         public List<CartItemDto> CartItems { get; set; } = new();
@@ -83,50 +81,14 @@ namespace YukiSoraShop.Pages.Customer
                 return RedirectToPage("/Auth/Login");
             }
 
-            var subtotal = CartItems.Sum(i => i.TotalPrice);
-            var tax = subtotal * 0.10m;
-            var grandTotal = subtotal + tax;
-
-            var order = new Order
+            var createdBy = HttpContext.Session.GetString("UserName") ?? "customer";
+            var orderItems = CartItems.Select(ci => new OrderItemInput
             {
-                AccountId = userId,
-                Status = "Pending",
-                Subtotal = subtotal,
-                ShippingFee = 0,
-                GrandTotal = grandTotal,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = HttpContext.Session.GetString("UserName") ?? "customer",
-                ModifiedAt = DateTime.UtcNow,
-                ModifiedBy = HttpContext.Session.GetString("UserName") ?? "customer",
-                IsDeleted = false
-            };
+                ProductId = ci.Product.Id,
+                Quantity = ci.Quantity
+            });
 
-            await _uow.OrderRepository.AddAsync(order);
-
-            foreach (var item in CartItems)
-            {
-                // Ensure product exists in DB; skip if not found
-                var productEntity = await _uow.ProductRepository.GetByIdAsync(item.Product.Id);
-                if (productEntity == null) continue;
-
-                var od = new OrderDetail
-                {
-                    Order = order,
-                    ProductId = productEntity.Id,
-                    Quantity = item.Quantity,
-                    UnitPrice = productEntity.Price,
-                    LineTotal = productEntity.Price * item.Quantity,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = order.CreatedBy,
-                    ModifiedAt = DateTime.UtcNow,
-                    ModifiedBy = order.ModifiedBy,
-                    IsDeleted = false
-                };
-
-                await _uow.OrderDetailRepository.AddAsync(od);
-            }
-
-            await _uow.SaveChangesAsync();
+            var order = await _orderService.CreateOrderFromCartAsync(userId, orderItems, createdBy);
 
             // Clear cart after creating order
             HttpContext.Session.Remove("ShoppingCart");

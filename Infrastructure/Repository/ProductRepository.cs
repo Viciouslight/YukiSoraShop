@@ -1,6 +1,7 @@
 ﻿using Application.IRepository;
 using Application.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,13 @@ namespace Infrastructure.Repository
         public ProductRepository(AppDbContext dbContext) : base(dbContext)
         {
             _appDbContext = dbContext;
+        }
+
+        public Task<List<Product>> GetAllProductsAsync()
+        {
+            return  _appDbContext.Products
+        .Include(p => p.ProductDetails)
+        .ToListAsync();
         }
     }
 }

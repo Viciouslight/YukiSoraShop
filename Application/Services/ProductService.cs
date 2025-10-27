@@ -10,86 +10,69 @@ namespace Application.Services
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
 
-        private static readonly List<ProductDto> _products = new()
-        {
-            new ProductDto
-            {
-                Id = 1,
-                Name = "iPhone 15 Pro",
-                Description = "Latest iPhone with advanced camera system",
-                Price = 25000000,
-                ImageUrl = "https://via.placeholder.com/300x300/007bff/ffffff?text=iPhone+15",
-                Category = "Electronics",
-                Stock = 50,
-                IsAvailable = true
-            },
-            new ProductDto
-            {
-                Id = 2,
-                Name = "Samsung Galaxy S24",
-                Description = "Flagship Android smartphone with AI features",
-                Price = 22000000,
-                ImageUrl = "https://via.placeholder.com/300x300/28a745/ffffff?text=Galaxy+S24",
-                Category = "Electronics",
-                Stock = 30,
-                IsAvailable = true
-            },
-            new ProductDto
-            {
-                Id = 3,
-                Name = "MacBook Air M3",
-                Description = "Ultra-thin laptop with M3 chip",
-                Price = 35000000,
-                ImageUrl = "https://via.placeholder.com/300x300/6c757d/ffffff?text=MacBook+Air",
-                Category = "Computers",
-                Stock = 20,
-                IsAvailable = true
-            },
-            new ProductDto
-            {
-                Id = 4,
-                Name = "Dell XPS 13",
-                Description = "Premium Windows laptop for professionals",
-                Price = 28000000,
-                ImageUrl = "https://via.placeholder.com/300x300/dc3545/ffffff?text=Dell+XPS",
-                Category = "Computers",
-                Stock = 15,
-                IsAvailable = true
-            },
-            new ProductDto
-            {
-                Id = 5,
-                Name = "AirPods Pro",
-                Description = "Wireless earbuds with noise cancellation",
-                Price = 6000000,
-                ImageUrl = "https://via.placeholder.com/300x300/17a2b8/ffffff?text=AirPods",
-                Category = "Accessories",
-                Stock = 100,
-                IsAvailable = true
-            }
-        };
-
         public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
         }
 
-        // DTO methods for display (using static data for now)
-        public ProductDto? GetProductById(int id)
-        {
-            return _products.FirstOrDefault(p => p.Id == id);
-        }
-
         public List<ProductDto> GetAllProducts()
         {
-            return _products;
+            var product = _productRepository.GetAllAsync().Result;
+            return product.Select(product => new ProductDto
+            {
+                Id = product.Id,
+                Name = product.ProductName,
+                Description = product.Description,
+                Price = product.Price,
+                ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                Category = product.CategoryName,
+                Stock = product.StockQuantity,
+                IsAvailable = product.IsDeleted,
+            }).ToList();
+        }
+
+        // DTO methods for display (using static data for now)
+        public List<ProductDto> GetProductsByName(string name)
+        {
+            var products = _productRepository.GetAllAsync().Result;
+
+            return products
+                .Where(p => p.ProductName.Contains(name, StringComparison.OrdinalIgnoreCase)) // lọc theo tên
+                .Select(product => new ProductDto
+                {
+                    Id = product.Id,
+                    Name = product.ProductName,
+                    Description = product.Description,
+                    Price = product.Price,
+                    ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                    Category = product.CategoryName,
+                    Stock = product.StockQuantity,
+                    IsAvailable = !product.IsDeleted,
+                })
+                .ToList();
         }
 
         public List<ProductDto> GetProductsByCategory(string category)
         {
-            return _products.Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+            var products = _productRepository.GetAllAsync().Result;
+
+            return products
+                .Where(p => p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase)) // lọc theo category
+                .Select(product => new ProductDto
+                {
+                    Id = product.Id,
+                    Name = product.ProductName,
+                    Description = product.Description,
+                    Price = product.Price,
+                    ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                    Category = product.CategoryName,
+                    Stock = product.StockQuantity,
+                    IsAvailable = !product.IsDeleted,
+                })
+                .ToList();
         }
+
 
         // Entity methods for CRUD operations
         public async Task<List<Product>> GetAllProductsAsync()
@@ -188,6 +171,6 @@ namespace Application.Services
             {
                 return null;
             }
+        }
     }
-}
 }

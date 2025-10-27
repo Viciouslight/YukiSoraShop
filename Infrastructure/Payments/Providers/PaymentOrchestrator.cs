@@ -18,11 +18,12 @@ namespace Infrastructure.Payments.Providers
         private readonly IUnitOfWork _uow;
         private readonly ILogger<PaymentOrchestrator> _logger;
 
-        public PaymentOrchestrator(IHttpContextAccessor http, IPaymentGateway gateway, IUnitOfWork uow, ILogger<PaymentOrchestrator> logger)
+        public PaymentOrchestrator(IHttpContextAccessor http, IPaymentGateway gateway, IUnitOfWork uow, IInvoiceService invoiceService, ILogger<PaymentOrchestrator> logger)
         {
             _http = http;
             _gateway = gateway;
             _uow = uow;
+            _invoiceService = invoiceService;
             _logger = logger;
         }
 
@@ -126,4 +127,5 @@ namespace Infrastructure.Payments.Providers
         }
     }
 }
+
 

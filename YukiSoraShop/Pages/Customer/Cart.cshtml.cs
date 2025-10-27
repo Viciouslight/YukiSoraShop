@@ -10,12 +10,12 @@ using YukiSoraShop.Extensions;
 namespace YukiSoraShop.Pages.Customer
 {
     [Authorize]
-    public class ViewCartModel : PageModel
+    public class CartModel : PageModel
     {
         private readonly IProductService _productService;
         private readonly IUnitOfWork _uow;
 
-        public ViewCartModel(IProductService productService, IUnitOfWork uow)
+        public CartModel(IProductService productService, IUnitOfWork uow)
         {
             _productService = productService;
             _uow = uow;
@@ -30,7 +30,7 @@ namespace YukiSoraShop.Pages.Customer
             LoadCartFromSession();
         }
 
-        // Removed sample item adder to clean up demo code
+        
 
         public IActionResult OnPostUpdateQuantity(int productId, string action)
         {

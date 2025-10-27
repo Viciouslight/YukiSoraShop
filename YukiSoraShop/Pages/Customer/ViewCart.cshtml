@@ -91,10 +91,11 @@
                             <strong class="text-cyan">@((Model.TotalAmount * 1.1m).ToString("N0")) VNĐ</strong>
                         </div>
 
-                        <button type="button" class="btn btn-cyan w-100 mb-2 glow"
-                                onclick="alert('Checkout functionality coming soon!')">
-                            <i class="fas fa-credit-card me-2"></i> Thanh toán
-                        </button>
+                        <form method="post" asp-page-handler="Checkout">
+                            <button type="submit" class="btn btn-cyan w-100 mb-2 glow">
+                                <i class="fas fa-credit-card me-2"></i> Thanh to�n
+                            </button>
+                        </form>
 
                         <a href="/" class="btn btn-outline-light w-100">
                             <i class="fas fa-arrow-left me-2"></i> Tiếp tục mua hàng

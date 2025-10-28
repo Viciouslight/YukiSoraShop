@@ -1,5 +1,7 @@
 ﻿using Application;
 using Application.IRepository;
+using Application.Services;
+using Application.Services.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +33,9 @@ namespace Infrastructure
             #endregion
 
             #region service config
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderService, OrderService>();
             #endregion
 
             #region quartz config

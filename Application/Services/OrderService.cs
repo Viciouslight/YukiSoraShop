@@ -1,7 +1,6 @@
 using Application.DTOs;
-using Application.IRepository;
-using Application.Models;
 using Application.Services.Interfaces;
+using Domain.Entities;
 
 namespace Application.Services
 {

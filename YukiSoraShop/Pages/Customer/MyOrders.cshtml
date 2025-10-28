@@ -71,7 +71,7 @@
                         <td class="text-end">
                             @if (!string.Equals(o.Status, "Paid", StringComparison.OrdinalIgnoreCase))
                             {
-                                <a class="btn btn-sm btn-primary" href="/Orders/Pay?OrderId=@o.OrderId">
+                                <a class="btn btn-sm btn-primary" href="/Orders/Checkout?OrderId=@o.OrderId">
                                     <i class="fas fa-credit-card"></i> Thanh toán
                                 </a>
                             }

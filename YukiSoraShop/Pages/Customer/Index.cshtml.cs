@@ -22,6 +22,11 @@ namespace YukiSoraShop.Pages.Customer
             Products = _productService.GetAllProducts();
         }
 
+        public ProductDto? GetProductById(int id)
+        {
+            return _productService.GetProductById(id);
+        }
+
         public IActionResult OnPostAddToCart(int id)
         {
             // Load cart from session

@@ -1,5 +1,5 @@
 using Application.DTOs;
-using Application.Models;
+using Domain.Entities;
 
 namespace Application.Services.Interfaces
 {

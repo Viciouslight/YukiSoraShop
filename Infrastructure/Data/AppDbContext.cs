@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Application.Models;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;

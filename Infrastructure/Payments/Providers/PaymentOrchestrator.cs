@@ -5,8 +5,8 @@ using Domain.Enums;
 using Infrastructure.Payments.Providers.VnPay;
 using Infrastructure.Payments.Services;
 using Microsoft.AspNetCore.Http;
-using Application.Models;
 using Microsoft.Extensions.Logging;
+using Domain.Entities;
 
 namespace Infrastructure.Payments.Providers
 {
@@ -27,7 +27,7 @@ namespace Infrastructure.Payments.Providers
             _logger = logger;
         }
 
-        public async Task<PaymentCheckoutDto> CreateCheckoutAsync(CreatePaymentCommand command, CancellationToken ct = default)
+        public async Task<PaymentCheckoutDTO> CreateCheckoutAsync(CreatePaymentCommand command, CancellationToken ct = default)
         {
             _logger.LogInformation("Creating VNPay checkout for order {OrderId}", command.OrderId);
             var order = await _uow.OrderRepository.GetByIdAsync(command.OrderId);
@@ -67,7 +67,7 @@ namespace Infrastructure.Payments.Providers
             return checkout;
         }
 
-        public async Task<PaymentResultDto> HandleCallbackAsync(IQueryCollection query, CancellationToken ct = default)
+        public async Task<PaymentResultDTO> HandleCallbackAsync(IQueryCollection query, CancellationToken ct = default)
         {
             var result = await _gateway.ParseAndValidateCallbackAsync(query, ct);
             _logger.LogInformation("Received VNPay callback for order {OrderId}, success={Success}", result.OrderId, result.IsSuccess);

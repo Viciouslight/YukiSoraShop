@@ -1,7 +1,7 @@
 ﻿using Application.DTOs;
-using Application.Models;
 using Application.Services.Interfaces;
 using Application.IRepository;
+using Domain.Entities;
 
 namespace Application.Services
 {
@@ -30,6 +30,23 @@ namespace Application.Services
                 Stock = product.StockQuantity,
                 IsAvailable = product.IsDeleted,
             }).ToList();
+        }
+
+        public ProductDto? GetProductById(int id)
+        {
+            var product = _productRepository.GetByIdAsync(id).Result;
+            if (product == null) return null;
+            return new ProductDto
+            {
+                Id = product.Id,
+                Name = product.ProductName,
+                Description = product.Description,
+                Price = product.Price,
+                ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                Category = product.CategoryName,
+                Stock = product.StockQuantity,
+                IsAvailable = !product.IsDeleted,
+            };
         }
 
         // DTO methods for display (using static data for now)

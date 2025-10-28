@@ -1,4 +1,3 @@
-using Application.Models;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -78,7 +77,7 @@ namespace YukiSoraShop.Pages.Auth
                 {
                     SuccessMessage = "🎉 Đổi mật khẩu thành công! Tài khoản của bạn đã an toàn hơn.";
                     TempData["SuccessMessage"] = "🎉 Đổi mật khẩu thành công! Tài khoản của bạn đã an toàn hơn.";
-                    return RedirectToPage("/Customer/ViewProfile");
+                    return RedirectToPage("/Customer/Profile");
                 }
                 else
                 {

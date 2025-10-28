@@ -2,7 +2,7 @@ using Domain.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Application.Models;
+namespace Domain.Entities;
 
 public partial class InvoiceDetail : BaseFullEntity
 {

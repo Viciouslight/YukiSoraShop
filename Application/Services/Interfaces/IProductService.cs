@@ -1,5 +1,5 @@
 ﻿using Application.DTOs;
-using Application.Models;
+using Domain.Entities;
 using System.Collections.Generic;
 
 namespace Application.Services.Interfaces
@@ -10,6 +10,7 @@ namespace Application.Services.Interfaces
         List<ProductDto> GetAllProducts();
         List<ProductDto> GetProductsByCategory(string category);
         List<ProductDto> GetProductsByName(string Name);
+        ProductDto? GetProductById(int id);
 
 
         // Entity methods for CRUD operations

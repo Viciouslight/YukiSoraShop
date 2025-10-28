@@ -1,7 +1,7 @@
 using Domain.Common;
 using System.Collections.Generic;
 
-namespace Application.Models;
+namespace Domain.Entities;
 
 public partial class Category : BaseFullEntity
 {

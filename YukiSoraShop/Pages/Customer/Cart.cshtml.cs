@@ -93,7 +93,7 @@ namespace YukiSoraShop.Pages.Customer
             // Clear cart after creating order
             HttpContext.Session.Remove("ShoppingCart");
 
-            return Redirect($"/Orders/Pay?OrderId={order.Id}");
+            return Redirect($"/Orders/Checkout?OrderId={order.Id}");
         }
 
         private void LoadCartFromSession()

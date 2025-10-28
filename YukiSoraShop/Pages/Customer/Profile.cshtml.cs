@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace YukiSoraShop.Pages.Customer
 {
     [Authorize]
-    public class ViewProfileModel : PageModel
+    public class ProfileModel : PageModel
     {
         private readonly IUserService _userService;
-        private readonly ILogger<ViewProfileModel> _logger;
+        private readonly ILogger<ProfileModel> _logger;
 
-        public ViewProfileModel(IUserService userService, ILogger<ViewProfileModel> logger)
+        public ProfileModel(IUserService userService, ILogger<ProfileModel> logger)
         {
             _userService = userService;
             _logger = logger;
@@ -58,7 +58,7 @@ namespace YukiSoraShop.Pages.Customer
             catch (Exception ex)
             {
                 // Log error and redirect to login
-                _logger.LogError(ex, "Error in ViewProfile");
+                _logger.LogError(ex, "Error in Profile");
                 Response.Redirect("/Auth/Login");
             }
         }

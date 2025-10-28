@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace YukiSoraShop.Pages.Orders
 {
-    public class PayModel : PageModel
+    public class CheckoutModel : PageModel
     {
         private readonly IPaymentOrchestrator _payment;
         private readonly IUnitOfWork _uow;
 
-        public PayModel(IPaymentOrchestrator payment, IUnitOfWork uow)
+        public CheckoutModel(IPaymentOrchestrator payment, IUnitOfWork uow)
         {
             _payment = payment;
             _uow = uow;

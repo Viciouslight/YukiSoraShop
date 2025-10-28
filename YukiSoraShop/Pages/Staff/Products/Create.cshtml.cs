@@ -1,10 +1,10 @@
-using Application.Models;
 using Application.Services.Interfaces;
 using YukiSoraShop.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using Domain.Entities;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {

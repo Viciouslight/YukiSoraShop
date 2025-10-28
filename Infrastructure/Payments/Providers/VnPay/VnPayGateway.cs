@@ -21,12 +21,12 @@ namespace Infrastructure.Payments.Providers.VnPay
             _opt = opt.Value;
         }
 
-        public Task<PaymentCheckoutDto> CreateCheckoutUrlAsync(CreatePaymentCommand command, CancellationToken ct = default)
+        public Task<PaymentCheckoutDTO> CreateCheckoutUrlAsync(CreatePaymentCommand command, CancellationToken ct = default)
         {
             throw new NotSupportedException("Use PaymentOrchestrator to generate the checkout URL with validated order amount.");
         }
 
-        internal Task<PaymentCheckoutDto> CreateCheckoutUrlInternalAsync(
+        internal Task<PaymentCheckoutDTO> CreateCheckoutUrlInternalAsync(
             int orderId, decimal amountVnd, string clientIp, string? bankCode, string? orderDesc, string orderTypeCode, CancellationToken ct)
         {
             var nowUtc = DateTime.UtcNow;
@@ -56,14 +56,14 @@ namespace Infrastructure.Payments.Providers.VnPay
 
             var url = vnp.CreateRequestUrl(_opt.vnp_BaseUrl, _opt.vnp_HashSecret);
 
-            return Task.FromResult(new PaymentCheckoutDto
+            return Task.FromResult(new PaymentCheckoutDTO
             {
                 CheckoutUrl = url,
                 Provider = "VNPay"
             });
         }
 
-        public Task<PaymentResultDto> ParseAndValidateCallbackAsync(IQueryCollection query, CancellationToken ct = default)
+        public Task<PaymentResultDTO> ParseAndValidateCallbackAsync(IQueryCollection query, CancellationToken ct = default)
         {
             var vnp = new VnPayLibrary();
             var rawDict = QueryHelpers.ParseQuery(query.ToString());
@@ -91,7 +91,7 @@ namespace Infrastructure.Payments.Providers.VnPay
 
             var ok = isValid && rspCode == "00" && txnStatus == "00";
 
-            var result = new PaymentResultDto
+            var result = new PaymentResultDTO
             {
                 IsSuccess = ok,
                 Message = ok ? "Payment successful" : $"Payment failed (code={rspCode}, status={txnStatus}, valid={isValid})",

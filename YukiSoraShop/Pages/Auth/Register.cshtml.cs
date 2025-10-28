@@ -21,6 +21,7 @@ namespace YukiSoraShop.Pages.Auth
         {
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)

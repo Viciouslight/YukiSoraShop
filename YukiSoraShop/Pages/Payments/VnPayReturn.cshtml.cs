@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace YukiSoraShop.Pages.Payments
 {
-    public class VnPayReturnModel : PageModel
+    public class PaymentsVnPayReturnModel : PageModel
     {
         private readonly IPaymentOrchestrator _payment;
 
-        public VnPayReturnModel(IPaymentOrchestrator payment)
+        public PaymentsVnPayReturnModel(IPaymentOrchestrator payment)
         {
             _payment = payment;
         }

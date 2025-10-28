@@ -3,16 +3,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Customer
 {
     [Authorize]
-    public class MyOrdersModel : PageModel
+    public class CustomerOrdersModel : PageModel
     {
         private readonly IUnitOfWork _uow;
-        private readonly ILogger<MyOrdersModel> _logger;
+        private readonly ILogger<CustomerOrdersModel> _logger;
 
-        public MyOrdersModel(IUnitOfWork uow, ILogger<MyOrdersModel> logger)
+        public CustomerOrdersModel(IUnitOfWork uow, ILogger<CustomerOrdersModel> logger)
         {
             _uow = uow;
             _logger = logger;
@@ -22,11 +23,8 @@ namespace YukiSoraShop.Pages.Customer
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userIdStr = HttpContext.Session.GetString("UserId");
-            if (!int.TryParse(userIdStr, out var userId) || userId <= 0)
-            {
-                return RedirectToPage("/Auth/Login");
-            }
+            var idStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (!int.TryParse(idStr, out var userId) || userId <= 0) return RedirectToPage("/Auth/Login");
 
             try
             {

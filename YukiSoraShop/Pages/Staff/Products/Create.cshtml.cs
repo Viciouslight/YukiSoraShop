@@ -1,22 +1,21 @@
 using Application.Services.Interfaces;
-using YukiSoraShop.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
-    public class CreateModel : PageModel
+    [Authorize(Roles = "Moderator")]
+    public class StaffProductCreateModel : PageModel
     {
-        private readonly IAuthorizationService _authService;
         private readonly IProductService _productService;
-        private readonly ILogger<CreateModel> _logger;
+        private readonly ILogger<StaffProductCreateModel> _logger;
 
-        public CreateModel(IAuthorizationService authService, IProductService productService, ILogger<CreateModel> logger)
+        public StaffProductCreateModel(IProductService productService, ILogger<StaffProductCreateModel> logger)
         {
-            _authService = authService;
             _productService = productService;
             _logger = logger;
         }
@@ -29,24 +28,17 @@ namespace YukiSoraShop.Pages.Staff.Products
         public async Task<IActionResult> OnGetAsync()
         {
             // Kiểm tra quyền Staff
-            if (!_authService.IsStaff())
-            {
-                Response.Redirect("/Auth/Login");
-                return Page();
-            }
+            
 
             await LoadCategoryOptions();
             return Page();
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
             // Kiểm tra quyền Staff
-            if (!_authService.IsStaff())
-            {
-                Response.Redirect("/Auth/Login");
-                return Page();
-            }
+            
 
             if (!ModelState.IsValid)
             {
@@ -57,11 +49,21 @@ namespace YukiSoraShop.Pages.Staff.Products
             try
             {
                 // Set thông tin cơ bản
-                Product.CreatedAt = DateTime.Now;
-                Product.CreatedBy = _authService.GetCurrentUserName();
-                Product.ModifiedAt = DateTime.Now;
-                Product.ModifiedBy = _authService.GetCurrentUserName();
+                Product.CreatedAt = DateTime.UtcNow;
+                Product.CreatedBy = HttpContext.User?.Identity?.Name ?? "system";
+                Product.ModifiedAt = DateTime.UtcNow;
+                Product.ModifiedBy = HttpContext.User?.Identity?.Name ?? "system";
                 Product.IsDeleted = false;
+
+                // Thiết lập CategoryName dựa trên CategoryId để đảm bảo ràng buộc dữ liệu
+                var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
+                if (category == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Danh mục không hợp lệ.");
+                    await LoadCategoryOptions();
+                    return Page();
+                }
+                Product.CategoryName = category.CategoryName;
 
                 // Lưu sản phẩm
                 var success = await _productService.CreateProductAsync(Product);

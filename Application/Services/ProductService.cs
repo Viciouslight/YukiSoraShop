@@ -1,40 +1,42 @@
-﻿using Application.DTOs;
+using Application.DTOs;
 using Application.Services.Interfaces;
-using Application.IRepository;
+using Application;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IUnitOfWork _uow;
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductService(IUnitOfWork uow)
         {
-            _productRepository = productRepository;
-            _categoryRepository = categoryRepository;
+            _uow = uow;
         }
 
-        public List<ProductDto> GetAllProducts()
+        // DTO methods for display (async)
+        public async Task<List<ProductDto>> GetAllProductsDtoAsync()
         {
-            var product = _productRepository.GetAllAsync().Result;
-            return product.Select(product => new ProductDto
-            {
-                Id = product.Id,
-                Name = product.ProductName,
-                Description = product.Description,
-                Price = product.Price,
-                ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
-                Category = product.CategoryName,
-                Stock = product.StockQuantity,
-                IsAvailable = product.IsDeleted,
-            }).ToList();
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
+            return await query
+                .Select(product => new ProductDto
+                {
+                    Id = product.Id,
+                    Name = product.ProductName,
+                    Description = product.Description,
+                    Price = product.Price,
+                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
+                    Category = product.CategoryName,
+                    Stock = product.StockQuantity,
+                    IsAvailable = !product.IsDeleted,
+                })
+                .ToListAsync();
         }
 
-        public ProductDto? GetProductById(int id)
+        public async Task<ProductDto?> GetProductDtoByIdAsync(int id)
         {
-            var product = _productRepository.GetByIdAsync(id).Result;
+            var product = await _uow.ProductRepository.FindOneAsync(p => p.Id == id, includeProperties: "ProductDetails");
             if (product == null) return null;
             return new ProductDto
             {
@@ -42,61 +44,57 @@ namespace Application.Services
                 Name = product.ProductName,
                 Description = product.Description,
                 Price = product.Price,
-                ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
                 Category = product.CategoryName,
                 Stock = product.StockQuantity,
                 IsAvailable = !product.IsDeleted,
             };
         }
 
-        // DTO methods for display (using static data for now)
-        public List<ProductDto> GetProductsByName(string name)
+        public async Task<List<ProductDto>> GetProductsByNameAsync(string name)
         {
-            var products = _productRepository.GetAllAsync().Result;
-
-            return products
-                .Where(p => p.ProductName.Contains(name, StringComparison.OrdinalIgnoreCase)) // lọc theo tên
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
+            return await query
+                .Where(p => EF.Functions.Like(p.ProductName, $"%{name}%"))
                 .Select(product => new ProductDto
                 {
                     Id = product.Id,
                     Name = product.ProductName,
                     Description = product.Description,
                     Price = product.Price,
-                    ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
                     Category = product.CategoryName,
                     Stock = product.StockQuantity,
                     IsAvailable = !product.IsDeleted,
                 })
-                .ToList();
+                .ToListAsync();
         }
 
-        public List<ProductDto> GetProductsByCategory(string category)
+        public async Task<List<ProductDto>> GetProductsByCategoryAsync(string category)
         {
-            var products = _productRepository.GetAllAsync().Result;
-
-            return products
-                .Where(p => p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase)) // lọc theo category
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
+            return await query
+                .Where(p => p.CategoryName == category)
                 .Select(product => new ProductDto
                 {
                     Id = product.Id,
                     Name = product.ProductName,
                     Description = product.Description,
                     Price = product.Price,
-                    ImageUrl = product.ProductDetails.FirstOrDefault()?.ImageUrl,
+                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
                     Category = product.CategoryName,
                     Stock = product.StockQuantity,
                     IsAvailable = !product.IsDeleted,
                 })
-                .ToList();
+                .ToListAsync();
         }
-
 
         // Entity methods for CRUD operations
         public async Task<List<Product>> GetAllProductsAsync()
         {
             try
             {
-                var products = await _productRepository.GetAllAsync();
+                var products = await _uow.ProductRepository.GetAllAsync();
                 return products.ToList();
             }
             catch (Exception)
@@ -109,7 +107,7 @@ namespace Application.Services
         {
             try
             {
-                return await _productRepository.GetByIdAsync(id);
+                return await _uow.ProductRepository.GetByIdAsync(id);
             }
             catch (Exception)
             {
@@ -121,8 +119,8 @@ namespace Application.Services
         {
             try
             {
-                await _productRepository.AddAsync(product);
-                await _productRepository.SaveChangesAsync();
+                await _uow.ProductRepository.AddAsync(product);
+                await _uow.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -135,8 +133,8 @@ namespace Application.Services
         {
             try
             {
-                _productRepository.Update(product);
-                await _productRepository.SaveChangesAsync();
+                _uow.ProductRepository.Update(product);
+                await _uow.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -149,11 +147,11 @@ namespace Application.Services
         {
             try
             {
-                var product = await _productRepository.GetByIdAsync(id);
+                var product = await _uow.ProductRepository.GetByIdAsync(id);
                 if (product != null)
                 {
-                    _productRepository.SoftDelete(product);
-                    await _productRepository.SaveChangesAsync();
+                    _uow.ProductRepository.SoftDelete(product);
+                    await _uow.SaveChangesAsync();
                     return true;
                 }
                 return false;
@@ -169,7 +167,7 @@ namespace Application.Services
         {
             try
             {
-                var categories = await _categoryRepository.GetAllAsync();
+                var categories = await _uow.CategoryRepository.GetAllAsync();
                 return categories.ToList();
             }
             catch (Exception)
@@ -182,7 +180,7 @@ namespace Application.Services
         {
             try
             {
-                return await _categoryRepository.GetByIdAsync(id);
+                return await _uow.CategoryRepository.GetByIdAsync(id);
             }
             catch (Exception)
             {

@@ -1,8 +1,9 @@
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Auth
 {
@@ -25,24 +26,20 @@ namespace YukiSoraShop.Pages.Auth
 
         public void OnGet()
         {
-            // Check if user is logged in
-            var userEmail = HttpContext.Session.GetString("UserEmail");
-            if (string.IsNullOrEmpty(userEmail))
+            if (!(User?.Identity?.IsAuthenticated ?? false))
             {
                 Response.Redirect("/Auth/Login");
             }
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
             try
             {
-                // Check if user is logged in
-                var userEmail = HttpContext.Session.GetString("UserEmail");
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return RedirectToPage("/Auth/Login");
-                }
+                // Use claims for current user email
+                var userEmail = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email);
+                if (string.IsNullOrEmpty(userEmail)) return RedirectToPage("/Auth/Login");
 
                 // Validate model
                 if (!ModelState.IsValid)

@@ -1,21 +1,20 @@
 ﻿using Application.DTOs;
 using Application.Services.Interfaces;
-using Application.IRepository;
 using Domain.Entities;
 
 namespace Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IAccountRepository _accountRepository;
-        public UserService(IAccountRepository accountRepository)
+        private readonly IUnitOfWork _uow;
+        public UserService(IUnitOfWork uow)
         {
-            _accountRepository = accountRepository;
+            _uow = uow;
         }
 
-        public UserDto? GetUserById(int id)
+        public async Task<UserDto?> GetUserByIdAsync(int id)
         {
-            var account = _accountRepository.GetByIdAsync(id).Result;
+            var account = await _uow.AccountRepository.GetByIdAsync(id);
             if (account == null) return null;
 
             return new UserDto
@@ -29,9 +28,9 @@ namespace Application.Services
             };
         }
 
-        public List<UserDto> GetAllUsers()
+        public async Task<List<UserDto>> GetAllUsersAsync()
         {
-            var accounts = _accountRepository.GetAllAsync().Result;
+            var accounts = await _uow.AccountRepository.GetAllAsync();
             return accounts.Select(account => new UserDto
             {
                 Id = account.Id,
@@ -48,7 +47,7 @@ namespace Application.Services
             try
             {
                 // Kiểm tra email đã tồn tại chưa
-                var existingAccount = await _accountRepository.GetByEmailAsync(model.Email);
+                var existingAccount = await _uow.AccountRepository.GetByEmailAsync(model.Email);
                 if (existingAccount != null)
                 {
                     return false; // Email đã tồn tại
@@ -64,9 +63,9 @@ namespace Application.Services
                     RoleId = 1, // Default to Customer role
                     Status = "Active",
                     IsExternal = false,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                     CreatedBy = "System",
-                    ModifiedAt = DateTime.Now,
+                    ModifiedAt = DateTime.UtcNow,
                     ModifiedBy = "System",
                     IsDeleted = false
                 };
@@ -75,8 +74,8 @@ namespace Application.Services
                 account.Password = model.Password;
 
                 // Lưu vào database
-                await _accountRepository.AddAsync(account);
-                await _accountRepository.SaveChangesAsync();
+                await _uow.AccountRepository.AddAsync(account);
+                await _uow.SaveChangesAsync();
 
                 return true;
             }
@@ -90,7 +89,7 @@ namespace Application.Services
         {
             try
             {
-                var account = await _accountRepository.GetByEmailAsync(email);
+                var account = await _uow.AccountRepository.GetByEmailAsync(email);
                 if (account == null) return null;
 
                 if (password == account.Password)
@@ -110,16 +109,16 @@ namespace Application.Services
         {
             try
             {
-                var account = await _accountRepository.GetByEmailAsync(email);
+                var account = await _uow.AccountRepository.GetByEmailAsync(email);
                 if (account == null) return false;
 
                 // Update password (plain text, no hashing as per user request)
                 account.Password = newPassword;
-                account.ModifiedAt = DateTime.Now;
+                account.ModifiedAt = DateTime.UtcNow;
                 account.ModifiedBy = "User";
 
-                _accountRepository.Update(account);
-                await _accountRepository.SaveChangesAsync();
+                _uow.AccountRepository.Update(account);
+                await _uow.SaveChangesAsync();
 
                 return true;
             }
@@ -133,7 +132,7 @@ namespace Application.Services
         {
             try
             {
-                return await _accountRepository.GetByEmailAsync(email);
+                return await _uow.AccountRepository.GetByEmailAsync(email);
             }
             catch (Exception)
             {

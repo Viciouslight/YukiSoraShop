@@ -1,5 +1,3 @@
-using Application.Services;
-using Application.Services.Interfaces;
 using Infrastructure;
 
 namespace YukiSoraShop
@@ -38,10 +36,6 @@ namespace YukiSoraShop
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPaymentServices(builder.Configuration);
 
-            // Register custom services
-            builder.Services.AddScoped<YukiSoraShop.Services.Interfaces.IAuthorizationService, YukiSoraShop.Services.AuthorizationService>();
-            // HttpContextAccessor is already registered in payment DI; remove duplicate
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline
@@ -61,6 +55,8 @@ namespace YukiSoraShop
             app.UseAuthorization();
 
             app.MapRazorPages();
+            // Redirect root to Home page to avoid 404 at '/'
+            app.MapGet("/", () => Results.Redirect("/Home"));
 
 
             app.Run();

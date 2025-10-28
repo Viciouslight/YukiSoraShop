@@ -5,8 +5,8 @@ namespace Application.Services.Interfaces
 {
     public interface IUserService
     {
-        UserDto? GetUserById(int id);
-        List<UserDto> GetAllUsers();
+        Task<UserDto?> GetUserByIdAsync(int id);
+        Task<List<UserDto>> GetAllUsersAsync();
         Task<bool> RegisterAsync(RegisterModel model);
         Task<Account?> LoginAsync(string email, string password);
         Task<bool> ChangePasswordAsync(string email, string newPassword);

@@ -6,11 +6,11 @@ namespace Application.Services.Interfaces
 {
     public interface IProductService
     {
-        // DTO methods for display
-        List<ProductDto> GetAllProducts();
-        List<ProductDto> GetProductsByCategory(string category);
-        List<ProductDto> GetProductsByName(string Name);
-        ProductDto? GetProductById(int id);
+        // DTO methods for display (async)
+        Task<List<ProductDto>> GetAllProductsDtoAsync();
+        Task<List<ProductDto>> GetProductsByCategoryAsync(string category);
+        Task<List<ProductDto>> GetProductsByNameAsync(string name);
+        Task<ProductDto?> GetProductDtoByIdAsync(int id);
 
 
         // Entity methods for CRUD operations

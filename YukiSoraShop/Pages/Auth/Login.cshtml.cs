@@ -1,4 +1,3 @@
-using Application.DTOs;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +25,7 @@ namespace YukiSoraShop.Pages.Auth
             ReturnUrl = returnUrl;
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             ReturnUrl = returnUrl;
@@ -35,38 +35,40 @@ namespace YukiSoraShop.Pages.Auth
                 return Page();
             }
 
-            // Thực hiện đăng nhập
             var account = await _userService.LoginAsync(Input.Email, Input.Password);
-            
+
             if (account != null)
             {
-                // Tạo claims cho authentication
+                var roleName = account.Role?.RoleName ?? (account.RoleId switch
+                {
+                    2 => "Administrator",
+                    3 => "Moderator",
+                    _ => "Customer"
+                });
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
                     new Claim(ClaimTypes.Name, account.FullName ?? account.UserName),
                     new Claim(ClaimTypes.Email, account.Email),
-                    new Claim(ClaimTypes.Role, account.RoleId.ToString()),
+                    new Claim(ClaimTypes.Role, roleName),
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                // Sign in với cookie authentication
                 await HttpContext.SignInAsync("CookieAuth", claimsPrincipal, new AuthenticationProperties
                 {
                     IsPersistent = Input.RememberMe,
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
-                // Set session (giữ lại cho compatibility)
-                HttpContext.Session.SetString("UserEmail", account.Email);
-                HttpContext.Session.SetString("UserName", account.FullName ?? account.UserName);
-                HttpContext.Session.SetString("UserId", account.Id.ToString());
-                HttpContext.Session.SetString("UserRole", account.RoleId.ToString());
-                
                 TempData["SuccessMessage"] = "Đăng nhập thành công!";
-                return LocalRedirect(returnUrl ?? "/");
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+                return RedirectToPage("/Index");
             }
 
             ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không đúng.");
@@ -74,3 +76,4 @@ namespace YukiSoraShop.Pages.Auth
         }
     }
 }
+

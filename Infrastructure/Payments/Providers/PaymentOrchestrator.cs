@@ -74,6 +74,9 @@ namespace Infrastructure.Payments.Providers
 
             var order = await _uow.OrderRepository.GetByIdAsync(result.OrderId);
             if (order is null) return result;
+            var tx = await _uow.BeginTransactionAsync();
+            try
+            {
 
             var payment = await _uow.PaymentRepository.FindOneAsync(
                 p => p.OrderId == order.Id && p.PaymentStatus == PaymentStatus.Pending, includeProperties: "PaymentMethod");
@@ -100,7 +103,7 @@ namespace Infrastructure.Payments.Providers
             {
                 order.Status = "Paid";
                 await _uow.SaveChangesAsync();
-                _logger.LogWarning("Payment failed for order {OrderId}: {Message}", result.OrderId, result.Message);
+                _logger.LogInformation("Payment succeeded for order {OrderId}", result.OrderId);
 
                 // 👉 Tạo invoice ngay sau khi thanh toán thành công (idempotent)
                 await _invoiceService.CreateInvoiceFromOrder(order.Id, ct);
@@ -109,9 +112,18 @@ namespace Infrastructure.Payments.Providers
             else
             {
                 await _uow.SaveChangesAsync();
+                _logger.LogWarning("Payment failed for order {OrderId}: {Message}", result.OrderId, result.Message);
             }
 
-            return result;
+                await tx.CommitAsync(ct);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling VNPay callback for order {OrderId}", result.OrderId);
+                try { await tx.RollbackAsync(ct); } catch { }
+                return result;
+            }
         }
 
         private async Task<PaymentMethod> EnsureVnPayMethodAsync(CancellationToken ct)

@@ -3,18 +3,18 @@ using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using YukiSoraShop.Extensions;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Customer
 {
     [Authorize]
-    public class ProfileModel : PageModel
+    public class CustomerProfileModel : PageModel
     {
         private readonly IUserService _userService;
-        private readonly ILogger<ProfileModel> _logger;
+        private readonly ILogger<CustomerProfileModel> _logger;
 
-        public ProfileModel(IUserService userService, ILogger<ProfileModel> logger)
+        public CustomerProfileModel(IUserService userService, ILogger<CustomerProfileModel> logger)
         {
             _userService = userService;
             _logger = logger;
@@ -22,64 +22,48 @@ namespace YukiSoraShop.Pages.Customer
 
         public UserDto? CurrentUser { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
             try
             {
-                // Get user info from login session
-                var userEmail = HttpContext.Session.GetString("UserEmail");
-                var userName = HttpContext.Session.GetString("UserName");
-                var userId = HttpContext.Session.GetString("UserId");
-                
-                // Debug: Log session data
-                _logger.LogDebug("Session - Email: {Email}, Name: {Name}, ID: {Id}", userEmail, userName, userId);
+                var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var email = User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+                var fullName = User.Identity?.Name ?? string.Empty;
 
-                if (!string.IsNullOrEmpty(userEmail) && !string.IsNullOrEmpty(userId))
+                if (!int.TryParse(idStr, out var id) || id <= 0)
                 {
-                    // Create user object from session data
-                    CurrentUser = new UserDto
-                    {
-                        Id = int.TryParse(userId, out int id) ? id : 1,
-                        FullName = userName ?? "User",
-                        Email = userEmail,
-                        Username = userEmail.Split('@')[0], // Extract username from email
-                        PhoneNumber = HttpContext.Session.GetString("UserPhone") ?? "",
-                        Address = HttpContext.Session.GetString("UserAddress") ?? "",
-                        DateOfBirth = DateTime.Now.AddYears(-25), // Default age
-                        AvatarUrl = "https://via.placeholder.com/150x150/007bff/ffffff?text=" + (userName?.Substring(0, 1).ToUpper() ?? "U")
-                    };
-                }
-                else
-                {
-                    // If not logged in, redirect to login
                     Response.Redirect("/Auth/Login");
+                    return;
                 }
+
+                CurrentUser = await _userService.GetUserByIdAsync(id) ?? new UserDto
+                {
+                    Id = id,
+                    FullName = fullName,
+                    Email = email,
+                    Username = string.IsNullOrEmpty(email) ? fullName : email.Split('@')[0],
+                    PhoneNumber = string.Empty,
+                    Address = string.Empty,
+                    DateOfBirth = DateTime.UtcNow.AddYears(-25),
+                    AvatarUrl = "https://via.placeholder.com/150x150/007bff/ffffff?text=" + ((fullName?.Length ?? 0) > 0 ? fullName.Substring(0, 1).ToUpper() : "U")
+                };
             }
             catch (Exception ex)
             {
-                // Log error and redirect to login
                 _logger.LogError(ex, "Error in Profile");
                 Response.Redirect("/Auth/Login");
             }
         }
 
+        [ValidateAntiForgeryToken]
         public IActionResult OnPostLoadUser(int userId)
         {
-            var user = _userService.GetUserById(userId);
-            if (user != null)
-            {
-                HttpContext.Session.SetObject("CurrentUser", user);
-            }
             return RedirectToPage();
         }
 
+        [ValidateAntiForgeryToken]
         public IActionResult OnPostSwitchUser(int userId)
         {
-            var user = _userService.GetUserById(userId);
-            if (user != null)
-            {
-                HttpContext.Session.SetObject("CurrentUser", user);
-            }
             return RedirectToPage();
         }
     }

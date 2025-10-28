@@ -36,6 +36,7 @@ namespace Infrastructure
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ICartService, CartService>();
             #endregion
 
             #region quartz config

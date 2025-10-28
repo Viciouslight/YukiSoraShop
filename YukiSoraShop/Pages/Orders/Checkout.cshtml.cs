@@ -3,15 +3,17 @@ using Application.Payments.Interfaces;
 using Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 
 namespace YukiSoraShop.Pages.Orders
 {
-    public class CheckoutModel : PageModel
+    [Authorize]
+    public class OrdersCheckoutModel : PageModel
     {
         private readonly IPaymentOrchestrator _payment;
         private readonly IUnitOfWork _uow;
 
-        public CheckoutModel(IPaymentOrchestrator payment, IUnitOfWork uow)
+        public OrdersCheckoutModel(IPaymentOrchestrator payment, IUnitOfWork uow)
         {
             _payment = payment;
             _uow = uow;
@@ -42,6 +44,7 @@ namespace YukiSoraShop.Pages.Orders
             return Page();
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostPayAsync()
         {
             if (OrderId <= 0)

@@ -27,6 +27,7 @@ namespace YukiSoraShop.Pages.Auth
         {
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
             try
@@ -50,7 +51,7 @@ namespace YukiSoraShop.Pages.Auth
                 // Store reset token in session (in real app, store in database with expiry)
                 HttpContext.Session.SetString("ResetToken", resetToken);
                 HttpContext.Session.SetString("ResetEmail", Input.Email);
-                HttpContext.Session.SetString("ResetExpiry", DateTime.Now.AddMinutes(15).ToString());
+                HttpContext.Session.SetString("ResetExpiry", DateTime.UtcNow.AddMinutes(15).ToString());
 
                 // Simulate sending email (in real app, send actual email)
                 _logger.LogInformation("Reset token generated for {Email}: {Token}", Input.Email, resetToken);

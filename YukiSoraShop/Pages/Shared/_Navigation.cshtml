@@ -1,44 +1,45 @@
-﻿@using YukiSoraShop.Services.Interfaces
-@inject IAuthorizationService AuthService
-
 @{
-    var userEmail = Context.Session.GetString("UserEmail");
-    var userName = Context.Session.GetString("UserName");
+    var isAuthenticated = User?.Identity?.IsAuthenticated == true;
+    var userName = User?.Identity?.Name ?? "";
 }
 
 <ul class="navbar-nav me-auto">
     <li class="nav-item">
         <a class="nav-link" href="/">Home</a>
     </li>
-    
-    @if (!string.IsNullOrEmpty(userEmail))
+
+    @if (isAuthenticated)
     {
-        @if (AuthService.IsAdmin())
+        if (User.IsInRole("Administrator"))
         {
-            <!-- Admin Menu - Dashboard only -->
             <li class="nav-item">
                 <a class="nav-link" href="/Admin/Dashboard">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
         }
-        else if (AuthService.IsStaff())
+        else if (User.IsInRole("Moderator"))
         {
-            <!-- Staff Menu - Product Management -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-box"></i> Quáº£n lÃ½ sáº£n pháº©m
+                    <i class="fas fa-box"></i> Quản lý sản phẩm
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/Staff/Products">
-                        <i class="fas fa-list"></i> Danh sÃ¡ch sáº£n pháº©m
-                    </a></li>
-                    <li><a class="dropdown-item" href="/Staff/Products/Create">
-                        <i class="fas fa-plus"></i> ThÃªm sáº£n pháº©m
-                    </a></li>
-                    <li><a class="dropdown-item" href="/Staff/Categories">
-                        <i class="fas fa-tags"></i> Quáº£n lÃ½ danh má»¥c
-                    </a></li>
+                    <li>
+                        <a class="dropdown-item" href="/Staff/Products">
+                            <i class="fas fa-list"></i> Danh sách sản phẩm
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/Staff/Products/Create">
+                            <i class="fas fa-plus"></i> Thêm sản phẩm
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/Staff/Categories">
+                            <i class="fas fa-tags"></i> Quản lý danh mục
+                        </a>
+                    </li>
                 </ul>
             </li>
         }
@@ -46,50 +47,56 @@
 </ul>
 
 <ul class="navbar-nav">
-    @if (string.IsNullOrEmpty(userEmail))
+    @if (!isAuthenticated)
     {
-        <!-- ChÆ°a Ä‘Äƒng nháº­p -->
         <li class="nav-item">
             <a class="nav-link" href="/Auth/Login">
-                <i class="fas fa-sign-in-alt"></i> ÄÄƒng nháº­p
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/Auth/Register">
-                <i class="fas fa-user-plus"></i> ÄÄƒng kÃ½
+                <i class="fas fa-user-plus"></i> Đăng ký
             </a>
         </li>
     }
     else
     {
-        <!-- ÄÃ£ Ä‘Äƒng nháº­p -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 <i class="fas fa-user"></i> @userName
-                @if (AuthService.IsAdmin())
+                @if (User.IsInRole("Administrator"))
                 {
                     <span class="badge bg-danger ms-1">Admin</span>
                 }
-                else if (AuthService.IsStaff())
+                else if (User.IsInRole("Moderator"))
                 {
                     <span class="badge bg-warning ms-1">Staff</span>
                 }
             </a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/Customer/Profile">
-                    <i class="fas fa-user-circle"></i> Profile
-                </a></li>
-                <li><a class="dropdown-item" href="/Customer/MyOrders">
-                    <i class="fas fa-receipt"></i> Đơn hàng của tôi
-                </a></li>
+                <li>
+                    <a class="dropdown-item" href="/Customer/Profile">
+                        <i class="fas fa-user-circle"></i> Profile
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="/Customer/MyOrders">
+                        <i class="fas fa-receipt"></i> Đơn hàng của tôi
+                    </a>
+                </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/Auth/Logout">
-                    <i class="fas fa-sign-out-alt"></i> ÄÄƒng xuáº¥t
-                </a></li>
+                <li>
+                    <form asp-page="/Auth/Logout" method="post" class="px-3 py-1">
+                        <button type="submit" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </button>
+                    </form>
+                </li>
             </ul>
         </li>
     }
-    
+
     <li class="nav-item">
         <a class="nav-link" href="/Customer/Cart">
             <i class="fas fa-shopping-cart"></i> Cart

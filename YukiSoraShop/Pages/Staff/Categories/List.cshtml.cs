@@ -1,21 +1,20 @@
 using Application.Services.Interfaces;
-using YukiSoraShop.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
-namespace YukiSoraShop.Pages.Staff
+namespace YukiSoraShop.Pages.Staff.Categories
 {
-    public class CategoriesModel : PageModel
+    [Authorize(Roles = "Moderator")]
+    public class StaffCategoriesModel : PageModel
     {
-        private readonly IAuthorizationService _authService;
         private readonly IProductService _productService;
-        private readonly ILogger<CategoriesModel> _logger;
+        private readonly ILogger<StaffCategoriesModel> _logger;
 
-        public CategoriesModel(IAuthorizationService authService, IProductService productService, ILogger<CategoriesModel> logger)
+        public StaffCategoriesModel(IProductService productService, ILogger<StaffCategoriesModel> logger)
         {
-            _authService = authService;
             _productService = productService;
             _logger = logger;
         }
@@ -25,11 +24,7 @@ namespace YukiSoraShop.Pages.Staff
         public async Task<IActionResult> OnGetAsync()
         {
             // Kiểm tra quyền Staff
-            if (!_authService.IsStaff())
-            {
-                Response.Redirect("/Auth/Login");
-                return Page();
-            }
+            
 
             try
             {

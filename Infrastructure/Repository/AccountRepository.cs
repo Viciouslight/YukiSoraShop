@@ -22,6 +22,7 @@ namespace Infrastructure.Repository
         public async Task<Account?> GetByEmailAsync(string email)
         {
             return await _appDbContext.Accounts
+                .Include(a => a.Role)
                 .FirstOrDefaultAsync(a => a.Email == email && !a.IsDeleted);
         }
     }

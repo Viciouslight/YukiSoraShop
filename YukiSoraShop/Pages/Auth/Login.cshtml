@@ -41,6 +41,7 @@
                             }
 
                             <form method="post" class="auth-form">
+                                @Html.AntiForgeryToken()
                                 <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                                 <div class="form-group mb-3">

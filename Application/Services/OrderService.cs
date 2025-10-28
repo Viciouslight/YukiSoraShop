@@ -34,30 +34,32 @@ namespace Application.Services
                 IsDeleted = false
             };
 
-            foreach (var item in list)
+            using (var tx = await _uow.BeginTransactionAsync())
             {
-                var product = await _uow.ProductRepository.GetByIdAsync(item.ProductId);
-                if (product == null) continue;
-
-                var unitPrice = product.Price;
-                var lineTotal = unitPrice * item.Quantity;
-                subtotal += lineTotal;
-
-                var od = new OrderDetail
+                foreach (var item in list)
                 {
-                    ProductId = product.Id,
-                    Quantity = item.Quantity,
-                    UnitPrice = unitPrice,
-                    LineTotal = lineTotal,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = createdBy,
-                    ModifiedAt = DateTime.UtcNow,
-                    ModifiedBy = createdBy,
-                    IsDeleted = false
-                };
+                    var product = await _uow.ProductRepository.GetByIdAsync(item.ProductId);
+                    if (product == null) continue;
 
-                order.OrderDetails.Add(od);
-            }
+                    var unitPrice = product.Price;
+                    var lineTotal = unitPrice * item.Quantity;
+                    subtotal += lineTotal;
+
+                    var od = new OrderDetail
+                    {
+                        ProductId = product.Id,
+                        Quantity = item.Quantity,
+                        UnitPrice = unitPrice,
+                        LineTotal = lineTotal,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = createdBy,
+                        ModifiedAt = DateTime.UtcNow,
+                        ModifiedBy = createdBy,
+                        IsDeleted = false
+                    };
+
+                    order.OrderDetails.Add(od);
+                }
 
             if (order.OrderDetails.Count == 0)
                 throw new InvalidOperationException("No valid items to create order.");
@@ -66,8 +68,10 @@ namespace Application.Services
             var tax = subtotal * 0.10m;
             order.GrandTotal = subtotal + tax + order.ShippingFee;
 
-            await _uow.OrderRepository.AddAsync(order);
-            await _uow.SaveChangesAsync();
+                await _uow.OrderRepository.AddAsync(order);
+                await _uow.SaveChangesAsync();
+                await tx.CommitAsync(ct);
+            }
             return order;
         }
     }

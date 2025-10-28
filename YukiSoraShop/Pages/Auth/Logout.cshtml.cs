@@ -6,7 +6,8 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class LogoutModel : PageModel
     {
-        public async Task<IActionResult> OnGetAsync()
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OnPostAsync()
         {
             // Sign out khỏi authentication
             await HttpContext.SignOutAsync("CookieAuth");

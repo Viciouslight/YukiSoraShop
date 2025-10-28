@@ -26,7 +26,7 @@ Mở file `YukiSoraShop/appsettings.json` và cập nhật connection string:
 ```json
 {
   "ConnectionStrings": {
-    "ClothingShop_DB": "Server=(local);uid=sa;pwd=12345;Database=ClothingShopDB;TrustServerCertificate=true;Encrypt=true;"
+    "YukiSoraShop_DB": "Server=(local);uid=sa;pwd=12345;Database=YukiSoraShopDB;TrustServerCertificate=true;Encrypt=true;"
   }
 }
 ```
@@ -35,7 +35,7 @@ Mở file `YukiSoraShop/appsettings.json` và cập nhật connection string:
 - `Server`: Tên server SQL Server (ví dụ: `(local)`, `localhost`, `.\SQLEXPRESS`)
 - `uid`: Username của SQL Server
 - `pwd`: Password của SQL Server
-- `Database`: Tên database (có thể giữ nguyên `ClothingShopDB`)
+- `Database`: Tên database (có thể giữ nguyên `YukiSoraShopDB`)
 
 #### Tạo Database và Migration
 

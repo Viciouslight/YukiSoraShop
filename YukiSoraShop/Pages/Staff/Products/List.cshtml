@@ -26,6 +26,7 @@
                 </h5>
             </div>
             <div class="card-body">
+                @await Html.PartialAsync("_Alerts")
                 @if (Model.Products != null && Model.Products.Any())
                 {
                     <div class="table-responsive">
@@ -58,8 +59,7 @@
                                                 <a href="/Staff/Products/Edit/@product.Id" class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-edit"></i> Sá»­a
                                                 </a>
-                                                <a href="/Staff/Products/Delete/@product.Id" class="btn btn-sm btn-outline-danger" 
-                                                   onclick="return confirm('Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a sáº£n pháº©m nÃ y?')">
+                                                <a href="/Staff/Products/Delete/@product.Id" class="btn btn-sm btn-outline-danger">
                                                     <i class="fas fa-trash"></i> XÃ³a
                                                 </a>
                                             </div>

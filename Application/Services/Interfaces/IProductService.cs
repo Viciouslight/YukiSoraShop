@@ -23,5 +23,6 @@ namespace Application.Services.Interfaces
         // Category methods
         Task<List<Category>> GetAllCategoriesAsync();
         Task<Category?> GetCategoryByIdAsync(int id);
+        Task<int> GetTotalProductsAsync();
     }
 }

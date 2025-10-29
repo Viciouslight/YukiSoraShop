@@ -11,5 +11,6 @@ namespace Application.Services.Interfaces
         Task<Account?> LoginAsync(string email, string password);
         Task<bool> ChangePasswordAsync(string email, string newPassword);
         Task<Account?> GetAccountByEmailAsync(string email);
+        Task<int> GetTotalUsersAsync();
     }
 }

@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.IRepository;
 using Application.Services.Interfaces;
 using Domain.Entities;
 
@@ -73,6 +74,11 @@ namespace Application.Services
                 await tx.CommitAsync(ct);
             }
             return order;
+        }
+
+        public async Task<int> GetTotalOrdersAsync()
+        {
+            return await _uow.OrderRepository.GetCountAsync();
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿using Domain.Common;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Domain.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.IRepository
 {
@@ -13,6 +14,7 @@ namespace Application.IRepository
         Task<TModel> GetByIdAsync(int id);
         IQueryable<TModel> GetAllQueryable(string includeProperties = "");
         Task<TModel> FindOneAsync(Expression<Func<TModel, bool>> predicate, string includeProperties = "");
+        Task<int> GetCountAsync();
         Task SaveChangesAsync();
     }
 }

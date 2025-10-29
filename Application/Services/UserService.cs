@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Application.IRepository;
 using Application.Services.Interfaces;
 using Domain.Entities;
 
@@ -140,5 +141,16 @@ namespace Application.Services
             }
         }
 
+        public async Task<int> GetTotalUsersAsync()
+        {
+            try
+            {
+                return await _uow.AccountRepository.GetCountAsync();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 }

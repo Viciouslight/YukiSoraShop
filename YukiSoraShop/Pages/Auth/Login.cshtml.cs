@@ -68,7 +68,7 @@ namespace YukiSoraShop.Pages.Auth
                 {
                     return LocalRedirect(returnUrl);
                 }
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Home");
             }
 
             ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không đúng.");
@@ -76,4 +76,3 @@ namespace YukiSoraShop.Pages.Auth
         }
     }
 }
-

@@ -1,32 +1,20 @@
-using Application.Services.Interfaces;
+using Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace YukiSoraShop.Pages.Admin
 {
     [Authorize(Roles = "Administrator")]
     public class AdminDashboardModel : PageModel
     {
-        private readonly IAuthorizationService _authService;
-        private readonly IUserService _userService;
-        private readonly IProductService _productService;
-        private readonly IOrderService _orderService;
-        private readonly IPaymentService _paymentService;
+        private readonly IUnitOfWork _uow;
 
-        // Cập nhật Constructor
-        public AdminDashboardModel(
-            IAuthorizationService authService,
-            IUserService userService,
-            IProductService productService,
-            IOrderService orderService,
-            IPaymentService paymentService)
+        public AdminDashboardModel(IUnitOfWork uow)
         {
-            _authService = authService;
-            _userService = userService;
-            _productService = productService;
-            _orderService = orderService;
-            _paymentService = paymentService;
+            _uow = uow;
         }
 
         public int TotalUsers { get; set; } = 3; // Số tài khoản đã seed
@@ -36,19 +24,16 @@ namespace YukiSoraShop.Pages.Admin
 
         public async Task OnGetAsync()
         {
-            // Kiểm tra quyền Admin
-            if (!_authService.IsAdmin())
-            {
-                Response.Redirect("/Auth/Login");
-                return;
-            }
+            // [Authorize] attribute ensures only Admin can access
+            // Tính toán thống kê cơ bản từ repositories
+            TotalUsers = await _uow.AccountRepository.GetAllQueryable().AsNoTracking().CountAsync();
+            TotalProducts = await _uow.ProductRepository.GetAllQueryable().AsNoTracking().CountAsync();
+            TotalOrders = await _uow.OrderRepository.GetAllQueryable().AsNoTracking().CountAsync();
 
-            TotalUsers = await _userService.GetTotalUsersAsync();
-            TotalProducts = await _productService.GetTotalProductsAsync();
-            TotalOrders = await _orderService.GetTotalOrdersAsync();
-            TotalRevenue = await _paymentService.GetTotalRevenueAsync();
-            // TODO: Lấy dữ liệu thống kê thực tế từ database
-            // Hiện tại sử dụng dữ liệu mẫu
+            // Tổng doanh thu dựa trên Payments đã thanh toán
+            var paidPayments = _uow.PaymentRepository.GetAllQueryable()
+                .Where(p => p.PaymentStatus == Domain.Enums.PaymentStatus.Paid);
+            TotalRevenue = await paidPayments.SumAsync(p => (decimal?)p.Amount) ?? 0m;
         }
     }
 }

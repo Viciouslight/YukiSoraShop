@@ -1,5 +1,7 @@
+using Application;
+using Application.Services;
+using Application.Services.Interfaces;
 using Infrastructure;
-
 namespace YukiSoraShop
 {
     public class Program
@@ -23,6 +25,16 @@ namespace YukiSoraShop
                 });
 
             builder.Services.AddAuthorization();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>(); // <-- THÊM DÒNG NÀY
+
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddPaymentServices(builder.Configuration);
+
+
 
             // Add session services
             builder.Services.AddDistributedMemoryCache();

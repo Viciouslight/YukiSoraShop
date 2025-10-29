@@ -18,7 +18,7 @@ namespace YukiSoraShop.Pages.Auth
         }
 
         [BindProperty]
-        public Application.DTOs.ForgotPasswordModel Input { get; set; } = new();
+        public Application.DTOs.ForgotPasswordDTO Input { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }

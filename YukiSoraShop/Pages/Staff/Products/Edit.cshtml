@@ -17,6 +17,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
+                @await Html.PartialAsync("_Alerts")
                 <form method="post">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -74,4 +75,3 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

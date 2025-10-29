@@ -6,12 +6,12 @@ namespace Application.Services.Interfaces
     public interface ICartService
     {
         // Session/in-memory helpers (for compatibility with existing callers)
-        List<CartItemDto> IncreaseQuantity(List<CartItemDto> cart, int productId);
-        List<CartItemDto> DecreaseQuantity(List<CartItemDto> cart, int productId);
-        List<CartItemDto> RemoveItem(List<CartItemDto> cart, int productId);
-        decimal GetTotal(List<CartItemDto> cart);
-        int GetCount(List<CartItemDto> cart);
-        List<OrderItemInput> ToOrderItems(List<CartItemDto> cart);
+        List<CartItemDTO> IncreaseQuantity(List<CartItemDTO> cart, int productId);
+        List<CartItemDTO> DecreaseQuantity(List<CartItemDTO> cart, int productId);
+        List<CartItemDTO> RemoveItem(List<CartItemDTO> cart, int productId);
+        decimal GetTotal(List<CartItemDTO> cart);
+        int GetCount(List<CartItemDTO> cart);
+        List<OrderItemInput> ToOrderItems(List<CartItemDTO> cart);
 
         // Persistent cart (Unit of Work + Entities)
         Task<Cart> GetOrCreateCartAsync(int accountId, CancellationToken ct = default);

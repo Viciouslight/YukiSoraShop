@@ -20,7 +20,7 @@ namespace YukiSoraShop.Pages.Customer
             _cartService = cartService;
         }
 
-        public List<CartItemDto> CartItems { get; set; } = new();
+        public List<CartItemDTO> CartItems { get; set; } = new();
         public decimal TotalAmount { get; set; }
         public int TotalItems { get; set; }
 
@@ -81,16 +81,16 @@ namespace YukiSoraShop.Pages.Customer
             var accountId = GetCurrentUserId();
             if (accountId <= 0)
             {
-                CartItems = new List<CartItemDto>();
+                CartItems = new List<CartItemDTO>();
                 TotalAmount = 0;
                 TotalItems = 0;
                 return;
             }
             var items = await _cartService.GetItemsAsync(accountId);
-            CartItems = items.Select(i => new CartItemDto
+            CartItems = items.Select(i => new CartItemDTO
             {
                 Quantity = i.Quantity,
-                Product = new ProductDto
+                Product = new ProductDTO
                 {
                     Id = i.ProductId,
                     Name = i.Product?.ProductName ?? $"Product #{i.ProductId}",

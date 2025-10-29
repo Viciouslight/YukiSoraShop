@@ -20,7 +20,7 @@ namespace YukiSoraShop.Pages.Customer
             _logger = logger;
         }
 
-        public UserDto? CurrentUser { get; set; }
+        public AccountDTO? CurrentUser { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -36,7 +36,7 @@ namespace YukiSoraShop.Pages.Customer
                     return;
                 }
 
-                CurrentUser = await _userService.GetUserByIdAsync(id) ?? new UserDto
+                CurrentUser = await _userService.GetUserByIdAsync(id) ?? new AccountDTO
                 {
                     Id = id,
                     FullName = fullName,

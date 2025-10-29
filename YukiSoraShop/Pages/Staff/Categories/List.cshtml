@@ -26,6 +26,7 @@
                 </h5>
             </div>
             <div class="card-body">
+                @await Html.PartialAsync("_Alerts")
                 @if (Model.Categories != null && Model.Categories.Any())
                 {
                     <div class="table-responsive">

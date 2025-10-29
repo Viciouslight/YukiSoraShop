@@ -15,33 +15,33 @@ namespace Application.Services
         }
 
         // In-memory helpers (backward compatibility)
-        public List<CartItemDto> IncreaseQuantity(List<CartItemDto> cart, int productId)
+        public List<CartItemDTO> IncreaseQuantity(List<CartItemDTO> cart, int productId)
         {
-            cart = cart ?? new List<CartItemDto>();
+            cart = cart ?? new List<CartItemDTO>();
             var item = cart.FirstOrDefault(i => i.Product.Id == productId);
             if (item != null) item.Quantity++;
             return cart;
         }
 
-        public List<CartItemDto> DecreaseQuantity(List<CartItemDto> cart, int productId)
+        public List<CartItemDTO> DecreaseQuantity(List<CartItemDTO> cart, int productId)
         {
-            cart = cart ?? new List<CartItemDto>();
+            cart = cart ?? new List<CartItemDTO>();
             var item = cart.FirstOrDefault(i => i.Product.Id == productId);
             if (item != null && item.Quantity > 1) item.Quantity--;
             return cart;
         }
 
-        public List<CartItemDto> RemoveItem(List<CartItemDto> cart, int productId)
+        public List<CartItemDTO> RemoveItem(List<CartItemDTO> cart, int productId)
         {
-            cart = cart ?? new List<CartItemDto>();
+            cart = cart ?? new List<CartItemDTO>();
             var item = cart.FirstOrDefault(i => i.Product.Id == productId);
             if (item != null) cart.Remove(item);
             return cart;
         }
 
-        public decimal GetTotal(List<CartItemDto> cart) => (cart ?? new List<CartItemDto>()).Sum(i => i.TotalPrice);
-        public int GetCount(List<CartItemDto> cart) => (cart ?? new List<CartItemDto>()).Sum(i => i.Quantity);
-        public List<OrderItemInput> ToOrderItems(List<CartItemDto> cart) => (cart ?? new List<CartItemDto>()).Select(ci => new OrderItemInput { ProductId = ci.Product.Id, Quantity = ci.Quantity }).ToList();
+        public decimal GetTotal(List<CartItemDTO> cart) => (cart ?? new List<CartItemDTO>()).Sum(i => i.TotalPrice);
+        public int GetCount(List<CartItemDTO> cart) => (cart ?? new List<CartItemDTO>()).Sum(i => i.Quantity);
+        public List<OrderItemInput> ToOrderItems(List<CartItemDTO> cart) => (cart ?? new List<CartItemDTO>()).Select(ci => new OrderItemInput { ProductId = ci.Product.Id, Quantity = ci.Quantity }).ToList();
 
         // Persistent cart methods
         public async Task<Cart> GetOrCreateCartAsync(int accountId, CancellationToken ct = default)

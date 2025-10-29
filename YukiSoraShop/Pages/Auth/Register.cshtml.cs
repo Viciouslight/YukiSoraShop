@@ -15,7 +15,7 @@ namespace YukiSoraShop.Pages.Auth
         }
 
         [BindProperty]
-        public Application.DTOs.RegisterModel Input { get; set; } = new();
+        public Application.DTOs.AccountRegistrationDTO Input { get; set; } = new();
 
         public void OnGet()
         {

@@ -12,12 +12,12 @@ namespace Application.Services
             _uow = uow;
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(int id)
+        public async Task<AccountDTO?> GetUserByIdAsync(int id)
         {
             var account = await _uow.AccountRepository.GetByIdAsync(id);
             if (account == null) return null;
 
-            return new UserDto
+            return new AccountDTO
             {
                 Id = account.Id,
                 Username = account.UserName,
@@ -37,10 +37,10 @@ namespace Application.Services
             };
         }
 
-        public async Task<List<UserDto>> GetAllUsersAsync()
+        public async Task<List<AccountDTO>> GetAllUsersAsync()
         {
             var accounts = await _uow.AccountRepository.GetAllAsync();
-            return accounts.Select(account => new UserDto
+            return accounts.Select(account => new AccountDTO
             {
                 Id = account.Id,
                 Username = account.UserName,

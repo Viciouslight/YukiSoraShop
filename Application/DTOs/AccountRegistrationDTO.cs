@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.DTOs
 {
-    public class RegisterModel
+    public class AccountRegistrationDTO
     {
         [Required(ErrorMessage = "Họ tên là bắt buộc")]
         [StringLength(100, ErrorMessage = "Họ tên không được quá 100 ký tự")]

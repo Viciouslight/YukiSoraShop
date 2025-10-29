@@ -5,8 +5,8 @@ namespace Application.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<UserDto?> GetUserByIdAsync(int id);
-        Task<List<UserDto>> GetAllUsersAsync();
+        Task<AccountDTO?> GetUserByIdAsync(int id);
+        Task<List<AccountDTO>> GetAllUsersAsync();
         Task<bool> UpdateProfileAsync(UpdateProfileCommand command);
     }
 }

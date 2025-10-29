@@ -16,7 +16,7 @@ namespace YukiSoraShop.Pages.Auth
         }
 
         [BindProperty]
-        public Application.DTOs.LoginModel Input { get; set; } = new();
+        public Application.DTOs.AccountLoginDTO Input { get; set; } = new();
 
         public string? ReturnUrl { get; set; }
 

@@ -13,6 +13,8 @@
     </div>
 </div>
 
+@await Html.PartialAsync("_Alerts")
+
 <div class="alert alert-warning">
     <i class="fas fa-exclamation-triangle"></i>
     Bạn có chắc chắn muốn xoá sản phẩm "<strong>@Model.Product?.ProductName</strong>"?
@@ -28,4 +30,3 @@
         <i class="fas fa-arrow-left"></i> Huỷ
     </a>
     </form>
-

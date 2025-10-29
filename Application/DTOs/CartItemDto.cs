@@ -1,8 +1,8 @@
 namespace Application.DTOs
 {
-    public class CartItemDto
+    public class CartItemDTO
     {
-        public ProductDto Product { get; set; } = new ProductDto();
+        public ProductDTO Product { get; set; } = new ProductDTO();
         public int Quantity { get; set; }
         public decimal TotalPrice => Product.Price * Quantity;
     }

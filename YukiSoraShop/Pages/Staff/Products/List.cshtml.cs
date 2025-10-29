@@ -20,6 +20,14 @@ namespace YukiSoraShop.Pages.Staff.Products
         }
 
         public List<Product> Products { get; set; } = new();
+        [BindProperty(SupportsGet = true)]
+        public int Page { get; set; } = 1;
+        [BindProperty(SupportsGet = true)]
+        public int Size { get; set; } = Application.DTOs.Pagination.PaginationDefaults.DefaultPageSize;
+        [BindProperty(SupportsGet = true)]
+        public string? Search { get; set; }
+        public int TotalPages { get; set; }
+        public int TotalItems { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -28,8 +36,10 @@ namespace YukiSoraShop.Pages.Staff.Products
 
             try
             {
-                // Lấy danh sách sản phẩm
-                Products = await _productService.GetAllProductsAsync();
+                var paged = await _productService.GetProductsPagedEntitiesAsync(Page, Size, Search);
+                Products = paged.Items.ToList();
+                TotalPages = paged.TotalPages;
+                TotalItems = paged.TotalItems;
             }
             catch (Exception ex)
             {

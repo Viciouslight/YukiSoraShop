@@ -13,7 +13,7 @@ namespace Application.Services
             _uow = uow;
         }
 
-        public async Task<bool> RegisterAsync(RegisterModel model)
+        public async Task<bool> RegisterAsync(AccountRegistrationDTO model)
         {
             try
             {

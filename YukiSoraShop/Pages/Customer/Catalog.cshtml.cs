@@ -2,6 +2,8 @@ using Application.Services.Interfaces;
 using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
+using Application.DTOs.Pagination;
 using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Customer
@@ -10,11 +12,13 @@ namespace YukiSoraShop.Pages.Customer
     {
         private readonly IProductService _productService;
         private readonly ICartService _cartService;
+        private readonly ILogger<CustomerCatalogModel> _logger;
 
-        public CustomerCatalogModel(IProductService productService, ICartService cartService)
+        public CustomerCatalogModel(IProductService productService, ICartService cartService, ILogger<CustomerCatalogModel> logger)
         {
             _productService = productService;
             _cartService = cartService;
+            _logger = logger;
         }
 
         public List<ProductDTO> Products { get; set; } = new();
@@ -31,10 +35,29 @@ namespace YukiSoraShop.Pages.Customer
 
         public async Task OnGetAsync()
         {
-            var paged = await _productService.GetProductsPagedAsync(Page, Size, Search, Category);
-            Products = paged.Items.ToList();
-            TotalPages = paged.TotalPages;
-            TotalItems = paged.TotalItems;
+            try
+            {
+                var size = Size <= 0 ? PaginationDefaults.DefaultPageSize : Math.Min(Size, PaginationDefaults.MaxPageSize);
+                var page = Page <= 0 ? PaginationDefaults.DefaultPageNumber : Page;
+
+                var paged = await _productService.GetProductsPagedAsync(page, size, Search, Category);
+                Products = paged.Items.ToList();
+                TotalPages = paged.TotalPages;
+                TotalItems = paged.TotalItems;
+
+                // Clamp current page to bounds for UI
+                if (TotalPages > 0 && Page > TotalPages) Page = TotalPages;
+                if (Page <= 0) Page = 1;
+                Size = size;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load catalog: page={Page}, size={Size}, search={Search}, category={Category}", Page, Size, Search, Category);
+                TempData["Error"] = "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
+                Products = new List<ProductDTO>();
+                TotalPages = 0;
+                TotalItems = 0;
+            }
         }
 
         // Removed sync helper; prefer async methods on service

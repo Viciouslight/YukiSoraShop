@@ -1,7 +1,7 @@
-using Application;
-using Application.Services;
-using Application.Services.Interfaces;
+
 using Infrastructure;
+using YukiSoraShop.Filters;
+
 namespace YukiSoraShop
 {
     public class Program
@@ -10,8 +10,10 @@ namespace YukiSoraShop
         {
 
             var builder = WebApplication.CreateBuilder(args);
-            // Add services to the container
-            builder.Services.AddRazorPages();
+            // Add services to the container (add global page exception filter)
+            builder.Services
+                .AddRazorPages()
+                .AddMvcOptions(o => { o.Filters.Add<GlobalExceptionPageFilter>(); });
 
             // Add Authentication services
             builder.Services.AddAuthentication("CookieAuth")
@@ -62,6 +64,8 @@ namespace YukiSoraShop
             app.UseStaticFiles();
 
             app.UseRouting();
+            // Razor Pages-style error handling: use /Error for exceptions and status codes
+            app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
             app.UseSession();
             
             app.UseAuthentication();

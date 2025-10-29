@@ -3,126 +3,58 @@ using Application.Services.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Application.DTOs.Pagination;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Application.Extensions;
 
 namespace Application.Services
 {
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _uow;
+        private readonly IMapper _mapper;
 
-        public ProductService(IUnitOfWork uow)
+        public ProductService(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
+            _mapper = mapper;
         }
 
         // DTO methods for display (async)
         public async Task<List<ProductDTO>> GetAllProductsDtoAsync()
         {
             var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
-            return await query
-                .Select(product => new ProductDTO
-                {
-                    Id = product.Id,
-                    Name = product.ProductName,
-                    Description = product.Description,
-                    Price = product.Price,
-                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
-                    Category = product.CategoryName,
-                    Stock = product.StockQuantity,
-                    IsAvailable = !product.IsDeleted,
-                })
-                .ToListAsync();
+            return await query.ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         public async Task<PagedResult<ProductDTO>> GetProductsPagedAsync(int pageNumber, int pageSize, string? search = null, string? category = null)
         {
             var filter = new PaginationFilter { PageNumber = pageNumber, PageSize = pageSize, Search = search, Category = category };
-            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
-            if (!string.IsNullOrWhiteSpace(filter.Search))
-                query = query.Where(p => EF.Functions.Like(p.ProductName, $"%{filter.Search}%"));
-            if (!string.IsNullOrWhiteSpace(filter.Category))
-                query = query.Where(p => p.CategoryName == filter.Category);
-
-            var total = await query.CountAsync();
-            var items = await query
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails")
+                .FilterBySearch(filter.Search)
+                .FilterByCategory(filter.Category)
                 .OrderByDescending(p => p.Id)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .Select(product => new ProductDTO
-                {
-                    Id = product.Id,
-                    Name = product.ProductName,
-                    Description = product.Description,
-                    Price = product.Price,
-                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
-                    Category = product.CategoryName,
-                    Stock = product.StockQuantity,
-                    IsAvailable = !product.IsDeleted,
-                })
-                .ToListAsync();
-
-            return new PagedResult<ProductDTO>
-            {
-                Items = items,
-                TotalItems = total,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize
-            };
+                .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider);
+            return await query.ToPagedResultAsync(filter.PageNumber, filter.PageSize);
         }
 
         public async Task<ProductDTO?> GetProductDtoByIdAsync(int id)
         {
             var product = await _uow.ProductRepository.FindOneAsync(p => p.Id == id, includeProperties: "ProductDetails");
             if (product == null) return null;
-            return new ProductDTO
-            {
-                Id = product.Id,
-                Name = product.ProductName,
-                Description = product.Description,
-                Price = product.Price,
-                ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
-                Category = product.CategoryName,
-                Stock = product.StockQuantity,
-                IsAvailable = !product.IsDeleted,
-            };
+            return _mapper.Map<ProductDTO>(product);
         }
 
         public async Task<List<ProductDTO>> GetProductsByNameAsync(string name)
         {
-            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
-            return await query
-                .Where(p => EF.Functions.Like(p.ProductName, $"%{name}%"))
-                .Select(product => new ProductDTO
-                {
-                    Id = product.Id,
-                    Name = product.ProductName,
-                    Description = product.Description,
-                    Price = product.Price,
-                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
-                    Category = product.CategoryName,
-                    Stock = product.StockQuantity,
-                    IsAvailable = !product.IsDeleted,
-                })
-                .ToListAsync();
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails").FilterBySearch(name);
+            return await query.ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         public async Task<List<ProductDTO>> GetProductsByCategoryAsync(string category)
         {
-            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails");
-            return await query
-                .Where(p => p.CategoryName == category)
-                .Select(product => new ProductDTO
-                {
-                    Id = product.Id,
-                    Name = product.ProductName,
-                    Description = product.Description,
-                    Price = product.Price,
-                    ImageUrl = product.ProductDetails.Select(pd => pd.ImageUrl).FirstOrDefault(),
-                    Category = product.CategoryName,
-                    Stock = product.StockQuantity,
-                    IsAvailable = !product.IsDeleted,
-                })
-                .ToListAsync();
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails").FilterByCategory(category);
+            return await query.ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         // Entity methods for CRUD operations
@@ -142,26 +74,11 @@ namespace Application.Services
         public async Task<PagedResult<Product>> GetProductsPagedEntitiesAsync(int pageNumber, int pageSize, string? search = null, string? category = null)
         {
             var filter = new PaginationFilter { PageNumber = pageNumber, PageSize = pageSize, Search = search, Category = category };
-            var query = _uow.ProductRepository.GetAllQueryable();
-            if (!string.IsNullOrWhiteSpace(filter.Search))
-                query = query.Where(p => EF.Functions.Like(p.ProductName, $"%{filter.Search}%"));
-            if (!string.IsNullOrWhiteSpace(filter.Category))
-                query = query.Where(p => p.CategoryName == filter.Category);
-
-            var total = await query.CountAsync();
-            var items = await query
-                .OrderByDescending(p => p.Id)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToListAsync();
-
-            return new PagedResult<Product>
-            {
-                Items = items,
-                TotalItems = total,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize
-            };
+            var query = _uow.ProductRepository.GetAllQueryable()
+                .FilterBySearch(filter.Search)
+                .FilterByCategory(filter.Category)
+                .OrderByDescending(p => p.Id);
+            return await Application.Extensions.QueryableExtensions.ToPagedResultAsync(query, filter.PageNumber, filter.PageSize);
         }
 
         public async Task<Product?> GetProductEntityByIdAsync(int id)

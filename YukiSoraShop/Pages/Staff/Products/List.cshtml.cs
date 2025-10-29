@@ -31,20 +31,27 @@ namespace YukiSoraShop.Pages.Staff.Products
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Kiểm tra quyền Staff
-            
-
             try
             {
-                var paged = await _productService.GetProductsPagedEntitiesAsync(Page, Size, Search);
+                var size = Size <= 0 ? Application.DTOs.Pagination.PaginationDefaults.DefaultPageSize : Math.Min(Size, Application.DTOs.Pagination.PaginationDefaults.MaxPageSize);
+                var page = Page <= 0 ? Application.DTOs.Pagination.PaginationDefaults.DefaultPageNumber : Page;
+
+                var paged = await _productService.GetProductsPagedEntitiesAsync(page, size, Search);
                 Products = paged.Items.ToList();
                 TotalPages = paged.TotalPages;
                 TotalItems = paged.TotalItems;
+
+                if (TotalPages > 0 && Page > TotalPages) Page = TotalPages;
+                if (Page <= 0) Page = 1;
+                Size = size;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading products list");
+                _logger.LogError(ex, "Error loading products list: page={Page}, size={Size}, search={Search}", Page, Size, Search);
+                TempData["Error"] = "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
                 Products = new List<Product>();
+                TotalPages = 0;
+                TotalItems = 0;
             }
 
             return Page();

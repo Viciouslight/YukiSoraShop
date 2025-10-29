@@ -7,57 +7,24 @@ namespace Application.Services
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _uow;
-        public UserService(IUnitOfWork uow)
+        private readonly AutoMapper.IMapper _mapper;
+        public UserService(IUnitOfWork uow, AutoMapper.IMapper mapper)
         {
             _uow = uow;
+            _mapper = mapper;
         }
 
         public async Task<AccountDTO?> GetUserByIdAsync(int id)
         {
             var account = await _uow.AccountRepository.GetByIdAsync(id);
             if (account == null) return null;
-
-            return new AccountDTO
-            {
-                Id = account.Id,
-                Username = account.UserName,
-                Email = account.Email,
-                FullName = account.FullName ?? "",
-                PhoneNumber = account.PhoneNumber ?? "",
-                Address = account.Address ?? string.Empty,
-                DateOfBirth = account.DateOfBirth,
-                Gender = account.Gender ?? string.Empty,
-                AvatarUrl = account.AvatarUrl ?? string.Empty,
-                RoleId = account.RoleId,
-                Status = account.Status,
-                IsExternal = account.IsExternal,
-                ExternalProvider = account.ExternalProvider,
-                CreatedAt = account.CreatedAt,
-                ModifiedAt = account.ModifiedAt
-            };
+            return _mapper.Map<AccountDTO>(account);
         }
 
         public async Task<List<AccountDTO>> GetAllUsersAsync()
         {
             var accounts = await _uow.AccountRepository.GetAllAsync();
-            return accounts.Select(account => new AccountDTO
-            {
-                Id = account.Id,
-                Username = account.UserName,
-                Email = account.Email,
-                FullName = account.FullName ?? "",
-                PhoneNumber = account.PhoneNumber ?? "",
-                Address = account.Address ?? string.Empty,
-                DateOfBirth = account.DateOfBirth,
-                Gender = account.Gender ?? string.Empty,
-                AvatarUrl = account.AvatarUrl ?? string.Empty,
-                RoleId = account.RoleId,
-                Status = account.Status,
-                IsExternal = account.IsExternal,
-                ExternalProvider = account.ExternalProvider,
-                CreatedAt = account.CreatedAt,
-                ModifiedAt = account.ModifiedAt
-            }).ToList();
+            return accounts.Select(a => _mapper.Map<AccountDTO>(a)).ToList();
         }
 
         public async Task<bool> UpdateProfileAsync(UpdateProfileCommand command)

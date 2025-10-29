@@ -4,13 +4,17 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<h1 class="text-danger">Có lỗi xảy ra</h1>
+<h2 class="text-danger">@Model.Message ?? "An error occurred while processing your request."</h2>
 
 @if (Model.ShowRequestId)
 {
     <p>
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        @if (Model.StatusCode != null)
+        {
+            <span class="ms-2 badge bg-secondary">@Model.StatusCode</span>
+        }
     </p>
 }
 

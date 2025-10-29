@@ -92,5 +92,10 @@ namespace Infrastructure.Repository
         {
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<int> GetCountAsync()
+        {
+            return await _dbSet.CountAsync(e => !e.IsDeleted);
+        }
     }
 }

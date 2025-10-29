@@ -1,6 +1,7 @@
-using Application.DTOs;
-using Application.Services.Interfaces;
 using Application;
+using Application.DTOs;
+using Application.IRepository;
+using Application.Services.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -186,6 +187,11 @@ namespace Application.Services
             {
                 return null;
             }
+        }
+
+        public async Task<int> GetTotalProductsAsync()
+        {
+            return await _uow.ProductRepository.GetCountAsync();
         }
     }
 }

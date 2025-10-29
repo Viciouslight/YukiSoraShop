@@ -45,7 +45,14 @@ namespace YukiSoraShop.Pages.Customer
                     PhoneNumber = string.Empty,
                     Address = string.Empty,
                     DateOfBirth = DateTime.UtcNow.AddYears(-25),
-                    AvatarUrl = "https://via.placeholder.com/150x150/007bff/ffffff?text=" + ((fullName?.Length ?? 0) > 0 ? fullName.Substring(0, 1).ToUpper() : "U")
+                    Gender = string.Empty,
+                    AvatarUrl = string.Empty,
+                    RoleId = 1,
+                    Status = "Active",
+                    IsExternal = false,
+                    ExternalProvider = null,
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow
                 };
             }
             catch (Exception ex)

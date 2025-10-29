@@ -122,6 +122,10 @@ public partial class AppDbContext
                     Email = "admin@gmail.com",
                     Password = "admin123",
                     PhoneNumber = "0123456789",
+                    Address = "",
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    Gender = "",
+                    AvatarUrl = "",
                     RoleId = 2, // Administrator role
                     Status = "Active",
                     IsExternal = false,
@@ -140,6 +144,10 @@ public partial class AppDbContext
                     Email = "staff@gmail.com",
                     Password = "staff123",
                     PhoneNumber = "0123456788",
+                    Address = "",
+                    DateOfBirth = new DateTime(1992, 1, 1),
+                    Gender = "",
+                    AvatarUrl = "",
                     RoleId = 3, // Moderator role
                     Status = "Active",
                     IsExternal = false,
@@ -158,6 +166,10 @@ public partial class AppDbContext
                     Email = "customer@gmail.com",
                     Password = "customer123",
                     PhoneNumber = "0123456787",
+                    Address = "",
+                    DateOfBirth = new DateTime(1995, 1, 1),
+                    Gender = "",
+                    AvatarUrl = "",
                     RoleId = 1, // Customer role
                     Status = "Active",
                     IsExternal = false,

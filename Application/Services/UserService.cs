@@ -1,7 +1,6 @@
 ﻿using Application.DTOs;
 using Application.IRepository;
 using Application.Services.Interfaces;
-using Domain.Entities;
 
 namespace Application.Services
 {
@@ -25,7 +24,16 @@ namespace Application.Services
                 Email = account.Email,
                 FullName = account.FullName ?? "",
                 PhoneNumber = account.PhoneNumber ?? "",
-                CreatedAt = account.CreatedAt
+                Address = account.Address ?? string.Empty,
+                DateOfBirth = account.DateOfBirth,
+                Gender = account.Gender ?? string.Empty,
+                AvatarUrl = account.AvatarUrl ?? string.Empty,
+                RoleId = account.RoleId,
+                Status = account.Status,
+                IsExternal = account.IsExternal,
+                ExternalProvider = account.ExternalProvider,
+                CreatedAt = account.CreatedAt,
+                ModifiedAt = account.ModifiedAt
             };
         }
 
@@ -39,118 +47,48 @@ namespace Application.Services
                 Email = account.Email,
                 FullName = account.FullName ?? "",
                 PhoneNumber = account.PhoneNumber ?? "",
-                CreatedAt = account.CreatedAt
+                Address = account.Address ?? string.Empty,
+                DateOfBirth = account.DateOfBirth,
+                Gender = account.Gender ?? string.Empty,
+                AvatarUrl = account.AvatarUrl ?? string.Empty,
+                RoleId = account.RoleId,
+                Status = account.Status,
+                IsExternal = account.IsExternal,
+                ExternalProvider = account.ExternalProvider,
+                CreatedAt = account.CreatedAt,
+                ModifiedAt = account.ModifiedAt
             }).ToList();
         }
 
-        public async Task<bool> RegisterAsync(RegisterModel model)
+        public async Task<bool> UpdateProfileAsync(UpdateProfileCommand command)
         {
             try
             {
-                // Kiểm tra email đã tồn tại chưa
-                var existingAccount = await _uow.AccountRepository.GetByEmailAsync(model.Email);
-                if (existingAccount != null)
+                var acc = await _uow.AccountRepository.GetByIdAsync(command.AccountId);
+                if (acc == null) return false;
+
+                acc.FullName = command.FullName?.Trim() ?? string.Empty;
+                acc.PhoneNumber = command.PhoneNumber?.Trim();
+                acc.Address = command.Address?.Trim() ?? string.Empty;
+                if (command.DateOfBirth.HasValue)
                 {
-                    return false; // Email đã tồn tại
+                    acc.DateOfBirth = command.DateOfBirth.Value;
                 }
+                acc.Gender = command.Gender?.Trim() ?? string.Empty;
+                acc.AvatarUrl = string.IsNullOrWhiteSpace(command.AvatarUrl) ? string.Empty : command.AvatarUrl.Trim();
+                acc.ModifiedAt = DateTime.UtcNow;
+                acc.ModifiedBy = string.IsNullOrWhiteSpace(command.ModifiedBy) ? "user" : command.ModifiedBy;
 
-                // Tạo account mới
-                var account = new Account
-                {
-                    UserName = model.Email, // Sử dụng email làm username
-                    Email = model.Email,
-                    FullName = model.FullName,
-                    PhoneNumber = model.PhoneNumber,
-                    RoleId = 1, // Default to Customer role
-                    Status = "Active",
-                    IsExternal = false,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = "System",
-                    ModifiedAt = DateTime.UtcNow,
-                    ModifiedBy = "System",
-                    IsDeleted = false
-                };
-
-                // Lưu password dạng plain text (không hash)
-                account.Password = model.Password;
-
-                // Lưu vào database
-                await _uow.AccountRepository.AddAsync(account);
+                _uow.AccountRepository.Update(acc);
                 await _uow.SaveChangesAsync();
-
                 return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public async Task<Account?> LoginAsync(string email, string password)
-        {
-            try
-            {
-                var account = await _uow.AccountRepository.GetByEmailAsync(email);
-                if (account == null) return null;
-
-                if (password == account.Password)
-                {
-                    return account;
-                }
-
-                return null;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public async Task<bool> ChangePasswordAsync(string email, string newPassword)
-        {
-            try
-            {
-                var account = await _uow.AccountRepository.GetByEmailAsync(email);
-                if (account == null) return false;
-
-                // Update password (plain text, no hashing as per user request)
-                account.Password = newPassword;
-                account.ModifiedAt = DateTime.UtcNow;
-                account.ModifiedBy = "User";
-
-                _uow.AccountRepository.Update(account);
-                await _uow.SaveChangesAsync();
-
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public async Task<Account?> GetAccountByEmailAsync(string email)
-        {
-            try
-            {
-                return await _uow.AccountRepository.GetByEmailAsync(email);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public async Task<int> GetTotalUsersAsync()
-        {
-            try
-            {
-                return await _uow.AccountRepository.GetCountAsync();
             }
             catch
             {
-                return 0;
+                return false;
             }
         }
+
+        // Auth-related methods moved to AuthService
     }
 }

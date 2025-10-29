@@ -1,156 +1,86 @@
 @page
-@model YukiSoraShop.Pages.Customer.CustomerCatalogModel
 @{
     ViewData["Title"] = "YukiSora Technology";
     Layout = "~/Pages/Shared/_AuthLayout.cshtml";
 }
 
 <div class="container-fluid px-0">
+    @if (TempData["LoggedOut"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show m-3" role="alert">
+            <i class="fas fa-info-circle me-2"></i> @TempData["LoggedOut"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-    <!-- Hero Section -->
-    <section class="hero-section d-flex align-items-center justify-content-center text-center position-relative" style="height: 90vh; background: url('/images/jewelry-hero.jpg') center/cover no-repeat;">
+    <section class="hero-section d-flex align-items-center justify-content-center text-center position-relative"
+             style="height: 90vh; background: url('/images/jewelry-hero.jpg') center/cover no-repeat;">
         <div class="overlay position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(0,0,0,0.5);"></div>
         <div class="hero-content position-relative text-white">
             <h1 class="display-3 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">YukiSora Technology</h1>
-            <p class="lead mb-4" style="font-weight: 300;">Kh·m ph· cÙng ngh?, s? l?a ch?n luÙn thu?c v? b?n!</p>
-            <a href="#featured-products" class="btn btn-light btn-lg px-5 rounded-pill shadow-sm">Kh·m ph· ngay</a>
+            <p class="lead mb-4" style="font-weight: 300;">Kh√°m ph√° c√¥ng ngh·ªá, s·ª± l·ª±a ch·ªçn lu√¥n thu·ªôc v·ªÅ b·∫°n!</p>
+            <a href="#featured-products" class="btn btn-light btn-lg px-5 rounded-pill shadow-sm">Kh√°m ph√° ngay</a>
         </div>
     </section>
 
-    <!-- About Section -->
     <section class="py-5 bg-light text-center">
         <div class="container">
-            <h2 class="fw-bold mb-4" style="font-family: 'Playfair Display', serif;">V? –?p B?t Ngu?n T? S? Tinh T?</h2>
+            <h2 class="fw-bold mb-4" style="font-family: 'Playfair Display', serif;">V·∫ª ƒê·∫πp B·∫Øt Ngu·ªìn T·ª´ S·ª± Tinh T·∫ø</h2>
             <p class="text-muted mx-auto" style="max-width: 700px;">
-                M?i s?n ph?m t?i YukiSora d?u du?c ch? t·c t? m? t? nh?ng b‡n tay t‡i hoa, k?t h?p gi?a ngh? thu?t v‡ phong c·ch hi?n d?i,
-                mang d?n v? d?p v?a sang tr?ng v?a ˝ nghia. Ngo‡i ra hi?u nang s? d?ng v‡ s?c m?nh c?a t?ng s?n ph?m d?u luÙn l‡m m?i kh·ch h‡ng h‡i lÚng
+                M·ªói s·∫£n ph·∫©m t·∫°i YukiSora ƒë·ªÅu ƒë∆∞·ª£c ch·∫ø t√°c t·ª´ nh·ªØng b√†n tay t√†i hoa, k·∫øt h·ª£p gi·ªØa ngh·ªá thu·∫≠t v√† phong c√°ch hi·ªán ƒë·∫°i,
+                mang ƒë·∫øn v·∫ª ƒë·∫πp v·ª´a sang tr·ªçng v·ª´a √Ω nghƒ©a.
             </p>
         </div>
     </section>
 
-    <!-- Quick Access Section -->
     <section class="py-5">
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-6">
                     <div class="card border-0 shadow-sm h-100 text-center p-4 hover-lift">
                         <i class="fas fa-user-circle fa-3x text-warning mb-3"></i>
-                        <h5 class="fw-bold mb-2">Khu v?c kh·ch h‡ng</h5>
-                        <p class="text-muted mb-4">Xem h? so, don h‡ng v‡ nh?ng s?n ph?m yÍu thÌch c?a b?n.</p>
+                        <h5 class="fw-bold mb-2">Khu v·ª±c kh√°ch h√†ng</h5>
+                        <p class="text-muted mb-4">Xem h·ªì s∆°, ƒë∆°n h√†ng v√† s·∫£n ph·∫©m y√™u th√≠ch c·ªßa b·∫°n.</p>
                         @{
                             var isAuthenticated = User?.Identity?.IsAuthenticated == true;
                         }
                         @if (!isAuthenticated)
                         {
-                            <a href="/Auth/Login" class="btn btn-outline-dark px-4 rounded-pill">–ang nh?p</a>
+                            <a href="/Auth/Login" class="btn btn-outline-dark px-4 rounded-pill">ƒêƒÉng nh·∫≠p</a>
                         }
                         else
                         {
-                            <a href="/Customer/Profile" class="btn btn-outline-dark px-4 rounded-pill">V‡o khu v?c kh·ch h‡ng</a>
+                            <a href="/Customer/Profile" class="btn btn-outline-dark px-4 rounded-pill">V√†o khu v·ª±c kh√°ch h√†ng</a>
                         }
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="card border-0 shadow-sm h-100 text-center p-4 hover-lift">
                         <i class="fas fa-gem fa-3x text-warning mb-3"></i>
-                        <h5 class="fw-bold mb-2">Gi? h‡ng c?a b?n</h5>
-                        <p class="text-muted mb-4">Xem l?i c·c s?n ph?m b?n yÍu thÌch v‡ s?n s‡ng s? h?u.</p>
-                        <a href="/Customer/ViewCart" class="btn btn-outline-dark px-4 rounded-pill">Xem gi? h‡ng</a>
+                        <h5 class="fw-bold mb-2">Gi·ªè h√†ng c·ªßa b·∫°n</h5>
+                        <p class="text-muted mb-4">Xem l·∫°i c√°c s·∫£n ph·∫©m ƒë√£ ch·ªçn v√† s·∫µn s√†ng thanh to√°n.</p>
+                        <a href="/Customer/Cart" class="btn btn-outline-dark px-4 rounded-pill">Xem gi·ªè h√†ng</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Featured Products Section -->
-    <section id="featured-products" class="py-5 bg-light">
+    <section id="featured-products" class="py-5 text-center bg-dark text-white">
         <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold" style="font-family: 'Playfair Display', serif;">B? Suu T?p N?i B?t</h2>
-                <p class="text-muted">Kh·m ph· nh?ng thi?t k? du?c yÍu thÌch nh?t c?a ch˙ng tÙi</p>
-            </div>
-
-            <div class="row g-4">
-                @if (Model.Products != null && Model.Products.Any())
-                {
-                    @foreach (var product in Model.Products)
-                    {
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card border-0 shadow-sm h-100 text-center hover-lift">
-                                <img src="@product.ImageUrl" class="card-img-top rounded-top" alt="@product.Name" style="height: 250px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold">@product.Name</h5>
-                                    <p class="text-muted small">@product.Description</p>
-                                    <p class="text-warning fw-bold mb-3">@product.Price.ToString("N0") VN–</p>
-                                    <button class="btn btn-dark btn-sm px-3 rounded-pill" onclick="addToCart(@product.Id, '@product.Name', @product.Price)">
-                                        <i class="fas fa-cart-plus me-2"></i>ThÍm v‡o gi?
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="col-12 text-center">
-                        <div class="alert alert-warning border-0 shadow-sm">
-                            Hi?n chua cÛ s?n ph?m n‡o trong b? suu t?p.
-                            <a href="/Customer" class="btn btn-outline-dark ms-2">Quay l?i</a>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action -->
-    <section class="py-5 text-center bg-dark text-white">
-        <div class="container">
-            <h3 class="fw-bold mb-3">Tham gia c?ng d?ng YukiSora Technology</h3>
-            <p class="text-light mb-4">–ang k˝ ngay d? nh?n uu d„i d?c quy?n v‡ kh·m ph· b? suu t?p m?i nh?t.</p>
-            <a href="/Auth/Register" class="btn btn-warning btn-lg px-5 rounded-pill">–ang k˝ ngay</a>
+            <h3 class="fw-bold mb-3">Kh√°m ph√° danh m·ª•c s·∫£n ph·∫©m</h3>
+            <p class="text-light mb-4">Truy c·∫≠p ngay ƒë·ªÉ xem ƒë·∫ßy ƒë·ªß s·∫£n ph·∫©m v√† ∆∞u ƒë√£i.</p>
+            <a href="/Customer/Catalog" class="btn btn-warning btn-lg px-5 rounded-pill">ƒêi t·ªõi Catalog</a>
         </div>
     </section>
 
 </div>
 
 @section Scripts {
-    <script>
-        function addToCart(id, name, price) {
-            let currentCount = parseInt(document.getElementById('cartCount')?.textContent || '0');
-            if (document.getElementById('cartCount')) {
-                document.getElementById('cartCount').textContent = currentCount + 1;
-            }
-            alert(`–„ thÍm "${name}" v‡o gi? h‡ng!`);
-        }
-
-        // Hover lift animation
-        document.querySelectorAll('.hover-lift').forEach(el => {
-            el.addEventListener('mouseenter', () => el.classList.add('shadow-lg', 'translate-up'));
-            el.addEventListener('mouseleave', () => el.classList.remove('shadow-lg', 'translate-up'));
-        });
-    </script>
-
     <style>
-        .translate-up {
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-        }
-
-        .hover-lift {
-            transition: all 0.3s ease;
-            border-radius: 20px;
-        }
-
-        .hero-section .overlay {
-            backdrop-filter: brightness(60%);
-        }
-
-        .hero-section .hero-content h1,
-        .hero-section .hero-content p {
-            animation: fadeInUp 1s ease;
-        }
+        .translate-up { transform: translateY(-5px); transition: all 0.3s ease; }
+        .hover-lift { transition: all 0.3s ease; border-radius: 20px; }
+        .hero-section .overlay { backdrop-filter: brightness(60%); }
+        .hero-section .hero-content h1, .hero-section .hero-content p { animation: fadeInUp 1s ease; }
     </style>
 }
-
-

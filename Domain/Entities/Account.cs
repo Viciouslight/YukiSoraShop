@@ -16,6 +16,14 @@ public partial class Account : BaseFullEntity
 
     public string? PhoneNumber { get; set; }
 
+    public string Address { get; set; } = string.Empty;
+
+    public DateTime DateOfBirth { get; set; }
+
+    public string Gender { get; set; } = string.Empty;
+
+    public string AvatarUrl { get; set; } = string.Empty;
+
     public int RoleId { get; set; }
 
     public string? Status { get; set; }

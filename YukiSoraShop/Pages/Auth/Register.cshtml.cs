@@ -7,11 +7,11 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class RegisterModel : PageModel
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public RegisterModel(IUserService userService)
+        public RegisterModel(IAuthService authService)
         {
-            _userService = userService;
+            _authService = authService;
         }
 
         [BindProperty]
@@ -37,7 +37,7 @@ namespace YukiSoraShop.Pages.Auth
             }
 
             // Thực hiện đăng ký
-            var result = await _userService.RegisterAsync(Input);
+            var result = await _authService.RegisterAsync(Input);
             
             if (result)
             {

@@ -11,7 +11,12 @@ namespace Application.DTOs
         public DateTime DateOfBirth { get; set; }
         public string Gender { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
+        public int RoleId { get; set; }
+        public string? Status { get; set; }
+        public bool IsExternal { get; set; }
+        public string? ExternalProvider { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
     }
 }
 

@@ -35,7 +35,7 @@ namespace YukiSoraShop.Pages.Orders
             if (OrderId <= 0)
             {
                 TempData["Error"] = "Thi?u OrderId";
-                return RedirectToPage("/Home");
+                return RedirectToPage("/Customer/Catalog");
             }
 
             var order = await _uow.OrderRepository.GetByIdAsync(OrderId);
@@ -50,7 +50,7 @@ namespace YukiSoraShop.Pages.Orders
             if (OrderId <= 0)
             {
                 TempData["Error"] = "Thi?u OrderId";
-                return RedirectToPage("/Home");
+                return RedirectToPage("/Customer/Catalog");
             }
 
             var cmd = new CreatePaymentCommand

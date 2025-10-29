@@ -8,11 +8,11 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class LoginModel : PageModel
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public LoginModel(IUserService userService)
+        public LoginModel(IAuthService authService)
         {
-            _userService = userService;
+            _authService = authService;
         }
 
         [BindProperty]
@@ -35,7 +35,7 @@ namespace YukiSoraShop.Pages.Auth
                 return Page();
             }
 
-            var account = await _userService.LoginAsync(Input.Email, Input.Password);
+            var account = await _authService.LoginAsync(Input.Email, Input.Password);
 
             if (account != null)
             {
@@ -68,7 +68,7 @@ namespace YukiSoraShop.Pages.Auth
                 {
                     return LocalRedirect(returnUrl);
                 }
-                return RedirectToPage("/Home");
+                return RedirectToPage("/Customer/Catalog");
             }
 
             ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không đúng.");

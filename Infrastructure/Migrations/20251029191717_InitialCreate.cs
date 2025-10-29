@@ -112,6 +112,10 @@ namespace Infrastructure.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsExternal = table.Column<bool>(type: "bit", nullable: false),
@@ -387,12 +391,12 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Accounts",
-                columns: new[] { "Id", "CreatedAt", "CreatedBy", "Email", "ExternalProvider", "FullName", "IsDeleted", "IsExternal", "ModifiedAt", "ModifiedBy", "Password", "PhoneNumber", "RoleId", "Status", "UserName" },
+                columns: new[] { "Id", "Address", "AvatarUrl", "CreatedAt", "CreatedBy", "DateOfBirth", "Email", "ExternalProvider", "FullName", "Gender", "IsDeleted", "IsExternal", "ModifiedAt", "ModifiedBy", "Password", "PhoneNumber", "RoleId", "Status", "UserName" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "admin@gmail.com", null, "Administrator", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "admin123", "0123456789", 2, "Active", "admin@gmail.com" },
-                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "staff@gmail.com", null, "Staff Member", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "staff123", "0123456788", 3, "Active", "staff@gmail.com" },
-                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "customer@gmail.com", null, "Customer User", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "customer123", "0123456787", 1, "Active", "customer@gmail.com" }
+                    { 1, "", "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@gmail.com", null, "Administrator", "", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "admin123", "0123456789", 2, "Active", "admin@gmail.com" },
+                    { 2, "", "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", new DateTime(1992, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "staff@gmail.com", null, "Staff Member", "", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "staff123", "0123456788", 3, "Active", "staff@gmail.com" },
+                    { 3, "", "", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", new DateTime(1995, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "customer@gmail.com", null, "Customer User", "", false, false, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "customer123", "0123456787", 1, "Active", "customer@gmail.com" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -9,12 +9,12 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class ChangePasswordModel : PageModel
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
         private readonly ILogger<ChangePasswordModel> _logger;
 
-        public ChangePasswordModel(IUserService userService, ILogger<ChangePasswordModel> logger)
+        public ChangePasswordModel(IAuthService authService, ILogger<ChangePasswordModel> logger)
         {
-            _userService = userService;
+            _authService = authService;
             _logger = logger;
         }
 
@@ -48,7 +48,7 @@ namespace YukiSoraShop.Pages.Auth
                 }
 
                 // Verify current password
-                var currentUser = await _userService.LoginAsync(userEmail, Input.CurrentPassword);
+                var currentUser = await _authService.LoginAsync(userEmail, Input.CurrentPassword);
                 if (currentUser == null)
                 {
                     ErrorMessage = "Mật khẩu hiện tại không đúng.";
@@ -69,7 +69,7 @@ namespace YukiSoraShop.Pages.Auth
                 }
 
                 // Update password in database
-                var success = await _userService.ChangePasswordAsync(userEmail, Input.NewPassword);
+                var success = await _authService.ChangePasswordAsync(userEmail, Input.NewPassword);
                 if (success)
                 {
                     SuccessMessage = "🎉 Đổi mật khẩu thành công! Tài khoản của bạn đã an toàn hơn.";

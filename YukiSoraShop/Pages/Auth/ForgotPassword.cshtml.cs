@@ -8,12 +8,12 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class ForgotPasswordModel : PageModel
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
         private readonly ILogger<ForgotPasswordModel> _logger;
 
-        public ForgotPasswordModel(IUserService userService, ILogger<ForgotPasswordModel> logger)
+        public ForgotPasswordModel(IAuthService authService, ILogger<ForgotPasswordModel> logger)
         {
-            _userService = userService;
+            _authService = authService;
             _logger = logger;
         }
 
@@ -38,7 +38,7 @@ namespace YukiSoraShop.Pages.Auth
                 }
 
                 // Check if email exists in database
-                var account = await _userService.GetAccountByEmailAsync(Input.Email);
+                var account = await _authService.GetAccountByEmailAsync(Input.Email);
                 if (account == null)
                 {
                     ErrorMessage = "❌ Email không tồn tại trong hệ thống. Vui lòng kiểm tra lại.";

@@ -7,11 +7,11 @@ namespace YukiSoraShop.Pages.Auth
 {
     public class ResetPasswordModel : PageModel
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public ResetPasswordModel(IUserService userService)
+        public ResetPasswordModel(IAuthService authService)
         {
-            _userService = userService;
+            _authService = authService;
         }
 
         [BindProperty]
@@ -96,7 +96,7 @@ namespace YukiSoraShop.Pages.Auth
                 }
 
                 // Update password in database
-                var success = await _userService.ChangePasswordAsync(Input.Email, Input.NewPassword);
+                var success = await _authService.ChangePasswordAsync(Input.Email, Input.NewPassword);
                 if (success)
                 {
                     // Clear session data

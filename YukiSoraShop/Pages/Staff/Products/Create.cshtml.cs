@@ -71,7 +71,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                 if (success)
                 {
                     TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
-                    return RedirectToPage("/Staff/Products");
+                    return RedirectToPage("/Staff/Products/List");
                 }
                 else
                 {

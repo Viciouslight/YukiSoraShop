@@ -15,6 +15,11 @@ namespace YukiSoraShop
             builder.Services.AddAuthentication("CookieAuth")
                 .AddCookie("CookieAuth", options =>
                 {
+                    options.Cookie.Name = ".YukiSora.Auth";
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SameSite = SameSiteMode.Lax; // protect CSRF while allowing normal nav
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // send over HTTPS only
+
                     options.LoginPath = "/Auth/Login";
                     options.LogoutPath = "/Auth/Logout";
                     options.AccessDeniedPath = "/Auth/Login";
@@ -29,8 +34,11 @@ namespace YukiSoraShop
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.Name = ".YukiSora.Session";
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
             builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -55,9 +63,8 @@ namespace YukiSoraShop
             app.UseAuthorization();
 
             app.MapRazorPages();
-            // Redirect root to Home page to avoid 404 at '/'
+            // Redirect root to Home landing page
             app.MapGet("/", () => Results.Redirect("/Home"));
-
 
             app.Run();
         }

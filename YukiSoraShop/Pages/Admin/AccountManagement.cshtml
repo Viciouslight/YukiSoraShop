@@ -46,7 +46,7 @@
                                 <td>@user.Address</td>
                                 <td>@user.CreatedAt.ToShortDateString()</td>
                                 <td>
-                                    <a asp-page="./EditAccount" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Sửa</a>
+                                    <a href="/Customer/EditProfile?id=@user.Id" class="btn btn-sm btn-warning">Sửa</a>
                                     <button class="btn btn-sm btn-danger" onclick="confirmDelete('@user.Id', '@user.FullName')">Xóa Mềm</button>
                                 </td>
                             </tr>

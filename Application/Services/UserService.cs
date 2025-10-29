@@ -89,6 +89,16 @@ namespace Application.Services
             }
         }
 
-        // Auth-related methods moved to AuthService
+        public async Task<int> GetTotalUsersAsync()
+        {
+            try
+            {
+                return await _uow.AccountRepository.GetCountAsync();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 }

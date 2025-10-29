@@ -31,15 +31,8 @@ namespace YukiSoraShop
 
             builder.Services.AddAuthorization();
 
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IOrderService, OrderService>();
-            builder.Services.AddScoped<IPaymentService, PaymentService>(); // <-- THÊM DÒNG NÀY
-
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPaymentServices(builder.Configuration);
-
-
 
             // Add session services
             builder.Services.AddDistributedMemoryCache();

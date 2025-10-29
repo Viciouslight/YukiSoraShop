@@ -19,6 +19,7 @@ namespace Infrastructure
             services.AddScoped<IPaymentGateway, VnPayGateway>();
             services.AddScoped<IPaymentOrchestrator, PaymentOrchestrator>();
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IPaymentQueryService, PaymentQueryService>();
 
             return services;
         }

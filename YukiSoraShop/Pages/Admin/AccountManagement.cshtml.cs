@@ -16,7 +16,7 @@ namespace YukiSoraShop.Pages.Admin
             _userService = userService;
         }
 
-        public List<UserDto> Users { get; set; } = new List<UserDto>();
+        public List<AccountDTO> Users { get; set; } = new List<AccountDTO>();
 
         public async Task OnGetAsync()
         {

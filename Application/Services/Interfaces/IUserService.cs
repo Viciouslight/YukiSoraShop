@@ -8,5 +8,6 @@ namespace Application.Services.Interfaces
         Task<AccountDTO?> GetUserByIdAsync(int id);
         Task<List<AccountDTO>> GetAllUsersAsync();
         Task<bool> UpdateProfileAsync(UpdateProfileCommand command);
+        Task<int> GetTotalUsersAsync();
     }
 }

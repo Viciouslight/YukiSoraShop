@@ -16,7 +16,7 @@ namespace YukiSoraShop.Pages.Auth
             HttpContext.Session.Clear();
             
             TempData["SuccessMessage"] = "Đăng xuất thành công!";
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Home");
         }
     }
 }

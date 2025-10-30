@@ -70,7 +70,11 @@ namespace YukiSoraShop.Pages.Customer
                 return RedirectToPage("/Auth/Login");
 
             await _cartService.AddItemAsync(accountId, id, 1);
-            return RedirectToPage(new { Page, Size, Search, Category });
+            TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
+            return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category });
+
+
+
         }
     }
 }

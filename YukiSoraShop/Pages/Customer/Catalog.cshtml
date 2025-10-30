@@ -10,6 +10,22 @@
     <div class="col-12">
         <h1 class="mb-4">Welcome to RazorPages Shop</h1>
         <p class="lead">Explore our products and manage your profile and cart!</p>
+
+        
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
     </div>
 </div>
 
@@ -62,9 +78,13 @@
                             <strong class="text-success">@product.Price.ToString("N0") VNĐ</strong>
                         </p>
                         <form method="post" asp-page-handler="AddToCart" class="d-inline">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@product.Id" />
                             <button type="submit" class="btn btn-outline-primary btn-sm">Add to Cart</button>
                         </form>
+                        <a asp-page="/Customer/ProductDetails" asp-route-id="@product.Id" class="btn btn-outline-secondary btn-sm ms-2">
+                            View Details
+                        </a>
                     </div>
                 </div>
             </div>
@@ -89,6 +109,16 @@
     </ul>
     </nav>
 
-@section Scripts { }
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            const alertEl = document.querySelector('.alert');
+            if (alertEl) {
+                const alert = new bootstrap.Alert(alertEl);
+                alert.close();
+            }
+        }, 3000);
+    </script>
+}
 
 

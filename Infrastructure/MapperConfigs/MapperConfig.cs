@@ -8,6 +8,8 @@ namespace Infrastructure.MapperConfigs
     {
         public MapperConfig()
         {
+            CreateMap<ProductDetail, ProductDetailDTO>();
+
             // Account -> AccountDTO
             CreateMap<Account, AccountDTO>();
 

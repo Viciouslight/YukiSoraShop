@@ -1,12 +1,8 @@
-﻿using Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema; 
-
-namespace Domain.Entities
+﻿namespace Application.DTOs
 {
-    [Table("ProductDetails")] 
-    public partial class ProductDetail : BaseFullEntity
+    public class ProductDetailDTO
     {
-        public int ProductId { get; set; }
+        public int Id { get; set; }
         public string? Color { get; set; }
         public string? Size { get; set; }
         public string? Material { get; set; }
@@ -14,6 +10,9 @@ namespace Domain.Entities
         public string? ImageUrl { get; set; }
         public int StockQuantity { get; set; }
         public decimal? AdditionalPrice { get; set; }
-        public virtual Product Product { get; set; } = null!;
+
+        public List<ProductDetailDTO>? ProductDetails { get; set; }
     }
+
+
 }

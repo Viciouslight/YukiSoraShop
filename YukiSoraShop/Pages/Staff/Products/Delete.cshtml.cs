@@ -7,7 +7,7 @@ using Domain.Entities;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
-    [Authorize(Roles = "Moderator")]
+    [Authorize(Roles = "Moderator,Staff")]
     public class StaffProductDeleteModel : PageModel
     {
         private readonly IProductService _productService;
@@ -59,4 +59,3 @@ namespace YukiSoraShop.Pages.Staff.Products
         }
     }
 }
-

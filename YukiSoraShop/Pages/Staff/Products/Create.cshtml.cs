@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
-    [Authorize(Roles = "Moderator")]
+    [Authorize(Roles = "Moderator,Staff")]
     public class StaffProductCreateModel : PageModel
     {
         private readonly IProductService _productService;
@@ -39,7 +40,6 @@ namespace YukiSoraShop.Pages.Staff.Products
         {
             try
             {
-                // Thiết lập CategoryName dựa trên CategoryId trước khi validate (field không bind từ form)
                 var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
                 if (category == null)
                 {
@@ -49,10 +49,20 @@ namespace YukiSoraShop.Pages.Staff.Products
                 }
                 Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
 
-                // Xóa lỗi ràng buộc cho field ẩn rồi validate lại toàn bộ model
-                ModelState.Remove("Product.CategoryName");
-                if (!TryValidateModel(Product))
+                // Clear ModelState and validate with correct prefix so hidden fields don't block
+                ModelState.Clear();
+                if (!TryValidateModel(Product, nameof(Product)))
                 {
+                    // Log specific validation errors to help debugging
+                    var errors = ModelState
+                        .Where(kvp => kvp.Value?.Errors?.Count > 0)
+                        .SelectMany(kvp => kvp.Value!.Errors.Select(err => new { Field = kvp.Key, Error = err.ErrorMessage }))
+                        .ToList();
+                    foreach (var e in errors)
+                    {
+                        _logger.LogWarning("Product create validation error: {Field} - {Error}", e.Field, e.Error);
+                    }
+                    TempData["Error"] = "Vui lòng kiểm tra các lỗi ở biểu mẫu và thử lại.";
                     await LoadCategoryOptions();
                     return Page();
                 }

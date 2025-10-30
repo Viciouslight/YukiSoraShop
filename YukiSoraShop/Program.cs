@@ -48,9 +48,6 @@ namespace YukiSoraShop
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
-            builder.Services.AddInfrastructureServices(builder.Configuration);
-            builder.Services.AddPaymentServices(builder.Configuration);
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline

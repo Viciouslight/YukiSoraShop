@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace YukiSoraShop.Pages.Staff.Categories
 {
-    [Authorize(Roles = "Moderator")]
+    [Authorize(Roles = "Moderator,Staff")]
     public class StaffCategoriesModel : PageModel
     {
         private readonly IProductService _productService;

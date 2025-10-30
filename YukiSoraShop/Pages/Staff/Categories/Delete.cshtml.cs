@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace YukiSoraShop.Pages.Staff.Categories
 {
-    [Authorize(Roles = "Moderator")]
+    [Authorize(Roles = "Moderator,Staff")]
     public class StaffCategoryDeleteModel : PageModel
     {
         private readonly ICategoryService _categoryService;
@@ -48,4 +48,3 @@ namespace YukiSoraShop.Pages.Staff.Categories
         }
     }
 }
-

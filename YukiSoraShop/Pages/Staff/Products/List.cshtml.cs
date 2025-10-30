@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
-    [Authorize(Roles = "Moderator")]
+    [Authorize(Roles = "Moderator,Staff")]
     public class StaffProductsModel : PageModel
     {
         private readonly IProductService _productService;

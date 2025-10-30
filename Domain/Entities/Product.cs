@@ -22,7 +22,8 @@ namespace Domain.Entities
         [Required]
         [StringLength(255)]
         public string CategoryName { get; set; } = null!;
-        public virtual Category Category { get; set; } = null!;
+        // Navigation can be null during create/edit posts; FK enforces requiredness
+        public virtual Category? Category { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
         public virtual ICollection<ProductDetail> ProductDetails { get; set; } = new List<ProductDetail>();

@@ -10,6 +10,8 @@ namespace Application.DTOs
         public string Category { get; set; } = string.Empty;
         public int Stock { get; set; }
         public bool IsAvailable { get; set; } = true;
+
+        public List<ProductDetailDTO> ProductDetails { get; set; } = new();
     }
 }
 

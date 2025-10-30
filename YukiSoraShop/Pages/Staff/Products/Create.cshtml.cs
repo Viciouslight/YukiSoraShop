@@ -37,33 +37,32 @@ namespace YukiSoraShop.Pages.Staff.Products
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
-            // Kiểm tra quyền Staff
-            
-
-            if (!ModelState.IsValid)
-            {
-                await LoadCategoryOptions();
-                return Page();
-            }
-
             try
             {
+                // Thiết lập CategoryName dựa trên CategoryId trước khi validate (field không bind từ form)
+                var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
+                if (category == null)
+                {
+                    ModelState.AddModelError("Product.CategoryId", "Danh mục không hợp lệ.");
+                    await LoadCategoryOptions();
+                    return Page();
+                }
+                Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
+
+                // Xóa lỗi ràng buộc cho field ẩn rồi validate lại toàn bộ model
+                ModelState.Remove("Product.CategoryName");
+                if (!TryValidateModel(Product))
+                {
+                    await LoadCategoryOptions();
+                    return Page();
+                }
+
                 // Set thông tin cơ bản
                 Product.CreatedAt = DateTime.UtcNow;
                 Product.CreatedBy = HttpContext.User?.Identity?.Name ?? "system";
                 Product.ModifiedAt = DateTime.UtcNow;
                 Product.ModifiedBy = HttpContext.User?.Identity?.Name ?? "system";
                 Product.IsDeleted = false;
-
-                // Thiết lập CategoryName dựa trên CategoryId để đảm bảo ràng buộc dữ liệu
-                var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
-                if (category == null)
-                {
-                    ModelState.AddModelError(string.Empty, "Danh mục không hợp lệ.");
-                    await LoadCategoryOptions();
-                    return Page();
-                }
-                Product.CategoryName = category.CategoryName;
 
                 // Lưu sản phẩm
                 var success = await _productService.CreateProductAsync(Product);
@@ -75,6 +74,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                 }
                 else
                 {
+                    TempData["Error"] = "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.";
                     ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
                 }
             }

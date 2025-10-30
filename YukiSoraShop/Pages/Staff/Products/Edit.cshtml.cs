@@ -37,23 +37,24 @@ namespace YukiSoraShop.Pages.Staff.Products
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                await LoadCategoryOptions();
-                return Page();
-            }
-
             try
             {
-                // ensure CategoryName stays in sync
+                // ensure CategoryName stays in sync before validate (field not bound from form)
                 var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
                 if (category == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Danh mục không hợp lệ.");
+                    ModelState.AddModelError("Product.CategoryId", "Danh mục không hợp lệ.");
                     await LoadCategoryOptions();
                     return Page();
                 }
-                Product.CategoryName = category.CategoryName;
+                Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
+
+                ModelState.Remove("Product.CategoryName");
+                if (!TryValidateModel(Product))
+                {
+                    await LoadCategoryOptions();
+                    return Page();
+                }
 
                 Product.ModifiedAt = DateTime.UtcNow;
                 Product.ModifiedBy = HttpContext.User?.Identity?.Name ?? "system";
@@ -64,6 +65,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                     TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
                     return RedirectToPage("/Staff/Products/List");
                 }
+                TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm.";
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi cập nhật sản phẩm.");
             }
             catch (Exception ex)
@@ -87,4 +89,3 @@ namespace YukiSoraShop.Pages.Staff.Products
         }
     }
 }
-

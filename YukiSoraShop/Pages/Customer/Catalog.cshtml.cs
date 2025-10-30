@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Application.DTOs.Pagination;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace YukiSoraShop.Pages.Customer
 {
@@ -32,6 +33,7 @@ namespace YukiSoraShop.Pages.Customer
         public string? Category { get; set; }
         public int TotalPages { get; set; }
         public int TotalItems { get; set; }
+        public List<SelectListItem> CategoryOptions { get; set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -49,6 +51,12 @@ namespace YukiSoraShop.Pages.Customer
                 if (TotalPages > 0 && Page > TotalPages) Page = TotalPages;
                 if (Page <= 0) Page = 1;
                 Size = size;
+
+                // Load categories for filter dropdown
+                var cats = await _productService.GetAllCategoriesAsync();
+                CategoryOptions = cats
+                    .Select(c => new SelectListItem { Value = c.CategoryName, Text = c.CategoryName, Selected = c.CategoryName == Category })
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -57,6 +65,7 @@ namespace YukiSoraShop.Pages.Customer
                 Products = new List<ProductDTO>();
                 TotalPages = 0;
                 TotalItems = 0;
+                CategoryOptions = new List<SelectListItem>();
             }
         }
 

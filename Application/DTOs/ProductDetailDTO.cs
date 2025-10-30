@@ -10,8 +10,6 @@
         public string? ImageUrl { get; set; }
         public int StockQuantity { get; set; }
         public decimal? AdditionalPrice { get; set; }
-
-        public List<ProductDetailDTO>? ProductDetails { get; set; }
     }
 
 

@@ -58,7 +58,10 @@
         <form method="get" class="d-flex gap-2">
             <input type="hidden" name="size" value="@Model.Size" />
             <input class="form-control" type="text" name="search" value="@Model.Search" placeholder="Search products..." />
-            <button class="btn btn-outline-primary" type="submit">Search</button>
+            <select class="form-select" name="category" asp-items="Model.CategoryOptions">
+                <option value="">-- All categories --</option>
+            </select>
+            <button class="btn btn-outline-primary" type="submit">Filter</button>
         </form>
     </div>
     <div class="col-12 text-muted">@Model.TotalItems sản phẩm</div>

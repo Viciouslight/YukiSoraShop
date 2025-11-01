@@ -1,5 +1,6 @@
 
 using Infrastructure;
+using Serilog;
 using YukiSoraShop.Filters;
 
 namespace YukiSoraShop
@@ -8,71 +9,89 @@ namespace YukiSoraShop
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                        .WriteTo.Console()
+                        .WriteTo.File("Logs/logBootstrap-.txt", rollingInterval: RollingInterval.Day)
+                        .CreateBootstrapLogger();
+            try
+            {
+                var builder = WebApplication.CreateBuilder(args);
 
-            var builder = WebApplication.CreateBuilder(args);
-            // Add services to the container (add global page exception filter)
-            builder.Services
-                .AddRazorPages()
-                .AddMvcOptions(o => { o.Filters.Add<GlobalExceptionPageFilter>(); });
+                builder.Host.UseSerilog((ctx, services, cfg) =>
+                    cfg.ReadFrom.Configuration(ctx.Configuration)
+                       .ReadFrom.Services(services)
+                       .Enrich.FromLogContext());
+                
+                builder.Services
+                    .AddRazorPages()
+                    .AddMvcOptions(o => { o.Filters.Add<GlobalExceptionPageFilter>(); });
 
-            // Add Authentication services
-            builder.Services.AddAuthentication("CookieAuth")
-                .AddCookie("CookieAuth", options =>
+                builder.Services.AddAuthentication("CookieAuth")
+                    .AddCookie("CookieAuth", options =>
+                    {
+                        options.Cookie.Name = ".YukiSora.Auth";
+                        options.Cookie.HttpOnly = true;
+                        options.Cookie.SameSite = SameSiteMode.Lax; 
+                        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+
+                        options.LoginPath = "/Auth/Login";
+                        options.LogoutPath = "/Auth/Logout";
+                        options.AccessDeniedPath = "/Auth/Login";
+                        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                        options.SlidingExpiration = true;
+                    });
+
+                builder.Services.AddAuthorization();
+
+                builder.Services.AddInfrastructureServices(builder.Configuration);
+                builder.Services.AddPaymentServices(builder.Configuration);
+
+                // Add session services
+                builder.Services.AddDistributedMemoryCache();
+                builder.Services.AddSession(options =>
                 {
-                    options.Cookie.Name = ".YukiSora.Auth";
+                    options.IdleTimeout = TimeSpan.FromMinutes(30);
+                    options.Cookie.Name = ".YukiSora.Session";
                     options.Cookie.HttpOnly = true;
-                    options.Cookie.SameSite = SameSiteMode.Lax; // protect CSRF while allowing normal nav
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // send over HTTPS only
-
-                    options.LoginPath = "/Auth/Login";
-                    options.LogoutPath = "/Auth/Logout";
-                    options.AccessDeniedPath = "/Auth/Login";
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                    options.SlidingExpiration = true;
+                    options.Cookie.IsEssential = true;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
 
-            builder.Services.AddAuthorization();
+                var app = builder.Build();
 
-            builder.Services.AddInfrastructureServices(builder.Configuration);
-            builder.Services.AddPaymentServices(builder.Configuration);
+                if (!app.Environment.IsDevelopment())
+                {
+                    app.UseExceptionHandler("/Error");
+                    app.UseHsts();
+                }
 
-            // Add session services
-            builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.Name = ".YukiSora.Session";
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            });
+                app.UseSerilogRequestLogging();
 
-            var app = builder.Build();
+                app.UseHttpsRedirection();
+                app.UseStaticFiles();
 
-            // Configure the HTTP request pipeline
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
+                app.UseRouting();
+                // Razor Pages-style error handling: use /Error for exceptions and status codes
+                app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
+                app.UseSession();
+
+                app.UseAuthentication();
+                app.UseAuthorization();
+
+                app.MapRazorPages();
+                app.MapGet("/", () => Results.Redirect("/Home"));
+
+                app.Run();
             }
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-            // Razor Pages-style error handling: use /Error for exceptions and status codes
-            app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
-            app.UseSession();
-            
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.MapRazorPages();
-            // Redirect root to Home landing page
-            app.MapGet("/", () => Results.Redirect("/Home"));
-
-            app.Run();
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application failed to start");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }

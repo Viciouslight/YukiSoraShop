@@ -46,8 +46,8 @@ namespace YukiSoraShop
                 builder.Services.AddInfrastructureServices(builder.Configuration);
                 builder.Services.AddPaymentServices(builder.Configuration);
 
-                // Add session services
                 builder.Services.AddDistributedMemoryCache();
+                builder.Services.AddMemoryCache();
                 builder.Services.AddSession(options =>
                 {
                     options.IdleTimeout = TimeSpan.FromMinutes(30);

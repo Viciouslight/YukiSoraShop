@@ -29,7 +29,7 @@ namespace Infrastructure.Repository
 
         public async Task<IEnumerable<TModel>> GetAllAsync()
         {
-            return await _dbSet.Where(e => !e.IsDeleted).ToListAsync();
+            return await _dbSet.AsNoTracking().Where(e => !e.IsDeleted).ToListAsync();
         }
 
         public async Task<TModel> GetByIdAsync(int id)
@@ -85,7 +85,7 @@ namespace Infrastructure.Repository
                 }
             }
 
-            return await query.Where(x => !x.IsDeleted).FirstOrDefaultAsync(predicate);
+            return await query.AsNoTracking().Where(x => !x.IsDeleted).FirstOrDefaultAsync(predicate);
         }
 
         public async Task SaveChangesAsync()

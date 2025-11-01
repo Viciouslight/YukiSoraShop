@@ -75,6 +75,7 @@ namespace Application.Services
         {
             var filter = new PaginationFilter { PageNumber = pageNumber, PageSize = pageSize, Search = search, Category = category };
             var query = _uow.ProductRepository.GetAllQueryable()
+                .AsNoTracking()
                 .FilterBySearch(filter.Search)
                 .FilterByCategory(filter.Category)
                 .OrderByDescending(p => p.Id);

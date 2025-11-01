@@ -20,9 +20,10 @@ namespace Infrastructure.Repository
 
         public Task<List<Product>> GetAllProductsAsync()
         {
-            return  _appDbContext.Products
-        .Include(p => p.ProductDetails)
-        .ToListAsync();
+            return _appDbContext.Products
+                .AsNoTracking()
+                .Include(p => p.ProductDetails)
+                .ToListAsync();
         }
     }
 }

@@ -4,6 +4,7 @@ using Application.Services;
 using Application.Services.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repository;
+using Infrastructure.Reporting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,8 @@ namespace Infrastructure
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICartService, CartService>();
+            // Reporting / Dashboard
+            services.AddScoped<Application.Admin.Interfaces.IAdminDashboardService, AdminDashboardService>();
             #endregion
 
             #region quartz config

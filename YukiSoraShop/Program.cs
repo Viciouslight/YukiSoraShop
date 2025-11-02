@@ -2,6 +2,7 @@
 using Infrastructure;
 using Serilog;
 using YukiSoraShop.Filters;
+using YukiSoraShop.Hubs;
 
 namespace YukiSoraShop
 {
@@ -45,6 +46,7 @@ namespace YukiSoraShop
 
                 builder.Services.AddInfrastructureServices(builder.Configuration);
                 builder.Services.AddPaymentServices(builder.Configuration);
+                builder.Services.AddSignalR();
 
                 builder.Services.AddDistributedMemoryCache();
                 builder.Services.AddMemoryCache();
@@ -80,6 +82,7 @@ namespace YukiSoraShop
                 app.UseAuthorization();
 
                 app.MapRazorPages();
+                app.MapHub<AdminDashboardHub>("/hubs/adminDashboard");
                 app.MapGet("/", () => Results.Redirect("/Home"));
 
                 app.Run();

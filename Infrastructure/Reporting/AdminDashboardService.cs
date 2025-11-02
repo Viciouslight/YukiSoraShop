@@ -19,13 +19,24 @@ namespace Infrastructure.Reporting
             _cache = cache;
         }
 
-        public async Task<AdminDashboardSummary> GetSummaryAsync(CancellationToken ct = default)
+        public Task<AdminDashboardSummary> GetSummaryAsync(CancellationToken ct = default)
         {
             if (_cache.TryGetValue(CacheKey, out AdminDashboardSummary cached))
             {
-                return cached;
+                return Task.FromResult(cached);
             }
 
+            return LoadAndCacheAsync(ct);
+        }
+
+        public async Task<AdminDashboardSummary> RefreshSummaryAsync(CancellationToken ct = default)
+        {
+            _cache.Remove(CacheKey);
+            return await LoadAndCacheAsync(ct);
+        }
+
+        private async Task<AdminDashboardSummary> LoadAndCacheAsync(CancellationToken ct)
+        {
             var totalUsers = await _uow.AccountRepository.GetCountAsync();
             var totalProducts = await _uow.ProductRepository.GetCountAsync();
             var totalOrders = await _uow.OrderRepository.GetCountAsync();

@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+using Application.Admin.Interfaces;
+using YukiSoraShop.Hubs;
 
 namespace YukiSoraShop.Pages.Admin
 {
@@ -14,12 +17,21 @@ namespace YukiSoraShop.Pages.Admin
     {
         private readonly IOrderService _orderService;
         private readonly IPaymentOrchestrator _paymentOrchestrator;
+        private readonly IAdminDashboardService _dashboardService;
+        private readonly IHubContext<AdminDashboardHub> _hubContext;
         private readonly ILogger<CashPaymentsModel> _logger;
 
-        public CashPaymentsModel(IOrderService orderService, IPaymentOrchestrator paymentOrchestrator, ILogger<CashPaymentsModel> logger)
+        public CashPaymentsModel(
+            IOrderService orderService,
+            IPaymentOrchestrator paymentOrchestrator,
+            IAdminDashboardService dashboardService,
+            IHubContext<AdminDashboardHub> hubContext,
+            ILogger<CashPaymentsModel> logger)
         {
             _orderService = orderService;
             _paymentOrchestrator = paymentOrchestrator;
+            _dashboardService = dashboardService;
+            _hubContext = hubContext;
             _logger = logger;
         }
 
@@ -52,6 +64,17 @@ namespace YukiSoraShop.Pages.Admin
                 if (result.IsSuccess)
                 {
                     StatusMessage = $"✅ Đã xác nhận thanh toán tiền mặt cho đơn hàng #{orderId}.";
+                    try
+                    {
+                        var summary = await _dashboardService.RefreshSummaryAsync();
+                        await BroadcastSummaryAsync(summary);
+                        await _hubContext.Clients.Group(AdminDashboardHub.AdminGroupName)
+                            .SendAsync("CashOrderRemoved", new { orderId });
+                    }
+                    catch (Exception broadcastEx)
+                    {
+                        _logger.LogWarning(broadcastEx, "Failed to broadcast SignalR update for order {OrderId}", orderId);
+                    }
                 }
                 else
                 {
@@ -72,7 +95,7 @@ namespace YukiSoraShop.Pages.Admin
             var orders = await _orderService.GetOrdersAwaitingCashAsync();
             Orders = orders.Select(o =>
             {
-                var cashPayment = o.Payments
+                var cashPayment = o.Payments?
                     .OrderByDescending(p => p.Id)
                     .FirstOrDefault(p => string.Equals(p.PaymentMethod?.Name, "Cash", StringComparison.OrdinalIgnoreCase));
 
@@ -87,6 +110,12 @@ namespace YukiSoraShop.Pages.Admin
                     PaymentStatus = cashPayment?.PaymentStatus.ToString() ?? "Pending"
                 };
             }).ToList();
+        }
+
+        private Task BroadcastSummaryAsync(Application.Admin.DTOs.AdminDashboardSummary summary)
+        {
+            return _hubContext.Clients.Group(AdminDashboardHub.AdminGroupName)
+                .SendAsync("DashboardSummaryUpdated", summary);
         }
 
         public class CashOrderVm

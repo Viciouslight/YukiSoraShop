@@ -89,7 +89,7 @@ namespace Application.Services
 
         public Task<Order?> GetOrderWithDetailsAsync(int id)
         {
-            return _uow.OrderRepository.FindOneAsync(o => o.Id == id, "OrderDetails.Product,Payments.PaymentMethod");
+            return _uow.OrderRepository.FindOneAsync(o => o.Id == id, "Account,OrderDetails.Product,Payments.PaymentMethod");
         }
 
         public async Task<List<Order>> GetOrdersAwaitingCashAsync(CancellationToken ct = default)

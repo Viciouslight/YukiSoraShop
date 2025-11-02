@@ -1,10 +1,14 @@
+using Application.Admin.Interfaces;
 using Application.Payments.Interfaces;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
+using YukiSoraShop.Hubs;
 
 namespace YukiSoraShop.Pages.Orders
 {
@@ -13,11 +17,22 @@ namespace YukiSoraShop.Pages.Orders
     {
         private readonly IOrderService _orderService;
         private readonly IPaymentOrchestrator _paymentOrchestrator;
+        private readonly IAdminDashboardService _dashboardService;
+        private readonly IHubContext<AdminDashboardHub> _hubContext;
+        private readonly ILogger<OrdersPaymentMethodModel> _logger;
 
-        public OrdersPaymentMethodModel(IOrderService orderService, IPaymentOrchestrator paymentOrchestrator)
+        public OrdersPaymentMethodModel(
+            IOrderService orderService,
+            IPaymentOrchestrator paymentOrchestrator,
+            IAdminDashboardService dashboardService,
+            IHubContext<AdminDashboardHub> hubContext,
+            ILogger<OrdersPaymentMethodModel> logger)
         {
             _orderService = orderService;
             _paymentOrchestrator = paymentOrchestrator;
+            _dashboardService = dashboardService;
+            _hubContext = hubContext;
+            _logger = logger;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -79,6 +94,34 @@ namespace YukiSoraShop.Pages.Orders
             {
                 var createdBy = User.Identity?.Name ?? "customer";
                 var result = await _paymentOrchestrator.CreateCashPaymentAsync(OrderId, createdBy);
+                if (result.IsSuccess)
+                {
+                    try
+                    {
+                        var orderSnapshot = await _orderService.GetOrderWithDetailsAsync(OrderId);
+                        if (orderSnapshot != null)
+                        {
+                            await _hubContext.Clients.Group(AdminDashboardHub.AdminGroupName)
+                                .SendAsync("CashOrderAdded", new
+                                {
+                                    orderId = orderSnapshot.Id,
+                                    customerName = orderSnapshot.Account?.FullName ?? orderSnapshot.Account?.UserName ?? $"User #{orderSnapshot.AccountId}",
+                                    customerEmail = orderSnapshot.Account?.Email ?? string.Empty,
+                                    createdAt = orderSnapshot.CreatedAt,
+                                    grandTotal = orderSnapshot.GrandTotal ?? (orderSnapshot.Subtotal + orderSnapshot.ShippingFee),
+                                    paymentStatus = "Pending"
+                                });
+                        }
+
+                        var summary = await _dashboardService.RefreshSummaryAsync();
+                        await _hubContext.Clients.Group(AdminDashboardHub.AdminGroupName)
+                            .SendAsync("DashboardSummaryUpdated", summary);
+                    }
+                    catch (Exception broadcastEx)
+                    {
+                        _logger.LogWarning(broadcastEx, "Failed to broadcast cash order creation for OrderId {OrderId}", OrderId);
+                    }
+                }
                 TempData["SuccessMessage"] = result.Message;
                 return RedirectToPage("/Orders/CashConfirmation", new { OrderId });
             }

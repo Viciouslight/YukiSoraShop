@@ -66,7 +66,7 @@
                     <th>Kích thước</th>
                     <th>Chất liệu</th>
                     <th>Xuất xứ</th>
-                    <th>Tồn kho</th>
+                    <th>Mô tả chi tiết</th>
                     <th>Giá phụ</th>
                     <th>Ảnh</th>
                 </tr>
@@ -79,7 +79,7 @@
                         <td>@detail.Size</td>
                         <td>@detail.Material</td>
                         <td>@detail.Origin</td>
-                        <td>@detail.StockQuantity</td>
+                        <td>@detail.Description</td>
                         <td>@((detail.AdditionalPrice ?? 0).ToString("N0")) VNĐ</td>
                         <td>
                             <img src="@detail.ImageUrl"

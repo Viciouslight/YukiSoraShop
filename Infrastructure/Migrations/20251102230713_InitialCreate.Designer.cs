@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251102211755_InitialCreate")]
+    [Migration("20251102230713_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -694,6 +694,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -722,9 +725,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Size")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

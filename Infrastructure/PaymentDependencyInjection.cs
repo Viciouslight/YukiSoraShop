@@ -16,7 +16,7 @@ namespace Infrastructure
             services.Configure<VnPayOptions>(config.GetSection("Vnpay"));
             services.AddHttpContextAccessor();
 
-            services.AddScoped<IPaymentGateway, VnPayGateway>();
+            services.AddScoped<IVnPayGateway, VnPayPaymentGateway>();
             services.AddScoped<IPaymentOrchestrator, PaymentOrchestrator>();
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IPaymentQueryService, PaymentQueryService>();

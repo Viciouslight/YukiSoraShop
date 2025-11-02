@@ -1,0 +1,81 @@
+@page
+@model YukiSoraShop.Pages.Orders.OrdersPaymentMethodModel
+@{
+    ViewData["Title"] = "Chọn phương thức thanh toán";
+}
+
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-wallet text-primary"></i> Chọn phương thức thanh toán</h5>
+                <span class="badge bg-info text-dark">Mã đơn: @Model.OrderId</span>
+            </div>
+            <div class="card-body">
+                @await Html.PartialAsync("_Alerts")
+                @if (Model.IsAwaitingCash)
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        Đơn hàng hiện đang chờ thanh toán tiền mặt. Bạn có thể tiếp tục với tiền mặt hoặc đổi sang VNPay bên dưới.
+                    </div>
+                }
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="OrderId" />
+                    <div class="mb-3">
+                        <small class="text-muted">Tổng thanh toán</small>
+                        <div class="h4 text-primary fw-semibold">@Model.GrandTotal.ToString("n0") VNĐ</div>
+                    </div>
+
+                    <div class="list-group mb-4">
+                        <label class="list-group-item d-flex gap-3 align-items-center">
+                            <input class="form-check-input flex-shrink-0" type="radio" asp-for="SelectedMethod" value="VNPay" />
+                            <span class="d-flex w-100 justify-content-between align-items-center">
+                                <span>
+                                    <strong>Thanh toán qua VNPay</strong>
+                                    <small class="d-block text-muted">Thanh toán trực tuyến qua cổng VNPay</small>
+                                </span>
+                                <i class="fas fa-credit-card text-primary"></i>
+                            </span>
+                        </label>
+                        <label class="list-group-item d-flex gap-3 align-items-center">
+                            <input class="form-check-input flex-shrink-0" type="radio" asp-for="SelectedMethod" value="Cash" />
+                            <span class="d-flex w-100 justify-content-between align-items-center">
+                                <span>
+                                    <strong>Thanh toán tiền mặt</strong>
+                                    <small class="d-block text-muted">Thanh toán khi nhận hàng hoặc tại cửa hàng</small>
+                                </span>
+                                <i class="fas fa-money-bill-wave text-success"></i>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i> Tiếp tục
+                        </button>
+                        <a class="btn btn-outline-secondary" asp-page="/Customer/MyOrders">
+                            <i class="fas fa-list"></i> Đơn hàng của tôi
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Lưu ý</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> VNPay hỗ trợ hầu hết ngân hàng nội địa.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Thanh toán tiền mặt áp dụng khi nhận hàng.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Bạn có thể thay đổi phương thức thanh toán trong phần quản lý đơn hàng.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -85,7 +85,7 @@ namespace Infrastructure.Repository
                 }
             }
 
-            return await query.AsNoTracking().Where(x => !x.IsDeleted).FirstOrDefaultAsync(predicate);
+            return await query.Where(x => !x.IsDeleted).FirstOrDefaultAsync(predicate);
         }
 
         public async Task SaveChangesAsync()

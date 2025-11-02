@@ -80,6 +80,15 @@ namespace Application.Services
         {
             return await _uow.OrderRepository.GetCountAsync();
         }
+
+        public Task<Order?> GetOrderByIdAsync(int id)
+        {
+            return _uow.OrderRepository.GetByIdAsync(id);
+        }
+
+        public Task<Order?> GetOrderWithDetailsAsync(int id)
+        {
+            return _uow.OrderRepository.FindOneAsync(o => o.Id == id, "OrderDetails.Product,Payments.PaymentMethod");
+        }
     }
 }
-

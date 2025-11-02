@@ -14,14 +14,14 @@ namespace Infrastructure.Payments.Providers
     {
         private readonly IInvoiceService _invoiceService;
         private readonly IHttpContextAccessor _http;
-        private readonly IPaymentGateway _gateway; // VnPayGateway
+        private readonly IVnPayGateway _vnPayGateway;
         private readonly IUnitOfWork _uow;
         private readonly ILogger<PaymentOrchestrator> _logger;
 
-        public PaymentOrchestrator(IHttpContextAccessor http, IPaymentGateway gateway, IUnitOfWork uow, IInvoiceService invoiceService, ILogger<PaymentOrchestrator> logger)
+        public PaymentOrchestrator(IHttpContextAccessor http, IVnPayGateway vnPayGateway, IUnitOfWork uow, IInvoiceService invoiceService, ILogger<PaymentOrchestrator> logger)
         {
             _http = http;
-            _gateway = gateway;
+            _vnPayGateway = vnPayGateway;
             _uow = uow;
             _invoiceService = invoiceService;
             _logger = logger;
@@ -36,7 +36,7 @@ namespace Infrastructure.Payments.Providers
 
             var amountVnd = order.GrandTotal!.Value;
 
-            var method = await EnsureVnPayMethodAsync(ct);
+            var method = await EnsurePaymentMethodAsync("VNPay", "VNPay payment gateway", ct);
             var payment = new Payment
             {
                 OrderId = order.Id,
@@ -49,10 +49,7 @@ namespace Infrastructure.Payments.Providers
 
             var ip = _http.HttpContext is null ? command.ClientIp : _http.HttpContext.Connection.RemoteIpAddress?.ToString() ?? command.ClientIp;
 
-            var vnGateway = _gateway as VnPayGateway
-                ?? throw new InvalidOperationException("VNPay gateway required.");
-
-            var checkout = await vnGateway.CreateCheckoutUrlInternalAsync(
+            var checkout = await _vnPayGateway.GenerateCheckoutUrlAsync(
                 orderId: order.Id,
                 amountVnd: amountVnd,
                 clientIp: ip,
@@ -69,7 +66,7 @@ namespace Infrastructure.Payments.Providers
 
         public async Task<PaymentResultDTO> HandleCallbackAsync(IQueryCollection query, CancellationToken ct = default)
         {
-            var result = await _gateway.ParseAndValidateCallbackAsync(query, ct);
+            var result = await _vnPayGateway.ParseAndValidateCallbackAsync(query, ct);
             _logger.LogInformation("Received VNPay callback for order {OrderId}, success={Success}", result.OrderId, result.IsSuccess);
 
             var order = await _uow.OrderRepository.GetByIdAsync(result.OrderId);
@@ -83,7 +80,7 @@ namespace Infrastructure.Payments.Providers
 
             if (payment is null)
             {
-                var method = await EnsureVnPayMethodAsync(ct);
+                var method = await EnsurePaymentMethodAsync("VNPay", "VNPay payment gateway", ct);
                 payment = new Payment
                 {
                     OrderId = order.Id,
@@ -126,12 +123,75 @@ namespace Infrastructure.Payments.Providers
             }
         }
 
-        private async Task<PaymentMethod> EnsureVnPayMethodAsync(CancellationToken ct)
+        public async Task<PaymentResultDTO> CreateCashPaymentAsync(int orderId, string createdBy, CancellationToken ct = default)
         {
-            var pm = await _uow.PaymentMethodRepository.FindOneAsync(p => p.Name == "VNPay");
+            _logger.LogInformation("Creating cash payment for order {OrderId}", orderId);
+
+            var order = await _uow.OrderRepository.GetByIdAsync(orderId);
+            if (order is null)
+            {
+                throw new InvalidOperationException("Order not found.");
+            }
+
+            if (order.GrandTotal is null)
+            {
+                order.GrandTotal = order.Subtotal + order.ShippingFee;
+            }
+
+            var amount = order.GrandTotal!.Value;
+
+            var method = await EnsurePaymentMethodAsync("Cash", "Thanh toán tiền mặt", ct);
+
+            var payment = await _uow.PaymentRepository.FindOneAsync(p => p.OrderId == order.Id && p.PaymentMethodId == method.Id);
+            if (payment is null)
+            {
+                payment = new Payment
+                {
+                    OrderId = order.Id,
+                    PaymentMethodId = method.Id,
+                    Amount = amount,
+                    Currency = "VND",
+                    PaymentStatus = PaymentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = createdBy,
+                    ModifiedAt = DateTime.UtcNow,
+                    ModifiedBy = createdBy,
+                    IsDeleted = false
+                };
+                await _uow.PaymentRepository.AddAsync(payment);
+            }
+            else
+            {
+                payment.Amount = amount;
+                payment.Currency = "VND";
+                payment.PaymentStatus = PaymentStatus.Pending;
+                payment.ModifiedAt = DateTime.UtcNow;
+                payment.ModifiedBy = createdBy;
+            }
+
+            order.Status = "AwaitingCash";
+            order.ModifiedAt = DateTime.UtcNow;
+            order.ModifiedBy = createdBy;
+
+            await _uow.SaveChangesAsync();
+
+            return new PaymentResultDTO
+            {
+                IsSuccess = true,
+                Message = "Đơn hàng sẽ được thanh toán bằng tiền mặt khi nhận hàng.",
+                OrderId = order.Id,
+                Amount = amount,
+                Currency = "VND",
+                Status = PaymentStatus.Pending
+            };
+        }
+
+        private async Task<PaymentMethod> EnsurePaymentMethodAsync(string name, string description, CancellationToken ct)
+        {
+            var pm = await _uow.PaymentMethodRepository.FindOneAsync(p => p.Name == name);
             if (pm is null)
             {
-                pm = new PaymentMethod { Name = "VNPay", IsActive = true, Description = "VNPay payment gateway" };
+                pm = new PaymentMethod { Name = name, IsActive = true, Description = description };
                 await _uow.PaymentMethodRepository.AddAsync(pm);
                 await _uow.SaveChangesAsync();
             }

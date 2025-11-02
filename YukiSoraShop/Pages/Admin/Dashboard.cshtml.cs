@@ -18,6 +18,7 @@ namespace YukiSoraShop.Pages.Admin
         public int TotalProducts { get; set; } = 0;
         public int TotalOrders { get; set; } = 0;
         public decimal TotalRevenue { get; set; } = 0;
+        public int AwaitingCashOrders { get; set; } = 0;
 
         public async Task OnGetAsync()
         {
@@ -26,6 +27,7 @@ namespace YukiSoraShop.Pages.Admin
             TotalProducts = summary.TotalProducts;
             TotalOrders = summary.TotalOrders;
             TotalRevenue = summary.TotalRevenue;
+            AwaitingCashOrders = summary.AwaitingCashOrders;
         }
     }
 }

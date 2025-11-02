@@ -210,5 +210,45 @@ public partial class AppDbContext
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(500);
         });
+
+        // Configure payment methods and seed defaults
+        modelBuilder.Entity<PaymentMethod>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("PaymentMethods");
+
+            entity.Property(e => e.Name)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255);
+
+            entity.HasData(
+                new
+                {
+                    Id = 1,
+                    Name = "VNPay",
+                    Description = "VNPay payment gateway",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System",
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new
+                {
+                    Id = 2,
+                    Name = "Cash",
+                    Description = "Thanh toán tiền mặt",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System",
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                }
+            );
+        });
     }
 }

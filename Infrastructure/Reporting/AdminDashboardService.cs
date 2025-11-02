@@ -30,6 +30,10 @@ namespace Infrastructure.Reporting
             var totalProducts = await _uow.ProductRepository.GetCountAsync();
             var totalOrders = await _uow.OrderRepository.GetCountAsync();
 
+            var awaitingCashOrders = await _uow.OrderRepository.GetAllQueryable()
+                .AsNoTracking()
+                .CountAsync(o => o.Status == "AwaitingCash", ct);
+
             var revenueQuery = _uow.PaymentRepository.GetAllQueryable()
                 .AsNoTracking()
                 .Where(p => p.PaymentStatus == Domain.Enums.PaymentStatus.Paid);
@@ -40,7 +44,8 @@ namespace Infrastructure.Reporting
                 TotalUsers = totalUsers,
                 TotalProducts = totalProducts,
                 TotalOrders = totalOrders,
-                TotalRevenue = totalRevenue
+                TotalRevenue = totalRevenue,
+                AwaitingCashOrders = awaitingCashOrders
             };
 
             _cache.Set(CacheKey, summary, new MemoryCacheEntryOptions

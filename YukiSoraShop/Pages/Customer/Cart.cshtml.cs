@@ -73,7 +73,7 @@ namespace YukiSoraShop.Pages.Customer
             var order = await _orderService.CreateOrderFromCartAsync(accountId, orderItems, createdBy);
             await _cartService.ClearAsync(accountId);
             await LoadFromPersistentCartAsync();
-            return Redirect($"/Orders/Checkout?OrderId={order.Id}");
+            return RedirectToPage("/Orders/PaymentMethod", new { orderId = order.Id });
         }
 
         private async Task LoadFromPersistentCartAsync()

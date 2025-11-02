@@ -186,6 +186,118 @@ namespace Infrastructure.Payments.Providers
             };
         }
 
+        public async Task<PaymentResultDTO> ConfirmCashPaymentAsync(int orderId, string confirmedBy, CancellationToken ct = default)
+        {
+            _logger.LogInformation("Confirming cash payment for order {OrderId}", orderId);
+
+            var order = await _uow.OrderRepository.FindOneAsync(o => o.Id == orderId, "Payments.PaymentMethod");
+            if (order is null)
+            {
+                _logger.LogWarning("Order {OrderId} not found when confirming cash payment", orderId);
+                return new PaymentResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Không tìm thấy đơn hàng.",
+                    OrderId = orderId,
+                    Amount = 0m,
+                    Currency = "VND",
+                    Status = PaymentStatus.Pending
+                };
+            }
+
+            if (!string.Equals(order.Status, "AwaitingCash", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogWarning("Order {OrderId} is not awaiting cash payment (status={Status})", order.Id, order.Status);
+                return new PaymentResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Đơn hàng không ở trạng thái chờ thanh toán tiền mặt.",
+                    OrderId = order.Id,
+                    Amount = order.GrandTotal ?? (order.Subtotal + order.ShippingFee),
+                    Currency = "VND",
+                    Status = string.Equals(order.Status, "Paid", StringComparison.OrdinalIgnoreCase) ? PaymentStatus.Paid : PaymentStatus.Pending
+                };
+            }
+
+            var method = await EnsurePaymentMethodAsync("Cash", "Thanh toán tiền mặt", ct);
+            var payment = await _uow.PaymentRepository.FindOneAsync(
+                p => p.OrderId == order.Id && p.PaymentMethodId == method.Id,
+                includeProperties: "PaymentMethod");
+
+            if (payment is null)
+            {
+                payment = new Payment
+                {
+                    OrderId = order.Id,
+                    PaymentMethodId = method.Id,
+                    Amount = order.GrandTotal ?? (order.Subtotal + order.ShippingFee),
+                    Currency = "VND",
+                    PaymentStatus = PaymentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = confirmedBy,
+                    ModifiedAt = DateTime.UtcNow,
+                    ModifiedBy = confirmedBy,
+                    IsDeleted = false
+                };
+                await _uow.PaymentRepository.AddAsync(payment);
+            }
+
+            var tx = await _uow.BeginTransactionAsync();
+            try
+            {
+                if (order.GrandTotal is null)
+                {
+                    order.GrandTotal = order.Subtotal + order.ShippingFee;
+                }
+
+                payment.Amount = order.GrandTotal.Value;
+                payment.PaymentStatus = PaymentStatus.Paid;
+                payment.TransactionRef ??= $"CASH-{order.Id}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+                payment.Currency = string.IsNullOrWhiteSpace(payment.Currency) ? "VND" : payment.Currency;
+                payment.ModifiedAt = DateTime.UtcNow;
+                payment.ModifiedBy = confirmedBy;
+
+                order.Status = "Paid";
+                order.ModifiedAt = DateTime.UtcNow;
+                order.ModifiedBy = confirmedBy;
+
+                await _uow.SaveChangesAsync();
+
+                await _invoiceService.CreateInvoiceFromOrder(order.Id, ct);
+
+                await tx.CommitAsync(ct);
+
+                _logger.LogInformation("Cash payment for order {OrderId} confirmed by {User}", order.Id, confirmedBy);
+                return new PaymentResultDTO
+                {
+                    IsSuccess = true,
+                    Message = "Đã xác nhận thanh toán tiền mặt.",
+                    TransactionRef = payment.TransactionRef,
+                    BankCode = payment.PaymentMethod?.Name,
+                    PayDate = DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
+                    RawQuery = string.Empty,
+                    Amount = order.GrandTotal.Value,
+                    Currency = payment.Currency ?? "VND",
+                    Status = PaymentStatus.Paid,
+                    OrderId = order.Id
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming cash payment for order {OrderId}", order.Id);
+                try { await tx.RollbackAsync(ct); } catch { }
+                return new PaymentResultDTO
+                {
+                    IsSuccess = false,
+                    Message = "Không thể xác nhận thanh toán tiền mặt. Vui lòng thử lại sau.",
+                    OrderId = order.Id,
+                    Amount = order.GrandTotal ?? (order.Subtotal + order.ShippingFee),
+                    Currency = "VND",
+                    Status = PaymentStatus.Pending
+                };
+            }
+        }
+
         private async Task<PaymentMethod> EnsurePaymentMethodAsync(string name, string description, CancellationToken ct)
         {
             var pm = await _uow.PaymentMethodRepository.FindOneAsync(p => p.Name == name);

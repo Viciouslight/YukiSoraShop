@@ -2,6 +2,7 @@ using Application.DTOs;
 using Application.IRepository;
 using Application.Services.Interfaces;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -89,6 +90,16 @@ namespace Application.Services
         public Task<Order?> GetOrderWithDetailsAsync(int id)
         {
             return _uow.OrderRepository.FindOneAsync(o => o.Id == id, "OrderDetails.Product,Payments.PaymentMethod");
+        }
+
+        public async Task<List<Order>> GetOrdersAwaitingCashAsync(CancellationToken ct = default)
+        {
+            var query = _uow.OrderRepository.GetAllQueryable("Account,Payments.PaymentMethod,OrderDetails.Product")
+                .AsNoTracking()
+                .Where(o => o.Status == "AwaitingCash");
+            return await query
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync(ct);
         }
     }
 }

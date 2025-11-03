@@ -52,6 +52,12 @@ namespace YukiSoraShop.Pages.Orders
                 return RedirectToPage("/Customer/MyOrders");
             }
 
+            if (!await IsVnPayActiveAsync())
+            {
+                TempData["Error"] = "Phương thức VNPay hiện không khả dụng. Vui lòng chọn phương thức khác.";
+                return RedirectToPage("/Orders/PaymentMethod", new { OrderId });
+            }
+
             GrandTotal = order.GrandTotal ?? (order.Subtotal + order.ShippingFee);
 
             return Page();
@@ -79,6 +85,12 @@ namespace YukiSoraShop.Pages.Orders
                 return RedirectToPage("/Customer/MyOrders");
             }
 
+            if (!await IsVnPayActiveAsync())
+            {
+                TempData["Error"] = "Phương thức VNPay hiện không khả dụng. Vui lòng chọn phương thức khác.";
+                return RedirectToPage("/Orders/PaymentMethod", new { OrderId });
+            }
+
             var cmd = new CreatePaymentCommand
             {
                 OrderId = OrderId,
@@ -96,6 +108,12 @@ namespace YukiSoraShop.Pages.Orders
         {
             var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             return int.TryParse(idStr, out var id) ? id : 0;
+        }
+
+        private async Task<bool> IsVnPayActiveAsync()
+        {
+            var method = await _uow.PaymentMethodRepository.FindOneAsync(pm => pm.Name == "VNPay");
+            return method?.IsActive ?? false;
         }
     }
 }

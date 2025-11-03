@@ -42,6 +42,7 @@ namespace Infrastructure
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             #endregion
 
             #region quartz config

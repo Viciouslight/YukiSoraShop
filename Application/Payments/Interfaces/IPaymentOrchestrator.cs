@@ -8,5 +8,9 @@ namespace Application.Payments.Interfaces
         Task<PaymentCheckoutDTO> CreateCheckoutAsync(CreatePaymentCommand command, CancellationToken ct = default);
 
         Task<PaymentResultDTO> HandleCallbackAsync(IQueryCollection query, CancellationToken ct = default);
+
+        Task<PaymentResultDTO> CreateCashPaymentAsync(int orderId, string createdBy, CancellationToken ct = default);
+
+        Task<PaymentResultDTO> ConfirmCashPaymentAsync(int orderId, string confirmedBy, CancellationToken ct = default);
     }
 }

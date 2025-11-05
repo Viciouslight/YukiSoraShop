@@ -1,17 +1,30 @@
 ﻿@page
 @model YukiSoraShop.Pages.Staff.Categories.StaffCategoriesModel
 @{
-    ViewData["Title"] = "Quáº£n lÃ½ danh má»¥c";
+    ViewData["Title"] = "Quản lý danh mục";
 }
+
+<!-- Breadcrumb điều hướng -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+        <li class="breadcrumb-item">
+            <a href="/Customer/Catalog">Điện thoại</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Quản lý danh mục
+        </li>
+    </ol>
+</nav>
+
 
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>
-                <i class="fas fa-tags text-primary"></i> Quáº£n lÃ½ danh má»¥c
+                <i class="fas fa-tags text-primary"></i> Quản lý danh mục
             </h1>
             <a href="/Staff/Categories/Create" class="btn btn-primary">
-                <i class="fas fa-plus"></i> ThÃªm danh má»¥c má»›i
+                <i class="fas fa-plus"></i> Thêm danh mục mới
             </a>
         </div>
     </div>
@@ -22,7 +35,7 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-list"></i> Danh sÃ¡ch danh má»¥c
+                    <i class="fas fa-list"></i> Danh sách danh mục
                 </h5>
             </div>
             <div class="card-body">
@@ -34,11 +47,11 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>ID</th>
-                                    <th>TÃªn danh má»¥c</th>
-                                    <th>MÃ´ táº£</th>
-                                    <th>Tráº¡ng thÃ¡i</th>
-                                    <th>NgÃ y táº¡o</th>
-                                    <th>Thao tÃ¡c</th>
+                                    <th>Tên danh mục</th>
+                                    <th>Mô tả</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,26 +60,25 @@
                                     <tr>
                                         <td>@category.Id</td>
                                         <td>@category.CategoryName</td>
-                                        <td>@(string.IsNullOrEmpty(category.Description) ? "KhÃ´ng cÃ³ mÃ´ táº£" : category.Description)</td>
+                                        <td>@(string.IsNullOrEmpty(category.Description) ? "Không có mô tả" : category.Description)</td>
                                         <td>
                                             @if (category.IsActive)
                                             {
-                                                <span class="badge bg-success">Hoáº¡t Ä‘á»™ng</span>
+                                                <span class="badge bg-success">Hoạt động</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-secondary">KhÃ´ng hoáº¡t Ä‘á»™ng</span>
+                                                <span class="badge bg-secondary">Không hoạt động</span>
                                             }
                                         </td>
                                         <td>@category.CreatedAt.ToString("dd/MM/yyyy")</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="/Staff/Categories/Edit/@category.Id" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-edit"></i> Sá»­a
+                                                    <i class="fas fa-edit"></i> Sửa
                                                 </a>
-                                                <a href="/Staff/Categories/Delete/@category.Id" class="btn btn-sm btn-outline-danger" 
-                                                   onclick="return confirm('Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a danh má»¥c nÃ y?')">
-                                                    <i class="fas fa-trash"></i> XÃ³a
+                                                <a href="/Staff/Categories/Delete/@category.Id" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i> Xóa
                                                 </a>
                                             </div>
                                         </td>
@@ -80,10 +92,10 @@
                 {
                     <div class="text-center py-5">
                         <i class="fas fa-tags fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">ChÆ°a cÃ³ danh má»¥c nÃ o</h5>
-                        <p class="text-muted">HÃ£y thÃªm danh má»¥c Ä‘áº§u tiÃªn cá»§a báº¡n!</p>
+                        <h5 class="text-muted">Chưa có danh mục nào</h5>
+                        <p class="text-muted">Hãy thêm danh mục đầu tiên của bạn!</p>
                         <a href="/Staff/Categories/Create" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> ThÃªm danh má»¥c
+                            <i class="fas fa-plus"></i> Thêm danh mục
                         </a>
                     </div>
                 }

@@ -4,6 +4,7 @@ using Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Orders
 {
@@ -39,7 +40,25 @@ namespace YukiSoraShop.Pages.Orders
             }
 
             var order = await _uow.OrderRepository.GetByIdAsync(OrderId);
-            GrandTotal = order?.GrandTotal ?? ((order?.Subtotal ?? 0) + (order?.ShippingFee ?? 0));
+            if (order == null || order.AccountId != GetCurrentUserId())
+            {
+                TempData["Error"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+
+            if (string.Equals(order.Status, "Paid", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Info"] = "Đơn hàng đã được thanh toán.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+
+            if (!await IsVnPayActiveAsync())
+            {
+                TempData["Error"] = "Phương thức VNPay hiện không khả dụng. Vui lòng chọn phương thức khác.";
+                return RedirectToPage("/Orders/PaymentMethod", new { OrderId });
+            }
+
+            GrandTotal = order.GrandTotal ?? (order.Subtotal + order.ShippingFee);
 
             return Page();
         }
@@ -53,6 +72,25 @@ namespace YukiSoraShop.Pages.Orders
                 return RedirectToPage("/Customer/Catalog");
             }
 
+            var order = await _uow.OrderRepository.GetByIdAsync(OrderId);
+            if (order == null || order.AccountId != GetCurrentUserId())
+            {
+                TempData["Error"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+
+            if (string.Equals(order.Status, "Paid", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Info"] = "Đơn hàng đã được thanh toán.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+
+            if (!await IsVnPayActiveAsync())
+            {
+                TempData["Error"] = "Phương thức VNPay hiện không khả dụng. Vui lòng chọn phương thức khác.";
+                return RedirectToPage("/Orders/PaymentMethod", new { OrderId });
+            }
+
             var cmd = new CreatePaymentCommand
             {
                 OrderId = OrderId,
@@ -64,6 +102,18 @@ namespace YukiSoraShop.Pages.Orders
 
             var dto = await _payment.CreateCheckoutAsync(cmd);
             return Redirect(dto.CheckoutUrl);
+        }
+
+        private int GetCurrentUserId()
+        {
+            var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            return int.TryParse(idStr, out var id) ? id : 0;
+        }
+
+        private async Task<bool> IsVnPayActiveAsync()
+        {
+            var method = await _uow.PaymentMethodRepository.FindOneAsync(pm => pm.Name == "VNPay");
+            return method?.IsActive ?? false;
         }
     }
 }

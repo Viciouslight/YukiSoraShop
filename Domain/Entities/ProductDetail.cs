@@ -1,19 +1,45 @@
 ﻿using Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema; 
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
-    [Table("ProductDetails")] 
+    [Table("ProductDetails")]
     public partial class ProductDetail : BaseFullEntity
     {
         public int ProductId { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập màu sắc.")]
+        [StringLength(255, ErrorMessage = "Màu sắc tối đa 255 ký tự.")]
         public string? Color { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập kích thước.")]
+        [StringLength(255, ErrorMessage = "Kích thước tối đa 255 ký tự.")]
         public string? Size { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập chất liệu.")]
+        [StringLength(255, ErrorMessage = "Chất liệu tối đa 255 ký tự.")]
         public string? Material { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập xuất xứ.")]
+        [StringLength(255, ErrorMessage = "Xuất xứ tối đa 255 ký tự.")]
         public string? Origin { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập URL hình ảnh.")]
+        [Url(ErrorMessage = "URL hình ảnh không hợp lệ.")]
         public string? ImageUrl { get; set; }
-        public int StockQuantity { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập mô tả chi tiết.")]
+        [StringLength(2000, ErrorMessage = "Mô tả tối đa 2000 ký tự.")]
+        public string? Description { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập giá phụ thêm (nếu có).")]
+        [Range(0, 999999999, ErrorMessage = "Giá phụ thêm không hợp lệ.")]
         public decimal? AdditionalPrice { get; set; }
+
+        [ValidateNever]
         public virtual Product Product { get; set; } = null!;
     }
+
 }

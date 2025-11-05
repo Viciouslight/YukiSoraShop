@@ -1,8 +1,10 @@
 ﻿using Application;
+using Application.Admin.Interfaces;
 using Application.IRepository;
 using Application.Services;
 using Application.Services.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Reporting;
 using Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -30,14 +32,18 @@ namespace Infrastructure
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
             #endregion
 
             #region service config
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICartService, CartService>();
+            services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             #endregion
 
             #region quartz config

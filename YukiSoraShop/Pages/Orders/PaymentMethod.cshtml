@@ -1,0 +1,105 @@
+@page
+@model YukiSoraShop.Pages.Orders.OrdersPaymentMethodModel
+@{
+    ViewData["Title"] = "Chọn phương thức thanh toán";
+}
+
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-wallet text-primary"></i> Chọn phương thức thanh toán</h5>
+                <span class="badge bg-info text-dark">Mã đơn: @Model.OrderId</span>
+            </div>
+            <div class="card-body">
+                @await Html.PartialAsync("_Alerts")
+                @if (Model.IsAwaitingCash)
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        Đơn hàng hiện đang chờ thanh toán tiền mặt. Bạn có thể tiếp tục với tiền mặt hoặc đổi sang phương thức khả dụng bên dưới.
+                    </div>
+                }
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="OrderId" />
+                    <div class="mb-3">
+                        <small class="text-muted">Tổng thanh toán</small>
+                        <div class="h4 text-primary fw-semibold">@Model.GrandTotal.ToString("n0") VNĐ</div>
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    @if (Model.PaymentMethods.Count == 0)
+                    {
+                        <div class="alert alert-warning">
+                            Hiện chưa có phương thức thanh toán nào khả dụng. Vui lòng quay lại sau.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group mb-4">
+                            @foreach (var method in Model.PaymentMethods)
+                            {
+                                var iconClass = "fas fa-wallet text-primary";
+                                if (string.Equals(method.Name, "Cash", System.StringComparison.OrdinalIgnoreCase))
+                                {
+                                    iconClass = "fas fa-money-bill-wave text-success";
+                                }
+                                else if (string.Equals(method.Name, "VNPay", System.StringComparison.OrdinalIgnoreCase))
+                                {
+                                    iconClass = "fas fa-credit-card text-primary";
+                                }
+
+                                var description = string.IsNullOrWhiteSpace(method.Description)
+                                    ? (string.Equals(method.Name, "Cash", System.StringComparison.OrdinalIgnoreCase)
+                                        ? "Thanh toán khi nhận hàng hoặc tại cửa hàng"
+                                        : "Thanh toán trực tuyến an toàn")
+                                    : method.Description;
+
+                                <label class="list-group-item d-flex gap-3 align-items-center">
+                                    <input class="form-check-input flex-shrink-0"
+                                           type="radio"
+                                           asp-for="SelectedMethod"
+                                           value="@method.Name" />
+                                    <span class="d-flex w-100 justify-content-between align-items-center">
+                                        <span>
+                                            <strong>@method.Name</strong>
+                                            <small class="d-block text-muted">@description</small>
+                                        </span>
+                                        <i class="@iconClass"></i>
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                        <span asp-validation-for="SelectedMethod" class="text-danger"></span>
+                    }
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" @(Model.PaymentMethods.Count == 0 ? "disabled" : "")>
+                            <i class="fas fa-arrow-right"></i> Tiếp tục
+                        </button>
+                        <a class="btn btn-outline-secondary" asp-page="/Customer/MyOrders">
+                            <i class="fas fa-list"></i> Đơn hàng của tôi
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Lưu ý</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Chỉ hiển thị những phương thức đang được kích hoạt.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Thanh toán tiền mặt áp dụng khi nhận hàng (nếu có).</li>
+                    <li class="mb-2"><i class="fas fa-check text-success"></i> Bạn có thể thay đổi phương thức thanh toán trong phần quản lý đơn hàng.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

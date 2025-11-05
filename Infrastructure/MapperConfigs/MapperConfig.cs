@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Application.DTOs;
 using Domain.Entities;
+using System.Linq;
 
 namespace Infrastructure.MapperConfigs
 {

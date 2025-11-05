@@ -19,7 +19,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title">@Model.TotalUsers</h4>
+                        <h4 class="card-title" id="totalUsersValue">@Model.TotalUsers</h4>
                         <p class="card-text">Tổng người dùng</p>
                     </div>
                     <div class="align-self-center">
@@ -35,7 +35,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title">@Model.TotalProducts</h4>
+                        <h4 class="card-title" id="totalProductsValue">@Model.TotalProducts</h4>
                         <p class="card-text">Tổng sản phẩm</p>
                     </div>
                     <div class="align-self-center">
@@ -51,7 +51,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title">@Model.TotalOrders</h4>
+                        <h4 class="card-title" id="totalOrdersValue">@Model.TotalOrders</h4>
                         <p class="card-text">Tổng đơn hàng</p>
                     </div>
                     <div class="align-self-center">
@@ -63,11 +63,27 @@
     </div>
 
     <div class="col-md-3 mb-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title" id="awaitingCashValue">@Model.AwaitingCashOrders</h4>
+                        <p class="card-text">Đơn chờ thanh toán tiền mặt</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
         <div class="card bg-info text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title">@Model.TotalRevenue.ToString("C0")</h4>
+                        <h4 class="card-title" id="totalRevenueValue">@Model.TotalRevenue.ToString("C0")</h4>
                         <p class="card-text">Tổng doanh thu</p>
                     </div>
                     <div class="align-self-center">
@@ -99,3 +115,41 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js" integrity="sha512-8w7PjJYG1ChcxrFAuo0xO+ogzAm8h1Hn0pVITNrW2N7DbStO2Qd6hw2yffA9H9n1tFoZTsvuCFbYo+aX6YTL/w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        (() => {
+            function applyDashboardSummary(summary) {
+                const map = {
+                    totalUsersValue: summary?.totalUsers ?? summary?.TotalUsers,
+                    totalProductsValue: summary?.totalProducts ?? summary?.TotalProducts,
+                    totalOrdersValue: summary?.totalOrders ?? summary?.TotalOrders,
+                    awaitingCashValue: summary?.awaitingCashOrders ?? summary?.AwaitingCashOrders,
+                    totalRevenueValue: summary?.totalRevenue ?? summary?.TotalRevenue
+                };
+
+                Object.entries(map).forEach(([id, value]) => {
+                    const el = document.getElementById(id);
+                    if (!el || value === undefined || value === null) return;
+                    if (id === "totalRevenueValue") {
+                        el.textContent = Number(value).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+                    } else {
+                        el.textContent = value;
+                    }
+                });
+            }
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/adminDashboard")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("DashboardSummaryUpdated", applyDashboardSummary);
+            connection.on("CashOrderAdded", () => { /* awaiting cash handled by summary event */ });
+            connection.on("CashOrderRemoved", () => { /* summary event handles counts */ });
+
+            connection.start().catch(err => console.error("SignalR connection error:", err));
+        })();
+    </script>
+}

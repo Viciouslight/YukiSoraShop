@@ -1,14 +1,13 @@
 using Application.Services.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
-using Domain.Entities;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
-    [Authorize(Roles = "Moderator")]
+    [Authorize(Roles = "Moderator,Staff")]
     public class StaffProductEditModel : PageModel
     {
         private readonly IProductService _productService;
@@ -23,56 +22,85 @@ namespace YukiSoraShop.Pages.Staff.Products
         [BindProperty]
         public Product Product { get; set; } = new();
 
+        [BindProperty]
+        public List<ProductDetail> ProductDetails { get; set; } = new();
+
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var product = await _productService.GetProductEntityByIdAsync(id);
-            if (product == null) return RedirectToPage("/Staff/Products/List");
-            Product = product;
             await LoadCategoryOptions();
+
+            Product = await _productService.GetProductByIdAsync(id);
+            if (Product == null) return NotFound();
+
+            ProductDetails = Product.ProductDetails?.ToList() ?? new List<ProductDetail>();
+
             return Page();
         }
 
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
+            await LoadCategoryOptions();
+
             if (!ModelState.IsValid)
             {
-                await LoadCategoryOptions();
+                TempData["Error"] = "Vui lòng kiểm tra các lỗi trong biểu mẫu.";
                 return Page();
             }
 
             try
             {
-                // ensure CategoryName stays in sync
                 var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
                 if (category == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Danh mục không hợp lệ.");
-                    await LoadCategoryOptions();
+                    ModelState.AddModelError("Product.CategoryId", "Danh mục không hợp lệ.");
                     return Page();
                 }
-                Product.CategoryName = category.CategoryName;
+
+                Product.CategoryName = category.CategoryName ?? string.Empty;
+                var username = HttpContext.User?.Identity?.Name ?? "system";
 
                 Product.ModifiedAt = DateTime.UtcNow;
-                Product.ModifiedBy = HttpContext.User?.Identity?.Name ?? "system";
+                Product.ModifiedBy = username;
 
-                var ok = await _productService.UpdateProductAsync(Product);
-                if (ok)
+                // Xử lý ProductDetails
+                foreach (var detail in ProductDetails)
+                {
+                    bool hasAnyField = !string.IsNullOrWhiteSpace(detail.Color) ||
+                                       !string.IsNullOrWhiteSpace(detail.Size) ||
+                                       !string.IsNullOrWhiteSpace(detail.Material) ||
+                                       !string.IsNullOrWhiteSpace(detail.Origin) ||
+                                       !string.IsNullOrWhiteSpace(detail.ImageUrl) ||
+                                       !string.IsNullOrWhiteSpace(detail.Description) ||
+                                       detail.AdditionalPrice.HasValue;
+
+                    if (hasAnyField)
+                    {
+                        detail.ModifiedAt = DateTime.UtcNow;
+                        detail.ModifiedBy = username;
+                    }
+                }
+
+                Product.ProductDetails = ProductDetails;
+
+                var success = await _productService.UpdateProductAsync(Product);
+
+                if (success)
                 {
                     TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
                     return RedirectToPage("/Staff/Products/List");
                 }
-                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi cập nhật sản phẩm.");
+
+                TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating product {ProductId}", Product?.Id);
-                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi cập nhật sản phẩm.");
+                _logger.LogError(ex, "Error updating product {ProductName}", Product?.ProductName);
+                TempData["Error"] = "Đã xảy ra lỗi. Vui lòng thử lại.";
             }
 
-            await LoadCategoryOptions();
             return Page();
         }
 
@@ -86,5 +114,5 @@ namespace YukiSoraShop.Pages.Staff.Products
             }).ToList();
         }
     }
-}
 
+}

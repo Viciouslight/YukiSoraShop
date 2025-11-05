@@ -1,8 +1,19 @@
 ﻿@page "{id:int}"
 @model YukiSoraShop.Pages.Customer.ProductDetailsModel
+@await Html.PartialAsync("_Alerts")
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
+
+<!-- Breadcrumb điều hướng -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a href="/Customer/Catalog">Điện thoại</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Product.Name</li>
+    </ol>
+</nav>
+
 
 <div class="container mt-5">
     <div class="row">
@@ -28,10 +39,38 @@
             <form method="post" asp-page-handler="AddToCart">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.Product.Id" />
+                <input type="hidden" id="selectedDetailId" name="productDetailId" />
+
+                <!-- Chọn màu -->
+                <div class="mb-3">
+                    <label for="color" class="form-label"><strong>Màu sắc:</strong></label>
+                    <select class="form-select" id="color" name="color" required>
+                        @foreach (var color in Model.ProductDetails.Select(d => d.Color).Distinct())
+                        {
+                            <option value="@color">@color</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Chọn size -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Kích thước:</strong></label>
+                    <div>
+                        @foreach (var size in Model.ProductDetails.Select(d => d.Size).Distinct())
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="size" id="size_@size" value="@size" required />
+                                <label class="form-check-label" for="size_@size">@size</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-3">
                     Thêm vào giỏ hàng
                 </button>
             </form>
+
 
             @if (TempData["Success"] != null)
             {
@@ -65,7 +104,7 @@
                     <th>Kích thước</th>
                     <th>Chất liệu</th>
                     <th>Xuất xứ</th>
-                    <th>Tồn kho</th>
+                    <th>Mô tả chi tiết</th>
                     <th>Giá phụ</th>
                     <th>Ảnh</th>
                 </tr>
@@ -78,7 +117,7 @@
                         <td>@detail.Size</td>
                         <td>@detail.Material</td>
                         <td>@detail.Origin</td>
-                        <td>@detail.StockQuantity</td>
+                        <td>@detail.Description</td>
                         <td>@((detail.AdditionalPrice ?? 0).ToString("N0")) VNĐ</td>
                         <td>
                             <img src="@detail.ImageUrl"
@@ -94,4 +133,99 @@
     {
         <div class="alert alert-info">Chưa có thông tin chi tiết cho sản phẩm này.</div>
     }
+
+    <hr class="my-5" />
+
+    @if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
+    {
+        <h4 class="mb-3">Sản phẩm liên quan</h4>
+        <div class="row">
+            @foreach (var item in Model.RelatedProducts)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name"
+                             style="height:200px; object-fit:cover;" />
+                        <div class="card-body text-center">
+                            <h6 class="card-title text-truncate">@item.Name</h6>
+                            <p class="text-danger fw-bold">@item.Price.ToString("N0") VNĐ</p>
+                            <a href="/Customer/ProductDetails/@item.Id" class="btn btn-outline-primary btn-sm">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
+@section Scripts {
+    <script>
+        // Dữ liệu biến thể từ backend (ProductDetails)
+        const productVariants = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProductDetails));
+
+        const colorSelect = document.getElementById('color');
+        const sizeRadios = document.querySelectorAll('input[name="size"]');
+        const addToCartBtn = document.querySelector('button[type="submit"]');
+        const selectedDetailInput = document.getElementById('selectedDetailId');
+
+        // 🧩 Hàm lọc size theo màu hiện tại
+        function filterSizes() {
+            const selectedColor = colorSelect.value;
+            const validSizes = productVariants
+                .filter(v => v.Color === selectedColor)
+                .map(v => v.Size);
+
+            sizeRadios.forEach(radio => {
+                if (validSizes.includes(radio.value)) {
+                    radio.disabled = false;
+                    radio.parentElement.style.opacity = '1';
+                } else {
+                    radio.disabled = true;
+                    radio.parentElement.style.opacity = '0.4';
+                    radio.checked = false;
+                }
+            });
+
+            updateSelectedDetailId();
+        }
+
+        // 🧩 Hàm cập nhật ID biến thể vào hidden input
+        function updateSelectedDetailId() {
+            const selectedColor = colorSelect.value;
+            const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
+
+            const variant = productVariants.find(v =>
+                v.Color === selectedColor && v.Size === selectedSize
+            );
+
+            if (variant) {
+                selectedDetailInput.value = variant.Id; // ✅ đúng ID biến thể
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = "Thêm vào giỏ hàng";
+            } else {
+                selectedDetailInput.value = "";
+                addToCartBtn.disabled = true;
+                addToCartBtn.textContent = "Vui lòng chọn màu & size";
+            }
+        }
+
+        // 🧩 Gắn sự kiện động
+        colorSelect.addEventListener('change', filterSizes);
+        sizeRadios.forEach(radio => radio.addEventListener('change', updateSelectedDetailId));
+        document.addEventListener('DOMContentLoaded', () => {
+            filterSizes(); // khởi tạo lần đầu
+            addToCartBtn.disabled = true; // chặn click sớm
+        });
+
+        // 🧩 Chặn submit nếu chưa có biến thể hợp lệ
+        document.querySelector('form').addEventListener('submit', e => {
+            if (!selectedDetailInput.value) {
+                e.preventDefault();
+                alert("Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng!");
+            }
+        });
+    </script>
+}
+
+

@@ -1,5 +1,4 @@
 ﻿using Domain.Common;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,7 +35,6 @@ namespace Domain.Entities
         [Range(0, 999999999, ErrorMessage = "Giá phụ thêm không hợp lệ.")]
         public decimal? AdditionalPrice { get; set; }
 
-        [ValidateNever]
         public virtual Product Product { get; set; } = null!;
     }
 

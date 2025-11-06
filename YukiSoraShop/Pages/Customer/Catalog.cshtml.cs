@@ -95,7 +95,7 @@ namespace YukiSoraShop.Pages.Customer
         }
 
         [ValidateAntiForgeryToken]
-        public IActionResult OnPostAddToCart(int id)
+        public async Task<IActionResult> OnPostAddToCart(int id)
         {
             var accountIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(accountIdStr, out var accountId) || accountId <= 0)

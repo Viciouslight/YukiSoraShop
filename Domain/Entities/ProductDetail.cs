@@ -29,12 +29,10 @@ namespace Domain.Entities
         [Required(ErrorMessage = "Vui lòng nhập URL hình ảnh.")]
         [Url(ErrorMessage = "URL hình ảnh không hợp lệ.")]
         public string? ImageUrl { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập mô tả chi tiết.")]
+        
         [StringLength(2000, ErrorMessage = "Mô tả tối đa 2000 ký tự.")]
         public string? Description { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập giá phụ thêm (nếu có).")]
+        
         [Range(0, 999999999, ErrorMessage = "Giá phụ thêm không hợp lệ.")]
         public decimal? AdditionalPrice { get; set; }
 

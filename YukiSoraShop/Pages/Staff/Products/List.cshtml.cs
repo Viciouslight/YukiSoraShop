@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
@@ -36,24 +37,25 @@ namespace YukiSoraShop.Pages.Staff.Products
 
         public int TotalPages { get; set; }
         public int TotalItems { get; set; }
-
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
             try
             {
-                // Validate size and page
+                // Normalize page/size
                 Size = Size <= 0 ? 10 : Size;
                 Page = Page <= 0 ? 1 : Page;
 
-                // Load products theo filter & pagination
+                // Load products with filters
                 var paged = await _productService.GetProductsPagedEntitiesAsync(Page, Size, Search, Category);
                 Products = paged.Items.ToList();
                 TotalPages = paged.TotalPages;
                 TotalItems = paged.TotalItems;
 
-                // Load categories cho dropdown
+                if (TotalPages > 0 && Page > TotalPages) Page = TotalPages;
+
+                // Load categories for filter
                 var categories = await _productService.GetAllCategoriesAsync();
                 CategoryOptions = categories.Select(c => new SelectListItem
                 {
@@ -61,9 +63,6 @@ namespace YukiSoraShop.Pages.Staff.Products
                     Text = c.CategoryName,
                     Selected = c.CategoryName == Category
                 }).ToList();
-
-                // Chốt lại page nếu vượt giới hạn
-                if (Page > TotalPages && TotalPages > 0) Page = TotalPages;
             }
             catch (Exception ex)
             {

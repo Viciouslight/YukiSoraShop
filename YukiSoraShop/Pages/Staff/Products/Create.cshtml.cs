@@ -29,7 +29,6 @@ namespace YukiSoraShop.Pages.Staff.Products
         [BindProperty]
         public List<ProductDetail> ProductDetails { get; set; } = new();
 
-
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
@@ -41,42 +40,52 @@ namespace YukiSoraShop.Pages.Staff.Products
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCategoryOptions();
-
-            // Validate Product
-            if (!ModelState.IsValid)
-            {
-                TempData["Error"] = "Vui lòng kiểm tra các lỗi trong biểu mẫu.";
-                return Page();
-            }
-
             try
             {
                 var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
                 if (category == null)
                 {
                     ModelState.AddModelError("Product.CategoryId", "Danh mục không hợp lệ.");
+                    await LoadCategoryOptions();
                     return Page();
                 }
 
-                Product.CategoryName = category.CategoryName ?? string.Empty;
+                Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
+
+                // Validate Product using correct prefix
+                ModelState.Clear();
+                if (!TryValidateModel(Product, nameof(Product)))
+                {
+                    var errors = ModelState
+                        .Where(kvp => kvp.Value?.Errors?.Count > 0)
+                        .SelectMany(kvp => kvp.Value!.Errors.Select(err => new { Field = kvp.Key, Error = err.ErrorMessage }))
+                        .ToList();
+                    foreach (var e in errors)
+                    {
+                        _logger.LogWarning("Product create validation error: {Field} - {Error}", e.Field, e.Error);
+                    }
+                    TempData["Error"] = "Vui lòng kiểm tra các lỗi ở biểu mẫu và thử lại.";
+                    await LoadCategoryOptions();
+                    return Page();
+                }
+
                 var username = HttpContext.User?.Identity?.Name ?? "system";
+                Product.CreatedAt = DateTime.UtcNow;
+                Product.CreatedBy = username;
+                Product.ModifiedAt = DateTime.UtcNow;
+                Product.ModifiedBy = username;
+                Product.IsDeleted = false;
 
-                Product.CreatedAt = Product.ModifiedAt = DateTime.UtcNow;
-                Product.CreatedBy = Product.ModifiedBy = username;
-
-                // 🔥 Kiểm tra bắt buộc có ít nhất 1 ProductDetail
+                // Validate ProductDetails: require at least one and ensure each has some value
                 if (ProductDetails == null || !ProductDetails.Any())
                 {
-                    //ModelState.AddModelError(string.Empty, "Bạn phải nhập ít nhất một biến thể sản phẩm (thông tin chi tiết).");
                     TempData["Error"] = "Vui lòng nhập thông tin chi tiết sản phẩm.";
+                    await LoadCategoryOptions();
                     return Page();
                 }
 
-                // 🔥 Kiểm tra từng ProductDetail có hợp lệ không
                 foreach (var detail in ProductDetails)
                 {
-                    // Nếu tất cả đều trống → báo lỗi luôn
                     bool allEmpty =
                         string.IsNullOrWhiteSpace(detail.Color) &&
                         string.IsNullOrWhiteSpace(detail.Size) &&
@@ -90,18 +99,21 @@ namespace YukiSoraShop.Pages.Staff.Products
                     {
                         ModelState.AddModelError(string.Empty, "Mỗi biến thể sản phẩm phải có ít nhất một thông tin được nhập.");
                         TempData["Error"] = "Vui lòng nhập đầy đủ thông tin cho từng biến thể sản phẩm.";
+                        await LoadCategoryOptions();
                         return Page();
                     }
 
-                    // Nếu có dữ liệu → validate model
                     if (!TryValidateModel(detail))
                     {
                         TempData["Error"] = "Vui lòng kiểm tra lại thông tin chi tiết sản phẩm.";
+                        await LoadCategoryOptions();
                         return Page();
                     }
 
-                    detail.CreatedAt = detail.ModifiedAt = DateTime.UtcNow;
-                    detail.CreatedBy = detail.ModifiedBy = username;
+                    detail.CreatedAt = DateTime.UtcNow;
+                    detail.CreatedBy = username;
+                    detail.ModifiedAt = DateTime.UtcNow;
+                    detail.ModifiedBy = username;
                 }
 
                 Product.ProductDetails = ProductDetails;
@@ -113,7 +125,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                     return RedirectToPage("/Staff/Products/List");
                 }
 
-                TempData["Error"] = "Có lỗi xảy ra khi thêm sản phẩm.";
+                TempData["Error"] = "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.";
             }
             catch (Exception ex)
             {

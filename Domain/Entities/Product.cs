@@ -13,7 +13,6 @@ namespace Domain.Entities
         [StringLength(255, ErrorMessage = "Tên sản phẩm tối đa 255 ký tự.")]
         public string ProductName { get; set; } = null!;
 
-        [Required(ErrorMessage = "Vui lòng nhập mô tả sản phẩm.")]
         [StringLength(2000, ErrorMessage = "Mô tả tối đa 2000 ký tự.")]
         public string? Description { get; set; }
 
@@ -25,10 +24,10 @@ namespace Domain.Entities
 
         [Required(ErrorMessage = "Vui lòng chọn danh mục.")]
         public int CategoryId { get; set; }
-
+        
         [StringLength(255)]
         public string CategoryName { get; set; } = string.Empty;
-
+        // Navigation can be null during create/edit posts; FK enforces requiredness
         public virtual Category? Category { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();

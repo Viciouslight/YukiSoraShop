@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Infrastructure.MapperConfigs
 {
-    public class MapperConfig : Profile
+    public class MapperProfileConfig : Profile
     {
-        public MapperConfig()
+        public MapperProfileConfig()
         {
             CreateMap<ProductDetail, ProductDetailDTO>();
 

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
@@ -42,30 +44,38 @@ namespace YukiSoraShop.Pages.Staff.Products
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
-            await LoadCategoryOptions();
-
-            if (!ModelState.IsValid)
-            {
-                TempData["Error"] = "Vui lòng kiểm tra các lỗi trong biểu mẫu.";
-                return Page();
-            }
-
             try
             {
                 var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
                 if (category == null)
                 {
                     ModelState.AddModelError("Product.CategoryId", "Danh mục không hợp lệ.");
+                    await LoadCategoryOptions();
                     return Page();
                 }
 
-                Product.CategoryName = category.CategoryName ?? string.Empty;
-                var username = HttpContext.User?.Identity?.Name ?? "system";
+                Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
 
+                ModelState.Clear();
+                if (!TryValidateModel(Product, nameof(Product)))
+                {
+                    var errors = ModelState
+                        .Where(kvp => kvp.Value?.Errors?.Count > 0)
+                        .SelectMany(kvp => kvp.Value!.Errors.Select(err => new { Field = kvp.Key, Error = err.ErrorMessage }))
+                        .ToList();
+                    foreach (var e in errors)
+                    {
+                        _logger.LogWarning("Product edit validation error: {Field} - {Error}", e.Field, e.Error);
+                    }
+                    await LoadCategoryOptions();
+                    TempData["Error"] = "Vui lòng kiểm tra các lỗi ở biểu mẫu và thử lại.";
+                    return Page();
+                }
+
+                var username = HttpContext.User?.Identity?.Name ?? "system";
                 Product.ModifiedAt = DateTime.UtcNow;
                 Product.ModifiedBy = username;
 
-                // Xử lý ProductDetails
                 foreach (var detail in ProductDetails)
                 {
                     bool hasAnyField = !string.IsNullOrWhiteSpace(detail.Color) ||
@@ -94,6 +104,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                 }
 
                 TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm.";
+                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi cập nhật sản phẩm.");
             }
             catch (Exception ex)
             {
@@ -114,5 +125,4 @@ namespace YukiSoraShop.Pages.Staff.Products
             }).ToList();
         }
     }
-
 }

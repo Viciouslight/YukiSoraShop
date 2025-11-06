@@ -17,6 +17,7 @@ namespace Application.Services.Interfaces
 
         // Entity methods for CRUD operations
         Task<List<Product>> GetAllProductsAsync();
+        Task<Product?> GetProductByIdAsync(int id);
         Task<PagedResult<Product>> GetProductsPagedEntitiesAsync(int pageNumber, int pageSize, string? search = null, string? category = null);
         Task<Product?> GetProductEntityByIdAsync(int id);
         Task<bool> CreateProductAsync(Product product);

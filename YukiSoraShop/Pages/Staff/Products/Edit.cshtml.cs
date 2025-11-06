@@ -1,10 +1,10 @@
 using Application.Services.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using Domain.Entities;
 using System.Linq;
 
 namespace YukiSoraShop.Pages.Staff.Products
@@ -24,14 +24,20 @@ namespace YukiSoraShop.Pages.Staff.Products
         [BindProperty]
         public Product Product { get; set; } = new();
 
+        [BindProperty]
+        public List<ProductDetail> ProductDetails { get; set; } = new();
+
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var product = await _productService.GetProductEntityByIdAsync(id);
-            if (product == null) return RedirectToPage("/Staff/Products/List");
-            Product = product;
             await LoadCategoryOptions();
+
+            Product = await _productService.GetProductByIdAsync(id);
+            if (Product == null) return NotFound();
+
+            ProductDetails = Product.ProductDetails?.ToList() ?? new List<ProductDetail>();
+
             return Page();
         }
 
@@ -40,7 +46,6 @@ namespace YukiSoraShop.Pages.Staff.Products
         {
             try
             {
-                // ensure CategoryName stays in sync before validate (field not bound from form)
                 var category = await _productService.GetCategoryByIdAsync(Product.CategoryId);
                 if (category == null)
                 {
@@ -48,6 +53,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                     await LoadCategoryOptions();
                     return Page();
                 }
+
                 Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
 
                 ModelState.Clear();
@@ -61,30 +67,51 @@ namespace YukiSoraShop.Pages.Staff.Products
                     {
                         _logger.LogWarning("Product edit validation error: {Field} - {Error}", e.Field, e.Error);
                     }
-                    TempData["Error"] = "Vui lòng kiểm tra các lỗi ở biểu mẫu và thử lại.";
                     await LoadCategoryOptions();
+                    TempData["Error"] = "Vui lòng kiểm tra các lỗi ở biểu mẫu và thử lại.";
                     return Page();
                 }
 
+                var username = HttpContext.User?.Identity?.Name ?? "system";
                 Product.ModifiedAt = DateTime.UtcNow;
-                Product.ModifiedBy = HttpContext.User?.Identity?.Name ?? "system";
+                Product.ModifiedBy = username;
 
-                var ok = await _productService.UpdateProductAsync(Product);
-                if (ok)
+                foreach (var detail in ProductDetails)
+                {
+                    bool hasAnyField = !string.IsNullOrWhiteSpace(detail.Color) ||
+                                       !string.IsNullOrWhiteSpace(detail.Size) ||
+                                       !string.IsNullOrWhiteSpace(detail.Material) ||
+                                       !string.IsNullOrWhiteSpace(detail.Origin) ||
+                                       !string.IsNullOrWhiteSpace(detail.ImageUrl) ||
+                                       !string.IsNullOrWhiteSpace(detail.Description) ||
+                                       detail.AdditionalPrice.HasValue;
+
+                    if (hasAnyField)
+                    {
+                        detail.ModifiedAt = DateTime.UtcNow;
+                        detail.ModifiedBy = username;
+                    }
+                }
+
+                Product.ProductDetails = ProductDetails;
+
+                var success = await _productService.UpdateProductAsync(Product);
+
+                if (success)
                 {
                     TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
                     return RedirectToPage("/Staff/Products/List");
                 }
+
                 TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm.";
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi cập nhật sản phẩm.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating product {ProductId}", Product?.Id);
-                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi cập nhật sản phẩm.");
+                _logger.LogError(ex, "Error updating product {ProductName}", Product?.ProductName);
+                TempData["Error"] = "Đã xảy ra lỗi. Vui lòng thử lại.";
             }
 
-            await LoadCategoryOptions();
             return Page();
         }
 

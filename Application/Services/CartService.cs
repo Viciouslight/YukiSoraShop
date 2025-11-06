@@ -1,4 +1,4 @@
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Services.Interfaces;
 using Application;
 using Domain.Entities;
@@ -70,9 +70,18 @@ namespace Application.Services
             return cart?.CartItems.Where(ci => !ci.IsDeleted).ToList() ?? new List<CartItem>();
         }
 
-        public async Task AddItemAsync(int accountId, int productId, int quantity = 1, CancellationToken ct = default)
+        public async Task AddItemAsync(int accountId, int productDetailId, int quantity = 1, CancellationToken ct = default)
         {
             var cart = await GetOrCreateCartAsync(accountId, ct);
+
+            // ✅ Kiểm tra nếu đây là ProductDetailId thì lấy ProductId tương ứng
+            var productDetail = await _uow.ProductDetailRepository.GetByIdAsync(productDetailId);
+            if (productDetail == null)
+                throw new Exception($"Không tìm thấy ProductDetailId = {productDetailId}");
+
+            var productId = productDetail.ProductId;
+
+            // 🔄 Kiểm tra sản phẩm đã có trong giỏ chưa
             var existing = cart.CartItems.FirstOrDefault(i => i.ProductId == productId && !i.IsDeleted);
             if (existing != null)
             {
@@ -84,7 +93,7 @@ namespace Application.Services
                 var item = new CartItem
                 {
                     CartId = cart.Id,
-                    ProductId = productId,
+                    ProductId = productId,   // 🧩 Lưu ProductId thật, không phải ProductDetailId
                     Quantity = Math.Max(1, quantity),
                     CreatedAt = DateTime.UtcNow,
                     ModifiedAt = DateTime.UtcNow,
@@ -95,8 +104,10 @@ namespace Application.Services
                 await _uow.CartItemRepository.AddAsync(item);
                 cart.CartItems.Add(item);
             }
+
             await _uow.SaveChangesAsync();
         }
+
 
         public async Task UpdateQuantityAsync(int accountId, int productId, int quantity, CancellationToken ct = default)
         {

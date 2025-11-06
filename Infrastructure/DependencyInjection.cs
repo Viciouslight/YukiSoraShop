@@ -32,6 +32,7 @@ namespace Infrastructure
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
             #endregion
 
             #region service config

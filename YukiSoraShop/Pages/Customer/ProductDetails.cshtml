@@ -131,3 +131,73 @@
         }
     </section>
 </div>
+@section Scripts {
+    <script>
+        // Dữ liệu biến thể từ backend (ProductDetails)
+        const productVariants = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProductDetails));
+
+        const colorSelect = document.getElementById('color');
+        const sizeRadios = document.querySelectorAll('input[name="size"]');
+        const addToCartBtn = document.querySelector('button[type="submit"]');
+        const selectedDetailInput = document.getElementById('selectedDetailId');
+
+        // 🧩 Hàm lọc size theo màu hiện tại
+        function filterSizes() {
+            const selectedColor = colorSelect.value;
+            const validSizes = productVariants
+                .filter(v => v.Color === selectedColor)
+                .map(v => v.Size);
+
+            sizeRadios.forEach(radio => {
+                if (validSizes.includes(radio.value)) {
+                    radio.disabled = false;
+                    radio.parentElement.style.opacity = '1';
+                } else {
+                    radio.disabled = true;
+                    radio.parentElement.style.opacity = '0.4';
+                    radio.checked = false;
+                }
+            });
+
+            updateSelectedDetailId();
+        }
+
+        // 🧩 Hàm cập nhật ID biến thể vào hidden input
+        function updateSelectedDetailId() {
+            const selectedColor = colorSelect.value;
+            const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
+
+            const variant = productVariants.find(v =>
+                v.Color === selectedColor && v.Size === selectedSize
+            );
+
+            if (variant) {
+                selectedDetailInput.value = variant.Id; // ✅ đúng ID biến thể
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = "Thêm vào giỏ hàng";
+            } else {
+                selectedDetailInput.value = "";
+                addToCartBtn.disabled = true;
+                addToCartBtn.textContent = "Vui lòng chọn màu & size";
+            }
+        }
+
+        // 🧩 Gắn sự kiện động
+        colorSelect.addEventListener('change', filterSizes);
+        sizeRadios.forEach(radio => radio.addEventListener('change', updateSelectedDetailId));
+        document.addEventListener('DOMContentLoaded', () => {
+            filterSizes(); // khởi tạo lần đầu
+            addToCartBtn.disabled = true; // chặn click sớm
+        });
+
+        // 🧩 Chặn submit nếu chưa có biến thể hợp lệ
+        document.querySelector('form').addEventListener('submit', e => {
+            if (!selectedDetailInput.value) {
+                e.preventDefault();
+                alert("Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng!");
+            }
+        });
+    </script>
+}
+
+

@@ -95,7 +95,7 @@ namespace YukiSoraShop.Pages.Customer
         }
 
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostAddToCartAsync(int id)
+        public IActionResult OnPostAddToCart(int id)
         {
             var accountIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(accountIdStr, out var accountId) || accountId <= 0)
@@ -130,5 +130,6 @@ namespace YukiSoraShop.Pages.Customer
             return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
 
         }
+
     }
 }

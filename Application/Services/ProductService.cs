@@ -1,4 +1,4 @@
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Services.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -87,6 +87,23 @@ namespace Application.Services
             try
             {
                 return await _uow.ProductRepository.GetByIdAsync(id);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Product?> GetProductByIdAsync(int id)
+        {
+            try
+            {
+                // Lấy sản phẩm kèm chi tiết và danh mục
+                var product = await _uow.ProductRepository.FindOneAsync(
+                    p => p.Id == id,
+                    includeProperties: "ProductDetails,Category"
+                );
+                return product;
             }
             catch (Exception)
             {

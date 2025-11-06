@@ -1,10 +1,11 @@
 using Application.Services.Interfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 
 namespace YukiSoraShop.Pages.Staff.Products
@@ -22,15 +23,16 @@ namespace YukiSoraShop.Pages.Staff.Products
         }
 
         [BindProperty]
+        [ValidateNever]
         public Product Product { get; set; } = new();
+
+        [BindProperty]
+        public List<ProductDetail> ProductDetails { get; set; } = new();
 
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Kiểm tra quyền Staff
-            
-
             await LoadCategoryOptions();
             return Page();
         }
@@ -47,13 +49,13 @@ namespace YukiSoraShop.Pages.Staff.Products
                     await LoadCategoryOptions();
                     return Page();
                 }
+
                 Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
 
-                // Clear ModelState and validate with correct prefix so hidden fields don't block
+                // Validate Product using correct prefix
                 ModelState.Clear();
                 if (!TryValidateModel(Product, nameof(Product)))
                 {
-                    // Log specific validation errors to help debugging
                     var errors = ModelState
                         .Where(kvp => kvp.Value?.Errors?.Count > 0)
                         .SelectMany(kvp => kvp.Value!.Errors.Select(err => new { Field = kvp.Key, Error = err.ErrorMessage }))
@@ -67,53 +69,81 @@ namespace YukiSoraShop.Pages.Staff.Products
                     return Page();
                 }
 
-                // Set thông tin cơ bản
+                var username = HttpContext.User?.Identity?.Name ?? "system";
                 Product.CreatedAt = DateTime.UtcNow;
-                Product.CreatedBy = HttpContext.User?.Identity?.Name ?? "system";
+                Product.CreatedBy = username;
                 Product.ModifiedAt = DateTime.UtcNow;
-                Product.ModifiedBy = HttpContext.User?.Identity?.Name ?? "system";
+                Product.ModifiedBy = username;
                 Product.IsDeleted = false;
 
-                // Lưu sản phẩm
+                // Validate ProductDetails: require at least one and ensure each has some value
+                if (ProductDetails == null || !ProductDetails.Any())
+                {
+                    TempData["Error"] = "Vui lòng nhập thông tin chi tiết sản phẩm.";
+                    await LoadCategoryOptions();
+                    return Page();
+                }
+
+                foreach (var detail in ProductDetails)
+                {
+                    bool allEmpty =
+                        string.IsNullOrWhiteSpace(detail.Color) &&
+                        string.IsNullOrWhiteSpace(detail.Size) &&
+                        string.IsNullOrWhiteSpace(detail.Material) &&
+                        string.IsNullOrWhiteSpace(detail.Origin) &&
+                        string.IsNullOrWhiteSpace(detail.ImageUrl) &&
+                        string.IsNullOrWhiteSpace(detail.Description) &&
+                        !detail.AdditionalPrice.HasValue;
+
+                    if (allEmpty)
+                    {
+                        ModelState.AddModelError(string.Empty, "Mỗi biến thể sản phẩm phải có ít nhất một thông tin được nhập.");
+                        TempData["Error"] = "Vui lòng nhập đầy đủ thông tin cho từng biến thể sản phẩm.";
+                        await LoadCategoryOptions();
+                        return Page();
+                    }
+
+                    if (!TryValidateModel(detail))
+                    {
+                        TempData["Error"] = "Vui lòng kiểm tra lại thông tin chi tiết sản phẩm.";
+                        await LoadCategoryOptions();
+                        return Page();
+                    }
+
+                    detail.CreatedAt = DateTime.UtcNow;
+                    detail.CreatedBy = username;
+                    detail.ModifiedAt = DateTime.UtcNow;
+                    detail.ModifiedBy = username;
+                }
+
+                Product.ProductDetails = ProductDetails;
+
                 var success = await _productService.CreateProductAsync(Product);
-                
                 if (success)
                 {
                     TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
                     return RedirectToPage("/Staff/Products/List");
                 }
-                else
-                {
-                    TempData["Error"] = "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.";
-                    ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
-                }
+
+                TempData["Error"] = "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.";
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại.");
                 _logger.LogError(ex, "Error creating product {ProductName}", Product?.ProductName);
+                TempData["Error"] = "Đã xảy ra lỗi. Vui lòng thử lại.";
             }
 
-            await LoadCategoryOptions();
             return Page();
         }
 
         private async Task LoadCategoryOptions()
         {
-            try
+            var categories = await _productService.GetAllCategoriesAsync();
+            CategoryOptions = categories.Select(c => new SelectListItem
             {
-                var categories = await _productService.GetAllCategoriesAsync();
-                CategoryOptions = categories.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.CategoryName
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading categories: create page");
-                CategoryOptions = new List<SelectListItem>();
-            }
+                Value = c.Id.ToString(),
+                Text = c.CategoryName
+            }).ToList();
         }
     }
 }

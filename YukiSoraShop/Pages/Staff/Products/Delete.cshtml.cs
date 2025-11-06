@@ -1,9 +1,8 @@
 using Application.Services.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using Domain.Entities;
 
 namespace YukiSoraShop.Pages.Staff.Products
 {
@@ -19,43 +18,40 @@ namespace YukiSoraShop.Pages.Staff.Products
             _logger = logger;
         }
 
-        [BindProperty]
-        public Product? Product { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public int Id { get; set; }
+
+        public Product Product { get; set; } = null!;
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            Product = await _productService.GetProductEntityByIdAsync(id);
-            if (Product == null)
-            {
-                TempData["Error"] = "Sản phẩm không tồn tại.";
-                return RedirectToPage("/Staff/Products/List");
-            }
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) return NotFound();
+
+            Product = product;
             return Page();
         }
 
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
-            if (Product == null) return RedirectToPage("/Staff/Products/List");
             try
             {
-                var ok = await _productService.DeleteProductAsync(Product.Id);
-                if (ok)
+                var deleted = await _productService.DeleteProductAsync(Id);
+                if (deleted)
                 {
-                    TempData["SuccessMessage"] = "Xoá sản phẩm thành công!";
+                    TempData["SuccessMessage"] = "Xóa sản phẩm thành công!";
+                    return RedirectToPage("/Staff/Products/List");
                 }
-                else
-                {
-                    TempData["Error"] = "Không thể xoá sản phẩm.";
-                }
+
+                TempData["Error"] = "Không thể xóa sản phẩm.";
+                return Page();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting product {ProductId}", Product?.Id);
-                TempData["Error"] = "Có lỗi xảy ra khi xoá sản phẩm.";
+                _logger.LogError(ex, "Error deleting product {ProductId}", Id);
+                TempData["Error"] = "Đã xảy ra lỗi khi xóa sản phẩm.";
+                return Page();
             }
-
-            return RedirectToPage("/Staff/Products/List");
         }
     }
 }

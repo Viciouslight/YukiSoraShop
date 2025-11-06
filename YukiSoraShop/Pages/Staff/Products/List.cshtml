@@ -4,6 +4,18 @@
     ViewData["Title"] = "Quản lý sản phẩm";
 }
 
+<!-- Breadcrumb điều hướng -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+        <li class="breadcrumb-item">
+            <a href="/Customer/Catalog">Điện thoại</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Quản lý sản phẩm
+        </li>
+    </ol>
+</nav>
+
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -66,7 +78,9 @@
                                         <td>@product.StockQuantity</td>
                                         <td>@product.CategoryName</td>
                                         <td>
-                                            <span class="badge bg-success">Còn hàng</span>
+                                            <span class="badge @(product.StockQuantity > 0 ? "bg-success" : "bg-danger")">
+                                                @(product.StockQuantity > 0 ? "Còn hàng" : "Hết hàng")
+                                            </span>
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
@@ -115,4 +129,3 @@
         </div>
     </div>
 </div>
-

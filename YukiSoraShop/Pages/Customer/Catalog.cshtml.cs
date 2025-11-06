@@ -72,18 +72,11 @@ namespace YukiSoraShop.Pages.Customer
         // Removed sync helper; prefer async methods on service
 
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostAddToCartAsync(int id)
+        public IActionResult OnPostAddToCart(int id)
         {
-            var accountIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(accountIdStr, out var accountId) || accountId <= 0)
-                return RedirectToPage("/Auth/Login");
-
-            await _cartService.AddItemAsync(accountId, id, 1);
-            TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
-            return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category });
-
-
-
+            // Chỉ cần điều hướng sang ProductDetails
+            return RedirectToPage("/Customer/ProductDetails", new { id });
         }
+
     }
 }

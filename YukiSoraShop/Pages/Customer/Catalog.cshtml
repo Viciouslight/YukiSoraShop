@@ -80,14 +80,13 @@
                         <p class="card-text">
                             <strong class="text-success">@product.Price.ToString("N0") VNĐ</strong>
                         </p>
-                        <form method="post" asp-page-handler="AddToCart" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@product.Id" />
-                            <button type="submit" class="btn btn-outline-primary btn-sm">Add to Cart</button>
-                        </form>
+                        <a asp-page="/Customer/ProductDetails" asp-route-id="@product.Id" class="btn btn-outline-primary btn-sm">
+                            Add to Cart
+                        </a>
                         <a asp-page="/Customer/ProductDetails" asp-route-id="@product.Id" class="btn btn-outline-secondary btn-sm ms-2">
                             View Details
                         </a>
+
                     </div>
                 </div>
             </div>

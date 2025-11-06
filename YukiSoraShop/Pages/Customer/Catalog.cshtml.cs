@@ -23,14 +23,22 @@ namespace YukiSoraShop.Pages.Customer
         }
 
         public List<ProductDTO> Products { get; set; } = new();
+
         [BindProperty(SupportsGet = true)]
         public int Page { get; set; } = 1;
+
         [BindProperty(SupportsGet = true)]
-        public int Size { get; set; } = Application.DTOs.Pagination.PaginationDefaults.DefaultPageSize;
+        public int Size { get; set; } = PaginationDefaults.DefaultPageSize;
+
         [BindProperty(SupportsGet = true)]
         public string? Search { get; set; }
+
         [BindProperty(SupportsGet = true)]
         public string? Category { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? Sort { get; set; }
+
         public int TotalPages { get; set; }
         public int TotalItems { get; set; }
         public List<SelectListItem> CategoryOptions { get; set; } = new();
@@ -43,24 +51,41 @@ namespace YukiSoraShop.Pages.Customer
                 var page = Page <= 0 ? PaginationDefaults.DefaultPageNumber : Page;
 
                 var paged = await _productService.GetProductsPagedAsync(page, size, Search, Category);
-                Products = paged.Items.ToList();
+                var products = paged.Items.ToList();
+
+                if (!string.IsNullOrEmpty(Sort))
+                {
+                    products = Sort switch
+                    {
+                        "price_asc" => products.OrderBy(p => p.Price).ToList(),
+                        "price_desc" => products.OrderByDescending(p => p.Price).ToList(),
+                        _ => products
+                    };
+                }
+
+                Products = products;
                 TotalPages = paged.TotalPages;
                 TotalItems = paged.TotalItems;
 
-                // Clamp current page to bounds for UI
                 if (TotalPages > 0 && Page > TotalPages) Page = TotalPages;
                 if (Page <= 0) Page = 1;
                 Size = size;
 
-                // Load categories for filter dropdown
                 var cats = await _productService.GetAllCategoriesAsync();
                 CategoryOptions = cats
-                    .Select(c => new SelectListItem { Value = c.CategoryName, Text = c.CategoryName, Selected = c.CategoryName == Category })
+                    .Select(c => new SelectListItem
+                    {
+                        Value = c.CategoryName,
+                        Text = c.CategoryName,
+                        Selected = c.CategoryName == Category
+                    })
                     .ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to load catalog: page={Page}, size={Size}, search={Search}, category={Category}", Page, Size, Search, Category);
+                _logger.LogError(ex, "Failed to load catalog: page={Page}, size={Size}, search={Search}, category={Category}",
+                    Page, Size, Search, Category);
+
                 TempData["Error"] = "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
                 Products = new List<ProductDTO>();
                 TotalPages = 0;
@@ -69,8 +94,6 @@ namespace YukiSoraShop.Pages.Customer
             }
         }
 
-        // Removed sync helper; prefer async methods on service
-
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAddToCartAsync(int id)
         {
@@ -78,11 +101,33 @@ namespace YukiSoraShop.Pages.Customer
             if (!int.TryParse(accountIdStr, out var accountId) || accountId <= 0)
                 return RedirectToPage("/Auth/Login");
 
+            // ✅ Kiểm tra quyền
+            var isAdmin = User.IsInRole("Administrator");
+            var isStaff = User.IsInRole("Moderator");
+
+            if (isAdmin)
+            {
+                TempData["Error"] = "Tài khoản quản trị không thể thêm sản phẩm vào giỏ hàng.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+
+            if (isStaff)
+            {
+                TempData["Error"] = "Nhân viên không thể thêm sản phẩm vào giỏ hàng.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+
+            // ✅ Khách hàng hợp lệ
             await _cartService.AddItemAsync(accountId, id, 1);
-            TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
-            return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category });
+            TempData["Success"] = "🎉 Đã thêm sản phẩm vào giỏ hàng!";
+            TempData.Keep(); // Giữ TempData sau redirect
 
+            // Cập nhật lại số lượng sản phẩm trong giỏ
+            var items = await _cartService.GetItemsAsync(accountId);
+            TempData["CartCount"] = items?.Sum(i => i.Quantity) ?? 0;
+            TempData.Keep();
 
+            return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
 
         }
     }

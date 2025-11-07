@@ -1,10 +1,12 @@
-﻿using Application.Services.Interfaces;
-using Application.DTOs;
+﻿using Application.DTOs;
+using Application.Services.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Customer
 {
@@ -111,5 +113,6 @@ namespace YukiSoraShop.Pages.Customer
             var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             return int.TryParse(idStr, out var id) ? id : 0;
         }
+
     }
 }

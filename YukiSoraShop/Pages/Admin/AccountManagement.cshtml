@@ -1,77 +1,97 @@
 ﻿@page
 @model YukiSoraShop.Pages.Admin.AccountManagementModel
 @{
-    ViewData["Title"] = "Quản lý Tài khoản";
+    ViewData["Title"] = "Account Management";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-user-cog text-primary"></i> Quản lý Tài khoản
-        </h1>
-    </div>
+<div class="page-title">
+    Account Management
 </div>
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Danh sách Người dùng</h6>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-@Model.MessageType">
+        <i class="fas fa-@(Model.MessageType == "success" ? "check-circle" : "exclamation-circle")"></i>
+        @Model.Message
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+}
+
+<div class="table-container">
+    <div class="card-header mb-4">
+        <h5><i class="fas fa-users text-primary"></i> Danh sách Người dùng</h5>
+    </div>
+
+    @if (Model.Users.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email / Username</th>
+                    <th>Họ Tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users)
+                {
                     <tr>
-                        <th>ID</th>
-                        <th>Email / Username</th>
-                        <th>Họ Tên</th>
-                        <th>Số điện thoại</th>
-                        <th>Địa chỉ</th>
-                        <th>Ngày tạo</th>
-                        <th>Thao tác</th>
+                        <td>@user.Id</td>
+                        <td>
+                            <strong>@user.Email</strong><br />
+                            <small class="text-muted">(@user.Username)</small>
+                        </td>
+                        <td>@(string.IsNullOrEmpty(user.FullName) ? "N/A" : user.FullName)</td>
+                        <td>@(string.IsNullOrEmpty(user.PhoneNumber) ? "N/A" : user.PhoneNumber)</td>
+                        <td>
+                            <span class="badge bg-success">Active</span>
+                        </td>
+                        <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@user.Id" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" 
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa mềm tài khoản của @user.FullName (ID: @user.Id) không?')">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </form>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Users.Any())
-                    {
-                        @foreach (var user in Model.Users)
-                        {
-                            <tr>
-                                <td>@user.Id</td>
-                                <td>
-                                    <strong>@user.Email</strong><br />
-                                    <small class="text-muted">(@user.Username)</small>
-                                </td>
-                                <td>@user.FullName</td>
-                                <td>@user.PhoneNumber</td>
-                                <td>@user.Address</td>
-                                <td>@user.CreatedAt.ToShortDateString()</td>
-                                <td>
-                                    <a asp-page="./EditAccount" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Sửa</a>
-                                    <button class="btn btn-sm btn-danger" onclick="confirmDelete('@user.Id', '@user.FullName')">Xóa Mềm</button>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center">
-                                Không tìm thấy tài khoản nào.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <h4>Không tìm thấy tài khoản nào</h4>
+            <p>Hiện tại chưa có tài khoản nào trong hệ thống.</p>
         </div>
-    </div>
+    }
 </div>
 
 @section Scripts {
     <script>
-        function confirmDelete(id, name) {
-            if (confirm(`Bạn có chắc chắn muốn xóa mềm tài khoản của ${name} (ID: ${id}) không?`)) {
-                alert("Chức năng xóa sẽ được triển khai sau!");
-            }
-        }
+        // Auto-hide alert after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var fadeOut = setInterval(function() {
+                    if (!alert.style.opacity) {
+                        alert.style.opacity = 1;
+                    }
+                    if (alert.style.opacity > 0) {
+                        alert.style.opacity -= 0.1;
+                    } else {
+                        clearInterval(fadeOut);
+                        alert.style.display = 'none';
+                    }
+                }, 50);
+            });
+        }, 5000);
     </script>
 }

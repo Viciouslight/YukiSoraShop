@@ -1,99 +1,165 @@
 @page
 @model YukiSoraShop.Pages.Admin.AdminDashboardModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Analytics";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-tachometer-alt text-primary"></i> Admin Dashboard
-        </h1>
+<div class="page-title">
+    Analytics
+</div>
+
+<div class="stats-container">
+    <div class="stat-card green">
+        <div class="stat-icon">
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-title">TOTAL REVENUE</div>
+        <div class="stat-value">@Model.TotalRevenue.ToString("C0")</div>
+        <div class="stat-trend">
+            <i class="fas fa-arrow-up trend-up"></i>
+            <span>Revenue increase</span>
+        </div>
+    </div>
+
+    <div class="stat-card pink">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-title">TOTAL USERS</div>
+        <div class="stat-value">@Model.TotalUsers</div>
+        <div class="stat-trend">
+            <i class="fas fa-arrows-alt-h"></i>
+            <span>Stable</span>
+        </div>
+    </div>
+
+    <div class="stat-card orange">
+        <div class="stat-icon">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="stat-title">NEW USERS</div>
+        <div class="stat-value">@Model.NewUsers</div>
+        <div class="stat-trend">
+            <i class="fas fa-arrow-up trend-up"></i>
+            <span>Last 30 days</span>
+        </div>
+    </div>
+
+    <div class="stat-card blue">
+        <div class="stat-icon">
+            <i class="fas fa-server"></i>
+        </div>
+        <div class="stat-title">SERVER UPTIME</div>
+        <div class="stat-value">99.9%</div>
+        <div class="stat-trend">
+            <span>Excellent</span>
+        </div>
+    </div>
+
+    <div class="stat-card purple">
+        <div class="stat-icon">
+            <i class="fas fa-tasks"></i>
+        </div>
+        <div class="stat-title">TO DO LIST</div>
+        <div class="stat-value">7 tasks</div>
+        <div class="stat-trend">
+            <span>Pending</span>
+        </div>
+    </div>
+
+    <div class="stat-card red">
+        <div class="stat-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-title">ISSUES</div>
+        <div class="stat-value">3</div>
+        <div class="stat-trend">
+            <i class="fas fa-arrow-up trend-down"></i>
+            <span>Needs attention</span>
+        </div>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-header">
+        <h5><i class="fas fa-chart-line text-primary"></i> Overview Statistics</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon blue me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Products</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">@Model.TotalProducts</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon orange me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Orders</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">@Model.TotalOrders</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon green me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Revenue</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">@Model.TotalRevenue.ToString("C0")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="row">
-    <!-- Statistics Cards -->
-    <div class="col-md-3 mb-4">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="card-title">@Model.TotalUsers</h4>
-                        <p class="card-text">Tổng người dùng</p>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-users fa-2x"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-4">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="card-title">@Model.TotalProducts</h4>
-                        <p class="card-text">Tổng sản phẩm</p>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-box fa-2x"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-4">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="card-title">@Model.TotalOrders</h4>
-                        <p class="card-text">Tổng đơn hàng</p>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-shopping-bag fa-2x"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-4">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="card-title">@Model.TotalRevenue.ToString("C0")</h4>
-                        <p class="card-text">Tổng doanh thu</p>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-dollar-sign fa-2x"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
+    <div class="col-md-4">
+        <div class="content-card">
             <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-line text-primary"></i> Thống kê tổng quan
-                </h5>
+                <h5>GRAPH</h5>
             </div>
             <div class="card-body">
-                <p class="text-muted">Chào mừng bạn đến với trang quản trị YukiSora Shop!</p>
-                <p>Trang này hiển thị các thống kê tổng quan về hệ thống. Bạn có thể xem thông tin về người dùng, sản phẩm, đơn hàng và doanh thu.</p>
-                
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Lưu ý:</strong> Đây là trang dành riêng cho quản trị viên. Chỉ có quyền xem thống kê, không có chức năng CRUD.
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                    <p>Chart placeholder</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="content-card">
+            <div class="card-header">
+                <h5>GRAPH</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-chart-line fa-3x mb-3"></i>
+                    <p>Chart placeholder</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="content-card">
+            <div class="card-header">
+                <h5>ADVERT</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-ad fa-3x mb-3"></i>
+                    <p>Advertisement area</p>
                 </div>
             </div>
         </div>

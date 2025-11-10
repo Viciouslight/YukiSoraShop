@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Application.DTOs.Pagination;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc.Selecting;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace YukiSoraShop.Pages.Customer
 {

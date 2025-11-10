@@ -1,10 +1,12 @@
-﻿using Application.Services.Interfaces;
-using Application.DTOs;
+﻿using Application.DTOs;
+using Application.Services.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 
 namespace YukiSoraShop.Pages.Customer
 {
@@ -13,19 +15,28 @@ namespace YukiSoraShop.Pages.Customer
     {
         private readonly IOrderService _orderService;
         private readonly ICartService _cartService;
+        private readonly ILogger<CustomerCartModel> _logger;
 
-        public CustomerCartModel(IOrderService orderService, ICartService cartService)
+        public CustomerCartModel(IOrderService orderService, ICartService cartService, ILogger<CustomerCartModel> logger)
         {
             _orderService = orderService;
             _cartService = cartService;
+            _logger = logger;
         }
 
         public List<CartItemDTO> CartItems { get; set; } = new();
         public decimal TotalAmount { get; set; }
         public int TotalItems { get; set; }
+        public bool CanCheckout { get; set; } = true;
 
         public async Task OnGetAsync()
         {
+            // Check if user is Admin or Staff
+            if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+            {
+                CanCheckout = false;
+            }
+            
             await LoadFromPersistentCartAsync();
         }
 
@@ -62,6 +73,21 @@ namespace YukiSoraShop.Pages.Customer
             var accountId = GetCurrentUserId();
             if (accountId <= 0) return RedirectToPage("/Auth/Login");
 
+            // Block Admin and Moderator from checking out
+            if (User.IsInRole("Administrator"))
+            {
+                _logger.LogWarning("Administrator account {AccountId} attempted to checkout", accountId);
+                TempData["Error"] = "Tài khoản quản trị không thể đặt hàng. Vui lòng sử dụng tài khoản khách hàng.";
+                return RedirectToPage();
+            }
+
+            if (User.IsInRole("Moderator"))
+            {
+                _logger.LogWarning("Moderator account {AccountId} attempted to checkout", accountId);
+                TempData["Error"] = "Tài khoản nhân viên không thể đặt hàng. Vui lòng sử dụng tài khoản khách hàng.";
+                return RedirectToPage();
+            }
+
             var createdBy = User.Identity?.Name ?? "customer";
             var orderItems = await _cartService.ToOrderItemsAsync(accountId);
             if (orderItems == null || orderItems.Count == 0)
@@ -70,10 +96,22 @@ namespace YukiSoraShop.Pages.Customer
                 return RedirectToPage();
             }
 
-            var order = await _orderService.CreateOrderFromCartAsync(accountId, orderItems, createdBy);
-            await _cartService.ClearAsync(accountId);
-            await LoadFromPersistentCartAsync();
-            return RedirectToPage("/Orders/PaymentMethod", new { orderId = order.Id });
+            try
+            {
+                var order = await _orderService.CreateOrderFromCartAsync(accountId, orderItems, createdBy);
+                await _cartService.ClearAsync(accountId);
+                await LoadFromPersistentCartAsync();
+                
+                _logger.LogInformation("Order {OrderId} created successfully for account {AccountId}", order.Id, accountId);
+                TempData["Success"] = $"✅ Đơn hàng #{order.Id} đã được tạo thành công!";
+                return RedirectToPage("/Orders/PaymentMethod", new { OrderId = order.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating order for account {AccountId}", accountId);
+                TempData["Error"] = "Không thể tạo đơn hàng. Vui lòng thử lại sau.";
+                return RedirectToPage();
+            }
         }
 
         private async Task LoadFromPersistentCartAsync()
@@ -111,5 +149,6 @@ namespace YukiSoraShop.Pages.Customer
             var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             return int.TryParse(idStr, out var id) ? id : 0;
         }
+
     }
 }

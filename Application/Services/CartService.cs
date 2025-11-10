@@ -70,31 +70,33 @@ namespace Application.Services
             return cart?.CartItems.Where(ci => !ci.IsDeleted).ToList() ?? new List<CartItem>();
         }
 
-        public async Task AddItemAsync(int accountId, int productDetailId, int quantity = 1, CancellationToken ct = default)
+        public async Task AddItemAsync(int accountId, int productId, int quantity, CancellationToken ct = default)
         {
+            if (productId <= 0) throw new ArgumentException("ProductId must be greater than 0", nameof(productId));
+            if (quantity <= 0) throw new ArgumentException("Quantity must be greater than 0", nameof(quantity));
+
             var cart = await GetOrCreateCartAsync(accountId, ct);
+            
+            // Validate product exists
+            var product = await _uow.ProductRepository.GetByIdAsync(productId);
+            if (product == null)
+                throw new InvalidOperationException($"Product with ID {productId} does not exist.");
 
-            // ✅ Kiểm tra nếu đây là ProductDetailId thì lấy ProductId tương ứng
-            var productDetail = await _uow.ProductDetailRepository.GetByIdAsync(productDetailId);
-            if (productDetail == null)
-                throw new Exception($"Không tìm thấy ProductDetailId = {productDetailId}");
-
-            var productId = productDetail.ProductId;
-
-            // 🔄 Kiểm tra sản phẩm đã có trong giỏ chưa
+            // Check if item already exists in cart
             var existing = cart.CartItems.FirstOrDefault(i => i.ProductId == productId && !i.IsDeleted);
             if (existing != null)
             {
-                existing.Quantity += Math.Max(1, quantity);
+                existing.Quantity += quantity;
                 existing.ModifiedAt = DateTime.UtcNow;
+                existing.ModifiedBy = "system";
             }
             else
             {
                 var item = new CartItem
                 {
                     CartId = cart.Id,
-                    ProductId = productId,   // 🧩 Lưu ProductId thật, không phải ProductDetailId
-                    Quantity = Math.Max(1, quantity),
+                    ProductId = productId,
+                    Quantity = quantity,
                     CreatedAt = DateTime.UtcNow,
                     ModifiedAt = DateTime.UtcNow,
                     CreatedBy = "system",
@@ -105,18 +107,20 @@ namespace Application.Services
                 cart.CartItems.Add(item);
             }
 
+            cart.ModifiedAt = DateTime.UtcNow;
             await _uow.SaveChangesAsync();
         }
-
 
         public async Task UpdateQuantityAsync(int accountId, int productId, int quantity, CancellationToken ct = default)
         {
             var cart = await GetOrCreateCartAsync(accountId, ct);
             var existing = cart.CartItems.FirstOrDefault(i => i.ProductId == productId && !i.IsDeleted);
             if (existing == null) return;
+            
             if (quantity <= 0)
             {
                 existing.IsDeleted = true;
+                existing.ModifiedAt = DateTime.UtcNow;
             }
             else
             {
@@ -137,6 +141,7 @@ namespace Application.Services
             foreach (var item in cart.CartItems.Where(i => !i.IsDeleted))
             {
                 item.IsDeleted = true;
+                item.ModifiedAt = DateTime.UtcNow;
             }
             await _uow.SaveChangesAsync();
         }

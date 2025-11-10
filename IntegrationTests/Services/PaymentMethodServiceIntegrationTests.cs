@@ -111,6 +111,8 @@ public class PaymentMethodServiceIntegrationTests
         public ICategoryRepository CategoryRepository => throw new NotImplementedException();
         public IProductDetailRepository ProductDetailRepository => throw new NotImplementedException();
 
+        public IProductDetailRepository ProductDetailRepository => throw new NotImplementedException();
+
         public Task<int> SaveChangesAsync() => _context.SaveChangesAsync();
 
         public Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction BeginTransaction() =>

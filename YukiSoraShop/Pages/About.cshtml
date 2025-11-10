@@ -1,0 +1,292 @@
+@page
+@model YukiSoraShop.Pages.AboutModel
+@{
+    ViewData["Title"] = "Gi?i thi?u - YukiSoraShop";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet" />
+</head>
+
+<body style="font-family: 'Inter', sans-serif; background-color: #f8f9fc;">
+
+    <!-- ===== HEADER ===== -->
+    <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary fs-4" href="/" style="font-family: 'Poppins', sans-serif;">
+                <i class="fas fa-bolt me-2 text-warning"></i>YukiSora<span class="text-dark">Shop</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-semibold">
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/">Trang ch?</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/Customer/Catalog">S?n ph?m</a></li>
+                    <li class="nav-item"><a class="nav-link active text-primary px-3" href="/About">Gi?i thi?u</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/Support">H? tr?</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="py-5 text-center text-white bg-gradient-primary">
+        <div class="container py-5">
+            <h1 class="fw-bold display-4 mb-3" style="font-family: 'Poppins', sans-serif;">V? YukiSora Technology</h1>
+            <p class="lead text-light mb-0">??i tác tin c?y trong chuy?n ??i s? và gi?i pháp công ngh?</p>
+        </div>
+    </section>
+
+    <!-- ===== COMPANY OVERVIEW ===== -->
+    <section class="container my-5">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Câu chuy?n c?a chúng tôi</h2>
+                <p class="text-muted mb-3">
+                    <strong>YukiSora Technology</strong> ???c thành l?p v?i s? m?nh mang ??n nh?ng gi?i pháp công ngh? 
+                    tiên ti?n và d? ti?p c?n cho doanh nghi?p Vi?t Nam. Chúng tôi tin r?ng công ngh? là chìa khóa 
+                    ?? m? ra nh?ng c? h?i phát tri?n b?n v?ng.
+                </p>
+                <p class="text-muted mb-3">
+                    V?i ??i ng? chuyên gia giàu kinh nghi?m và ?am mê, chúng tôi không ng?ng nghiên c?u và phát tri?n 
+                    các s?n ph?m, d?ch v? ?áp ?ng nhu c?u th?c t? c?a khách hàng trong th?i ??i s?.
+                </p>
+                <p class="text-muted">
+                    T? các thi?t b? ph?n c?ng ch?t l??ng cao ??n gi?i pháp ph?n m?m tùy ch?nh, YukiSora cam k?t 
+                    ??ng hành cùng khách hàng trên hành trình chuy?n ??i s? thành công.
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800" 
+                     class="img-fluid rounded-4 shadow-lg" alt="Team">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CORE VALUES ===== -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Giá tr? c?t lõi</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Uy tín</h5>
+                        <p class="text-muted small mb-0">Cam k?t ch?t l??ng và trách nhi?m v?i khách hàng</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <i class="fas fa-lightbulb fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold">Sáng t?o</h5>
+                        <p class="text-muted small mb-0">??i m?i không ng?ng ?? mang ??n giá tr? v??t tr?i</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <i class="fas fa-users fa-3x text-success mb-3"></i>
+                        <h5 class="fw-bold">??ng hành</h5>
+                        <p class="text-muted small mb-0">Luôn bên c?nh khách hàng trong m?i giai ?o?n</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <i class="fas fa-award fa-3x text-danger mb-3"></i>
+                        <h5 class="fw-bold">Ch?t l??ng</h5>
+                        <p class="text-muted small mb-0">S?n ph?m và d?ch v? ??t tiêu chu?n qu?c t?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SOLUTIONS ===== -->
+    <section class="container my-5">
+        <h2 class="text-center fw-bold mb-5">Gi?i pháp c?a chúng tôi</h2>
+        <div class="row g-4">
+            <!-- Hardware Solutions -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="fas fa-microchip fa-2x text-primary"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Thi?t b? & Ph?n c?ng</h4>
+                        <p class="text-muted mb-3">
+                            Cung c?p các thi?t b? công ngh? cao t? các th??ng hi?u uy tín:
+                        </p>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Máy ch? & Storage</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Thi?t b? m?ng</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Workstation chuyên d?ng</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Thi?t b? v?n phòng thông minh</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Gi?i pháp b?o m?t v?t lý</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Software Solutions -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="fas fa-laptop-code fa-2x text-success"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Gi?i pháp ph?n m?m</h4>
+                        <p class="text-muted mb-3">
+                            Phát tri?n và tri?n khai các h? th?ng ph?n m?m:
+                        </p>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>H? th?ng qu?n lý doanh nghi?p (ERP)</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Qu?n lý quan h? khách hàng (CRM)</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>E-commerce & Digital Marketing</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Mobile Apps (iOS/Android)</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Cloud Solutions & SaaS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support & Services -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="fas fa-headset fa-2x text-warning"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">H? tr? & D?ch v?</h4>
+                        <p class="text-muted mb-3">
+                            ??i ng? chuyên gia s?n sàng h? tr? 24/7:
+                        </p>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>T? v?n gi?i pháp công ngh?</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Tri?n khai & ?ào t?o</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>B?o trì & nâng c?p</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>H? tr? k? thu?t 24/7</li>
+                            <li class="mb-2"><i class="fas fa-check text-success me-2"></i>D?ch v? cloud & hosting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== STATISTICS ===== -->
+    <section class="bg-gradient-primary text-white py-5">
+        <div class="container">
+            <div class="row text-center g-4">
+                <div class="col-md-3">
+                    <i class="fas fa-building fa-3x mb-3"></i>
+                    <h2 class="fw-bold mb-2">500+</h2>
+                    <p class="mb-0">Doanh nghi?p tin dùng</p>
+                </div>
+                <div class="col-md-3">
+                    <i class="fas fa-project-diagram fa-3x mb-3"></i>
+                    <h2 class="fw-bold mb-2">1,000+</h2>
+                    <p class="mb-0">D? án hoàn thành</p>
+                </div>
+                <div class="col-md-3">
+                    <i class="fas fa-smile fa-3x mb-3"></i>
+                    <h2 class="fw-bold mb-2">98%</h2>
+                    <p class="mb-0">Khách hàng hài lòng</p>
+                </div>
+                <div class="col-md-3">
+                    <i class="fas fa-clock fa-3x mb-3"></i>
+                    <h2 class="fw-bold mb-2">24/7</h2>
+                    <p class="mb-0">H? tr? khách hàng</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="container my-5 text-center">
+        <h2 class="fw-bold mb-4">S?n sàng b?t ??u hành trình chuy?n ??i s??</h2>
+        <p class="text-muted mb-4">Liên h? v?i chúng tôi ngay hôm nay ?? ???c t? v?n mi?n phí</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/Support" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-phone me-2"></i>Liên h? ngay
+            </a>
+            <a href="/Customer/Catalog" class="btn btn-outline-primary btn-lg px-5">
+                <i class="fas fa-shopping-bag me-2"></i>Xem s?n ph?m
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-dark text-light pt-5 pb-3">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="fw-bold mb-3">YukiSora Technology</h5>
+                    <p class="text-light opacity-75">
+                        ??i tác tin c?y trong chuy?n ??i s? và gi?i pháp công ngh? cho doanh nghi?p Vi?t Nam.
+                    </p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <h6 class="fw-bold mb-3">S?n ph?m</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">Thi?t b? ph?n c?ng</a></li>
+                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">Ph?n m?m</a></li>
+                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">D?ch v?</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h6 class="fw-bold mb-3">Công ty</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/About" class="text-light text-decoration-none opacity-75">Gi?i thi?u</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none opacity-75">Tin t?c</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none opacity-75">Tuy?n d?ng</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-bold mb-3">Liên h?</h6>
+                    <ul class="list-unstyled text-light opacity-75">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>123 ???ng ABC, Qu?n 1, TP.HCM</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+84 123 456 789</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i>contact@yukisora.vn</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-light opacity-25" />
+            <p class="text-center small mb-0 opacity-75">
+                © 2025 YukiSora Technology. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5);
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

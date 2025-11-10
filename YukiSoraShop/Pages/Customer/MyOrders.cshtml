@@ -33,7 +33,6 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-semibold">
                     <li class="nav-item"><a class="nav-link text-dark px-3" href="/">Trang chủ</a></li>
                     <li class="nav-item"><a class="nav-link text-dark px-3" href="/Customer/Catalog">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link text-dark px-3 active" href="/Customer/Orders">Đơn hàng</a></li>
                     <li class="nav-item"><a class="nav-link text-dark px-3" href="/Support">Hỗ trợ</a></li>
                 </ul>
             </div>
@@ -109,7 +108,7 @@
                                     <td class="text-end">
                                         @if (o.ShowPayButton)
                                         {
-                                            <a class="btn btn-sm btn-gradient" href="/Orders/Checkout?OrderId=@o.OrderId">
+                                            <a class="btn btn-sm btn-gradient" href="/Orders/PaymentMethod?OrderId=@o.OrderId">
                                                 <i class="fas fa-credit-card"></i> Thanh toán
                                             </a>
                                         }

@@ -1,203 +1,151 @@
 ﻿@page "{id:int}"
 @model YukiSoraShop.Pages.Customer.ProductDetailsModel
 @{
-    ViewData["Title"] = "Chi tiết sản phẩm";
+    ViewData["Title"] = Model.Product?.Name ?? "Chi tiết sản phẩm";
+    var isAdminOrStaff = User.IsInRole("Administrator") || User.IsInRole("Moderator");
 }
 
-<!-- Alerts -->
-@await Html.PartialAsync("_Alerts")
-
 <div class="container my-5">
-    <!-- Header -->
-    <div class="text-center mb-5">
-        <h1 class="fw-bold display-6">@Model.Product.Name</h1>
-        <p class="text-muted lead">@Model.Product.Category</p>
-    </div>
+    @if (isAdminOrStaff)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Lưu ý:</strong> Tài khoản quản trị/nhân viên không thể thêm sản phẩm vào giỏ hàng.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-    <div class="row g-5 align-items-start">
-        <!-- Product Image -->
-        <div class="col-md-5">
-            <div class="card border-0 shadow-sm">
-                <img src="@Model.Product.ImageUrl"
-                     alt="@Model.Product.Name"
-                     class="img-fluid rounded-4"
-                     style="object-fit: cover; height: 420px;" />
+    <div class="row g-5">
+        <!-- Ảnh sản phẩm -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-3">
+                <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name"
+                     class="img-fluid rounded-4" style="object-fit: cover; height: 420px;">
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                @foreach (var detail in Model.Product.ProductDetails.Take(4))
+                {
+                    <img src="@detail.ImageUrl" class="rounded-3 border"
+                         style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                         onclick="selectVariant('@detail.Id', '@detail.ImageUrl', '@detail.AdditionalPrice')" />
+                }
             </div>
         </div>
 
-        <!-- Product Info -->
-        <div class="col-md-7">
-            <div class="card border-0 shadow-sm p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="badge bg-@(Model.Product.IsAvailable ? "success" : "secondary") fs-6">
-                        @(Model.Product.IsAvailable ? "Còn hàng" : "Hết hàng")
-                    </span>
-                    <h3 class="text-danger fw-bold mb-0">
-                        @Model.Product.Price.ToString("N0") VNĐ
-                    </h3>
+        <!-- Thông tin sản phẩm -->
+        <div class="col-lg-7">
+            <h2 class="fw-bold">@Model.Product.Name</h2>
+            <p class="text-muted">@Model.Product.Category</p>
+            <h3 id="product-price" class="text-danger fw-bold mb-3">
+                @Model.Product.Price.ToString("N0") VNĐ
+            </h3>
+
+            <p class="text-secondary">@Model.Product.Description</p>
+
+            <dl class="row small mb-4">
+                <dt class="col-sm-4">Danh mục:</dt>
+                <dd class="col-sm-8">@Model.Product.Category</dd>
+                <dt class="col-sm-4">Mã sản phẩm:</dt>
+                <dd class="col-sm-8">@Model.Product.Id</dd>
+            </dl>
+
+            @if (Model.Product.ProductDetails.Any())
+            {
+                <div class="mb-3">
+                    <label class="fw-semibold">Chọn biến thể:</label>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        @foreach (var detail in Model.Product.ProductDetails)
+                        {
+                            <button type="button" class="btn btn-outline-primary btn-sm variant-btn"
+                                    data-id="@detail.Id"
+                                    data-extra="@detail.AdditionalPrice"
+                                    onclick="selectVariant('@detail.Id', '@detail.ImageUrl', '@detail.AdditionalPrice')">
+                                @detail.Color @if(!string.IsNullOrWhiteSpace(detail.Size)){<span>(@detail.Size)</span>}
+                            </button>
+                        }
+                    </div>
                 </div>
+            }
 
-                <p class="text-secondary mb-4">@Model.Product.Description</p>
-
-                <dl class="row small mb-4">
-                    <dt class="col-sm-3">Danh mục:</dt>
-                    <dd class="col-sm-9">@Model.Product.Category</dd>
-                    <dt class="col-sm-3">Mã sản phẩm:</dt>
-                    <dd class="col-sm-9">@Model.Product.Id</dd>
-                </dl>
-
-                <form method="post" asp-page-handler="AddToCart" class="d-grid gap-2">
+            @if (isAdminOrStaff)
+            {
+                <button type="button" class="btn btn-lg btn-secondary w-100" disabled title="Tài khoản quản trị/nhân viên không thể mua hàng">
+                    <i class="fas fa-ban me-2"></i>Không thể thêm vào giỏ hàng
+                </button>
+            }
+            else
+            {
+                <form method="post" asp-page-handler="AddToCart" class="mt-4">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Product.Id" />
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <input type="hidden" id="selectedDetailId" name="productDetailId" value="0" />
+
+                    <button type="submit" id="addToCartBtn" class="btn btn-lg btn-primary w-100" disabled>
                         <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
                     </button>
                 </form>
-            </div>
-
-            <!-- Alert messages -->
-            @if (TempData["Success"] != null || TempData["Error"] != null)
-            {
-                <div class="mt-4">
-                    @if (TempData["Success"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-                    @if (TempData["Error"] != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-                </div>
             }
         </div>
     </div>
 
     <hr class="my-5" />
 
-    <!-- Product Variants -->
+    <!-- Thông số kỹ thuật -->
     <section>
-        <h4 class="fw-semibold mb-3">Chi tiết biến thể sản phẩm</h4>
+        <h4 class="fw-semibold mb-3">Thông số kỹ thuật</h4>
+        <table class="table table-bordered table-striped">
+            <tbody>
+                @if (Model.Product.ProductDetails.Any())
+                {
+                    var d = Model.Product.ProductDetails.First();
+                    <tr><th>Màu sắc</th><td>@d.Color</td></tr>
+                    <tr><th>Kích thước</th><td>@d.Size</td></tr>
+                    <tr><th>Chất liệu</th><td>@d.Material</td></tr>
+                    <tr><th>Xuất xứ</th><td>@d.Origin</td></tr>
+                }
+            </tbody>
+        </table>
+    </section>
 
-        @if (Model.ProductDetails != null && Model.ProductDetails.Any())
-        {
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered align-middle shadow-sm">
-                    <thead class="table-light">
-                        <tr class="text-center">
-                            <th>Màu sắc</th>
-                            <th>Kích thước</th>
-                            <th>Chất liệu</th>
-                            <th>Xuất xứ</th>
-                            <th>Mô tả chi tiết</th>
-                            <th>Giá phụ</th>
-                            <th>Ảnh</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var detail in Model.ProductDetails)
-                        {
-                            <tr>
-                                <td>@detail.Color</td>
-                                <td>@detail.Size</td>
-                                <td>@detail.Material</td>
-                                <td>@detail.Origin</td>
-                                <td>@detail.Description</td>
-                                <td class="text-end text-danger fw-semibold">
-                                    @((detail.AdditionalPrice ?? 0).ToString("N0")) VNĐ
-                                </td>
-                                <td class="text-center">
-                                    <img src="@detail.ImageUrl"
-                                         alt="Ảnh chi tiết"
-                                         class="rounded-3"
-                                         style="width: 60px; height: 60px; object-fit: cover;" />
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i>Chưa có thông tin chi tiết cho sản phẩm này.
-            </div>
-        }
+    <!-- Mô tả chi tiết -->
+    <section class="mt-5">
+        <h4 class="fw-semibold mb-3">Mô tả chi tiết</h4>
+        <p>@Model.Product.ProductDetails.FirstOrDefault()?.Description</p>
     </section>
 </div>
+
 @section Scripts {
-    <script>
-        // Dữ liệu biến thể từ backend (ProductDetails)
-        const productVariants = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProductDetails));
+<script>
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const selectedDetailInput = document.getElementById('selectedDetailId');
+    const variantBtns = document.querySelectorAll('.variant-btn');
+    const priceEl = document.getElementById('product-price');
+    const basePrice = parseFloat("@Model.Product.Price");
+    const hasVariants = @(Model.Product.ProductDetails.Any() ? "true" : "false");
 
-        const colorSelect = document.getElementById('color');
-        const sizeRadios = document.querySelectorAll('input[name="size"]');
-        const addToCartBtn = document.querySelector('button[type="submit"]');
-        const selectedDetailInput = document.getElementById('selectedDetailId');
+    // If no variants, enable button immediately
+    if (!hasVariants && addToCartBtn) {
+        addToCartBtn.disabled = false;
+    }
 
-        // 🧩 Hàm lọc size theo màu hiện tại
-        function filterSizes() {
-            const selectedColor = colorSelect.value;
-            const validSizes = productVariants
-                .filter(v => v.Color === selectedColor)
-                .map(v => v.Size);
+    function selectVariant(id, imgUrl, extraPrice) {
+        if (!addToCartBtn) return;
+        
+        selectedDetailInput.value = id;
+        addToCartBtn.disabled = false;
 
-            sizeRadios.forEach(radio => {
-                if (validSizes.includes(radio.value)) {
-                    radio.disabled = false;
-                    radio.parentElement.style.opacity = '1';
-                } else {
-                    radio.disabled = true;
-                    radio.parentElement.style.opacity = '0.4';
-                    radio.checked = false;
-                }
-            });
+        variantBtns.forEach(btn => btn.classList.remove('active'));
+        const btn = document.querySelector(`.variant-btn[data-id='${id}']`);
+        if (btn) btn.classList.add('active');
 
-            updateSelectedDetailId();
-        }
+        // cập nhật ảnh chính
+        const mainImg = document.querySelector(".card img");
+        if (mainImg) mainImg.src = imgUrl;
 
-        // 🧩 Hàm cập nhật ID biến thể vào hidden input
-        function updateSelectedDetailId() {
-            const selectedColor = colorSelect.value;
-            const selectedSize = document.querySelector('input[name="size"]:checked')?.value;
-
-            const variant = productVariants.find(v =>
-                v.Color === selectedColor && v.Size === selectedSize
-            );
-
-            if (variant) {
-                selectedDetailInput.value = variant.Id; // ✅ đúng ID biến thể
-                addToCartBtn.disabled = false;
-                addToCartBtn.textContent = "Thêm vào giỏ hàng";
-            } else {
-                selectedDetailInput.value = "";
-                addToCartBtn.disabled = true;
-                addToCartBtn.textContent = "Vui lòng chọn màu & size";
-            }
-        }
-
-        // 🧩 Gắn sự kiện động
-        colorSelect.addEventListener('change', filterSizes);
-        sizeRadios.forEach(radio => radio.addEventListener('change', updateSelectedDetailId));
-        document.addEventListener('DOMContentLoaded', () => {
-            filterSizes(); // khởi tạo lần đầu
-            addToCartBtn.disabled = true; // chặn click sớm
-        });
-
-        // 🧩 Chặn submit nếu chưa có biến thể hợp lệ
-        document.querySelector('form').addEventListener('submit', e => {
-            if (!selectedDetailInput.value) {
-                e.preventDefault();
-                alert("Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng!");
-            }
-        });
-    </script>
+        // cập nhật giá
+        const newPrice = basePrice + parseFloat(extraPrice || 0);
+        priceEl.innerText = newPrice.toLocaleString('vi-VN') + " VNĐ";
+    }
+</script>
 }
-
-

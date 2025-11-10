@@ -1,5 +1,7 @@
-
+using Application.Payments.Interfaces;
 using Infrastructure;
+using Infrastructure.Payments.Options;
+using Infrastructure.Payments.Providers.VnPay;
 using Serilog;
 using YukiSoraShop.Filters;
 using YukiSoraShop.Hubs;
@@ -27,6 +29,7 @@ namespace YukiSoraShop
                     .AddRazorPages()
                     .AddMvcOptions(o => { o.Filters.Add<GlobalExceptionPageFilter>(); });
 
+                // Configure Cookie Authentication
                 builder.Services.AddAuthentication("CookieAuth")
                     .AddCookie("CookieAuth", options =>
                     {
@@ -40,6 +43,20 @@ namespace YukiSoraShop
                         options.AccessDeniedPath = "/Auth/Login";
                         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                         options.SlidingExpiration = true;
+                    })
+                    // Add Google OAuth Authentication
+                    .AddGoogle("Google", options =>
+                    {
+                        options.ClientId = builder.Configuration["Google:ClientId"] ?? "";
+                        options.ClientSecret = builder.Configuration["Google:ClientSecret"] ?? "";
+                        options.SignInScheme = "CookieAuth";
+                        options.SaveTokens = true;
+                        
+                        // Request additional scopes if needed
+                        options.Scope.Add("profile");
+                        options.Scope.Add("email");
+                        
+                        options.CallbackPath = "/signin-google";
                     });
 
                 builder.Services.AddAuthorization();
@@ -59,6 +76,12 @@ namespace YukiSoraShop
                     options.Cookie.SameSite = SameSiteMode.Lax;
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
+                // register VNPay options from configuration and the gateway
+                builder.Services.Configure<VnPayOptions>(builder.Configuration.GetSection("VnPay"));
+                builder.Services.AddSingleton<IVnPayGateway, VnPayPaymentGateway>();
+
+                // ensure IHttpContextAccessor exists (for IP helpers)
+                builder.Services.AddHttpContextAccessor();
 
                 var app = builder.Build();
 

@@ -48,6 +48,27 @@
         </div>
     </section>
 
+    <!-- ===== ALERTS ===== -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="container mt-4">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="container mt-4">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
     <!-- ===== MAIN CART CONTENT ===== -->
     <section class="container my-5">
         @if (Model.CartItems.Any())
@@ -121,11 +142,24 @@
                                 <strong class="text-primary">@((Model.TotalAmount * 1.1m).ToString("N0")) VNĐ</strong>
                             </div>
 
-                            <form method="post" asp-page-handler="Checkout">
-                                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
-                                    <i class="fas fa-credit-card me-2"></i> Thanh toán ngay
+                            @if (!Model.CanCheckout)
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <small>Tài khoản quản trị/nhân viên không thể đặt hàng.</small>
+                                </div>
+                                <button type="button" class="btn btn-secondary w-100 py-2 fw-semibold" disabled>
+                                    <i class="fas fa-ban me-2"></i> Không thể thanh toán
                                 </button>
-                            </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-page-handler="Checkout">
+                                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                                        <i class="fas fa-credit-card me-2"></i> Thanh toán ngay
+                                    </button>
+                                </form>
+                            }
 
                             <a href="/Customer/Catalog" class="btn btn-outline-primary w-100 mt-3">
                                 <i class="fas fa-arrow-left me-2"></i> Tiếp tục mua hàng

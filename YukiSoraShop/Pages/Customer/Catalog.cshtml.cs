@@ -94,42 +94,86 @@ namespace YukiSoraShop.Pages.Customer
             }
         }
 
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostAddToCart(int id)
+        private int GetAccountIdFromUser()
         {
             var accountIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(accountIdStr, out var accountId) || accountId <= 0)
-                return RedirectToPage("/Auth/Login");
+            return int.TryParse(accountIdStr, out var accountId) ? accountId : 0;
+        }
 
-            // ✅ Kiểm tra quyền
-            var isAdmin = User.IsInRole("Administrator");
-            var isStaff = User.IsInRole("Moderator");
-
-            if (isAdmin)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OnPostAddToCart(int id, CancellationToken ct = default)
+        {
+            if (id <= 0)
             {
+                TempData["Error"] = "Sản phẩm không hợp lệ.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+
+            var accountId = GetAccountIdFromUser();
+            if (accountId <= 0)
+            {
+                return RedirectToPage("/Auth/Login");
+            }
+
+            // Role restrictions - Block Admin and Moderator
+            if (User.IsInRole("Administrator"))
+            {
+                _logger.LogWarning("Administrator account {AccountId} attempted to add product to cart", accountId);
                 TempData["Error"] = "Tài khoản quản trị không thể thêm sản phẩm vào giỏ hàng.";
                 return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
             }
 
-            if (isStaff)
+            if (User.IsInRole("Moderator"))
             {
-                TempData["Error"] = "Nhân viên không thể thêm sản phẩm vào giỏ hàng.";
+                _logger.LogWarning("Moderator account {AccountId} attempted to add product to cart", accountId);
+                TempData["Error"] = "Tài khoản nhân viên không thể thêm sản phẩm vào giỏ hàng.";
                 return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
             }
 
-            // ✅ Khách hàng hợp lệ
-            await _cartService.AddItemAsync(accountId, id, 1);
-            TempData["Success"] = "🎉 Đã thêm sản phẩm vào giỏ hàng!";
-            TempData.Keep(); // Giữ TempData sau redirect
+            try
+            {
+                var product = await _productService.GetProductDtoByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["Error"] = "Sản phẩm không tồn tại.";
+                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                }
 
-            // Cập nhật lại số lượng sản phẩm trong giỏ
-            var items = await _cartService.GetItemsAsync(accountId);
-            TempData["CartCount"] = items?.Sum(i => i.Quantity) ?? 0;
-            TempData.Keep();
+                // Check if product has variants
+                bool hasVariants = product.ProductDetails != null && product.ProductDetails.Any();
 
-            return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                // If product has variants, redirect to details page to choose variant
+                if (hasVariants)
+                {
+                    TempData["Info"] = "Sản phẩm có nhiều biến thể. Vui lòng chọn biến thể trước khi thêm vào giỏ hàng.";
+                    return RedirectToPage("/Customer/ProductDetails", new { id });
+                }
 
+                // Product has NO variants - allow direct add to cart
+                // Check availability
+                if (!product.IsAvailable || product.Stock <= 0)
+                {
+                    TempData["Error"] = "Sản phẩm tạm thời không có sẵn.";
+                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                }
+
+                // Add to cart (price comes from product entity)
+                await _cartService.AddItemAsync(accountId, id, 1, ct);
+
+                // Update cart count
+                var items = await _cartService.GetItemsAsync(accountId, ct);
+                TempData["CartCount"] = items?.Sum(i => i.Quantity) ?? 0;
+
+                _logger.LogInformation("Product {ProductId} added to cart for account {AccountId}", id, accountId);
+                TempData["Success"] = $"Đã thêm \"{product.Name}\" vào giỏ hàng!";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to add product {ProductId} to cart for account {AccountId}", id, accountId);
+                TempData["Error"] = "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
         }
-
     }
 }

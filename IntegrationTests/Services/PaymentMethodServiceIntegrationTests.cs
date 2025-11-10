@@ -109,6 +109,7 @@ public class PaymentMethodServiceIntegrationTests
         public IPaymentRepository PaymentRepository => throw new NotImplementedException();
         public IProductRepository ProductRepository => throw new NotImplementedException();
         public ICategoryRepository CategoryRepository => throw new NotImplementedException();
+        public IProductDetailRepository ProductDetailRepository => throw new NotImplementedException();
 
         public IProductDetailRepository ProductDetailRepository => throw new NotImplementedException();
 

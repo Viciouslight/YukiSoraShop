@@ -1,4 +1,3 @@
-
 using Application.Payments.Interfaces;
 using Infrastructure;
 using Infrastructure.Payments.Options;
@@ -30,6 +29,7 @@ namespace YukiSoraShop
                     .AddRazorPages()
                     .AddMvcOptions(o => { o.Filters.Add<GlobalExceptionPageFilter>(); });
 
+                // Configure Cookie Authentication
                 builder.Services.AddAuthentication("CookieAuth")
                     .AddCookie("CookieAuth", options =>
                     {
@@ -43,6 +43,20 @@ namespace YukiSoraShop
                         options.AccessDeniedPath = "/Auth/Login";
                         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                         options.SlidingExpiration = true;
+                    })
+                    // Add Google OAuth Authentication
+                    .AddGoogle("Google", options =>
+                    {
+                        options.ClientId = builder.Configuration["Google:ClientId"] ?? "";
+                        options.ClientSecret = builder.Configuration["Google:ClientSecret"] ?? "";
+                        options.SignInScheme = "CookieAuth";
+                        options.SaveTokens = true;
+                        
+                        // Request additional scopes if needed
+                        options.Scope.Add("profile");
+                        options.Scope.Add("email");
+                        
+                        options.CallbackPath = "/signin-google";
                     });
 
                 builder.Services.AddAuthorization();

@@ -32,19 +32,27 @@ namespace Application.Services
 
         public async Task<bool> SetStatusAsync(int id, bool isActive, string modifiedBy, CancellationToken ct = default)
         {
-            var method = await _uow.PaymentMethodRepository.GetByIdAsync(id);
+            // Use queryable with tracking to ensure entity is tracked by context
+            var method = await _uow.PaymentMethodRepository
+                .GetAllQueryable()
+                .Where(pm => pm.Id == id)
+                .FirstOrDefaultAsync(ct);
+
             if (method == null)
             {
                 return false;
             }
 
+            // Update properties
             method.IsActive = isActive;
             method.ModifiedBy = string.IsNullOrWhiteSpace(modifiedBy) ? "system" : modifiedBy.Trim();
             method.ModifiedAt = DateTime.UtcNow;
 
+            // Update and save
             _uow.PaymentMethodRepository.Update(method);
-            await _uow.SaveChangesAsync();
-            return true;
+            var result = await _uow.SaveChangesAsync();
+            
+            return result > 0;
         }
     }
 }

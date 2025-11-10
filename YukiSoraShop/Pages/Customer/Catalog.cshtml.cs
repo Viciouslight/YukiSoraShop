@@ -115,16 +115,18 @@ namespace YukiSoraShop.Pages.Customer
                 return RedirectToPage("/Auth/Login");
             }
 
-            // Role restrictions
+            // Role restrictions - Block Admin and Moderator
             if (User.IsInRole("Administrator"))
             {
+                _logger.LogWarning("Administrator account {AccountId} attempted to add product to cart", accountId);
                 TempData["Error"] = "Tài khoản quản trị không thể thêm sản phẩm vào giỏ hàng.";
                 return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
             }
 
             if (User.IsInRole("Moderator"))
             {
-                TempData["Error"] = "Nhân viên không thể thêm sản phẩm vào giỏ hàng.";
+                _logger.LogWarning("Moderator account {AccountId} attempted to add product to cart", accountId);
+                TempData["Error"] = "Tài khoản nhân viên không thể thêm sản phẩm vào giỏ hàng.";
                 return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
             }
 
@@ -137,13 +139,17 @@ namespace YukiSoraShop.Pages.Customer
                     return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
                 }
 
-                // If product has variants, redirect to details page
-                if (product.ProductDetails != null && product.ProductDetails.Any())
+                // Check if product has variants
+                bool hasVariants = product.ProductDetails != null && product.ProductDetails.Any();
+
+                // If product has variants, redirect to details page to choose variant
+                if (hasVariants)
                 {
                     TempData["Info"] = "Sản phẩm có nhiều biến thể. Vui lòng chọn biến thể trước khi thêm vào giỏ hàng.";
                     return RedirectToPage("/Customer/ProductDetails", new { id });
                 }
 
+                // Product has NO variants - allow direct add to cart
                 // Check availability
                 if (!product.IsAvailable || product.Stock <= 0)
                 {
@@ -158,7 +164,8 @@ namespace YukiSoraShop.Pages.Customer
                 var items = await _cartService.GetItemsAsync(accountId, ct);
                 TempData["CartCount"] = items?.Sum(i => i.Quantity) ?? 0;
 
-                TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
+                _logger.LogInformation("Product {ProductId} added to cart for account {AccountId}", id, accountId);
+                TempData["Success"] = $"Đã thêm \"{product.Name}\" vào giỏ hàng!";
                 return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
             }
             catch (Exception ex)

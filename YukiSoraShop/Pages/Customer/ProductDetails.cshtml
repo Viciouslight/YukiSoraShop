@@ -2,9 +2,19 @@
 @model YukiSoraShop.Pages.Customer.ProductDetailsModel
 @{
     ViewData["Title"] = Model.Product?.Name ?? "Chi tiết sản phẩm";
+    var isAdminOrStaff = User.IsInRole("Administrator") || User.IsInRole("Moderator");
 }
 
 <div class="container my-5">
+    @if (isAdminOrStaff)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Lưu ý:</strong> Tài khoản quản trị/nhân viên không thể thêm sản phẩm vào giỏ hàng.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="row g-5">
         <!-- Ảnh sản phẩm -->
         <div class="col-lg-5">
@@ -58,15 +68,24 @@
                 </div>
             }
 
-            <form method="post" asp-page-handler="AddToCart" class="mt-4">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.Product.Id" />
-                <input type="hidden" id="selectedDetailId" name="productDetailId" value="0" />
-
-                <button type="submit" id="addToCartBtn" class="btn btn-lg btn-primary w-100" disabled>
-                    <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
+            @if (isAdminOrStaff)
+            {
+                <button type="button" class="btn btn-lg btn-secondary w-100" disabled title="Tài khoản quản trị/nhân viên không thể mua hàng">
+                    <i class="fas fa-ban me-2"></i>Không thể thêm vào giỏ hàng
                 </button>
-            </form>
+            }
+            else
+            {
+                <form method="post" asp-page-handler="AddToCart" class="mt-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Product.Id" />
+                    <input type="hidden" id="selectedDetailId" name="productDetailId" value="0" />
+
+                    <button type="submit" id="addToCartBtn" class="btn btn-lg btn-primary w-100" disabled>
+                        <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
+                    </button>
+                </form>
+            }
         </div>
     </div>
 
@@ -103,8 +122,16 @@
     const variantBtns = document.querySelectorAll('.variant-btn');
     const priceEl = document.getElementById('product-price');
     const basePrice = parseFloat("@Model.Product.Price");
+    const hasVariants = @(Model.Product.ProductDetails.Any() ? "true" : "false");
+
+    // If no variants, enable button immediately
+    if (!hasVariants && addToCartBtn) {
+        addToCartBtn.disabled = false;
+    }
 
     function selectVariant(id, imgUrl, extraPrice) {
+        if (!addToCartBtn) return;
+        
         selectedDetailInput.value = id;
         addToCartBtn.disabled = false;
 
@@ -113,7 +140,8 @@
         if (btn) btn.classList.add('active');
 
         // cập nhật ảnh chính
-        document.querySelector(".card img").src = imgUrl;
+        const mainImg = document.querySelector(".card img");
+        if (mainImg) mainImg.src = imgUrl;
 
         // cập nhật giá
         const newPrice = basePrice + parseFloat(extraPrice || 0);

@@ -1,0 +1,381 @@
+@page
+@model YukiSoraShop.Pages.SupportModel
+@{
+    ViewData["Title"] = "H? tr? - YukiSoraShop";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet" />
+</head>
+
+<body style="font-family: 'Inter', sans-serif; background-color: #f8f9fc;">
+
+    <!-- ===== HEADER ===== -->
+    <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary fs-4" href="/" style="font-family: 'Poppins', sans-serif;">
+                <i class="fas fa-bolt me-2 text-warning"></i>YukiSora<span class="text-dark">Shop</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-semibold">
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/">Trang ch?</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/Customer/Catalog">S?n ph?m</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/About">Gi?i thi?u</a></li>
+                    <li class="nav-item"><a class="nav-link active text-primary px-3" href="/Support">H? tr?</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="py-5 text-center text-white bg-gradient-primary">
+        <div class="container py-5">
+            <h1 class="fw-bold display-4 mb-3" style="font-family: 'Poppins', sans-serif;">
+                <i class="fas fa-headset me-3"></i>H? tr? khách hàng
+            </h1>
+            <p class="lead text-light mb-0">Chúng tôi luôn s?n sàng h? tr? b?n 24/7</p>
+        </div>
+    </section>
+
+    <!-- ===== QUICK CONTACT ===== -->
+    <section class="container my-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mx-auto mb-3">
+                        <i class="fas fa-phone fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Hotline</h5>
+                    <p class="text-muted mb-2">Liên h? ngay v?i chúng tôi</p>
+                    <a href="tel:+84123456789" class="text-primary fw-bold fs-5 text-decoration-none">
+                        +84 123 456 789
+                    </a>
+                    <p class="text-muted small mt-2">H? tr? 24/7</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4 mx-auto mb-3">
+                        <i class="fas fa-envelope fa-3x text-success"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Email</h5>
+                    <p class="text-muted mb-2">G?i yêu c?u h? tr? qua email</p>
+                    <a href="mailto:support@yukisora.vn" class="text-success fw-bold text-decoration-none">
+                        support@yukisora.vn
+                    </a>
+                    <p class="text-muted small mt-2">Ph?n h?i trong 2 gi?</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex p-4 mx-auto mb-3">
+                        <i class="fab fa-facebook-messenger fa-3x text-info"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Live Chat</h5>
+                    <p class="text-muted mb-2">Chat tr?c ti?p v?i chuyên viên</p>
+                    <button class="btn btn-info text-white fw-bold" onclick="alert('Ch?c n?ng ?ang phát tri?n')">
+                        B?t ??u chat
+                    </button>
+                    <p class="text-muted small mt-2">Online 8:00 - 22:00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ SECTION ===== -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Câu h?i th??ng g?p</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="accordion" id="faqAccordion">
+                        <!-- FAQ 1 -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    <i class="fas fa-question-circle text-primary me-2"></i>
+                                    Làm th? nào ?? ??t hàng?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    <ol class="mb-0">
+                                        <li>??ng ký/??ng nh?p tài kho?n</li>
+                                        <li>Ch?n s?n ph?m và thêm vào gi? hàng</li>
+                                        <li>Ki?m tra gi? hàng và ti?n hành thanh toán</li>
+                                        <li>Ch?n ph??ng th?c thanh toán (VNPay ho?c ti?n m?t)</li>
+                                        <li>Xác nh?n ??n hàng và ch? giao hàng</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    <i class="fas fa-credit-card text-primary me-2"></i>
+                                    Có nh?ng ph??ng th?c thanh toán nào?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Chúng tôi h? tr? 2 ph??ng th?c thanh toán:
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>VNPay:</strong> Thanh toán online qua th? ATM, Visa, Mastercard, QR Code</li>
+                                        <li><strong>Ti?n m?t (COD):</strong> Thanh toán khi nh?n hàng</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    <i class="fas fa-shipping-fast text-primary me-2"></i>
+                                    Th?i gian giao hàng là bao lâu?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    <ul class="mb-0">
+                                        <li><strong>N?i thành TP.HCM:</strong> 1-2 ngày làm vi?c</li>
+                                        <li><strong>Các t?nh thành khác:</strong> 3-5 ngày làm vi?c</li>
+                                        <li><strong>Vùng xa, h?i ??o:</strong> 5-7 ngày làm vi?c</li>
+                                    </ul>
+                                    <p class="mt-2 mb-0">*Th?i gian có th? thay ??i tùy ?i?u ki?n th?i ti?t và ??a lý</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    <i class="fas fa-undo text-primary me-2"></i>
+                                    Chính sách ??i tr? nh? th? nào?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    <ul class="mb-0">
+                                        <li>??i tr? trong vòng 7 ngày k? t? ngày nh?n hàng</li>
+                                        <li>S?n ph?m còn nguyên v?n, ch?a qua s? d?ng</li>
+                                        <li>Có ??y ?? h?p, ph? ki?n, hóa ??n</li>
+                                        <li>Mi?n phí ??i tr? trong tr??ng h?p l?i nhà s?n xu?t</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 5 -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                                    S?n ph?m có ???c b?o hành không?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    <p class="mb-2">T?t c? s?n ph?m ??u ???c b?o hành chính hãng:</p>
+                                    <ul class="mb-0">
+                                        <li><strong>Thi?t b? ph?n c?ng:</strong> 12-36 tháng tùy s?n ph?m</li>
+                                        <li><strong>Ph?n m?m:</strong> H? tr? k? thu?t mi?n phí trong th?i gian b?o hành</li>
+                                        <li><strong>D?ch v?:</strong> Cam k?t ch?t l??ng theo h?p ??ng</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 6 -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                    <i class="fas fa-user-tie text-primary me-2"></i>
+                                    Tài kho?n Admin/Staff có mua hàng ???c không?
+                                </button>
+                            </h2>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    <p class="mb-0">
+                                        <strong>Không.</strong> Tài kho?n qu?n tr? (Administrator) và nhân viên (Moderator/Staff) 
+                                        không th? thêm s?n ph?m vào gi? hàng và ??t hàng. Ch?c n?ng này ch? dành cho 
+                                        tài kho?n khách hàng (Customer). N?u b?n là nhân viên và mu?n mua hàng, vui lòng 
+                                        ??ng ký tài kho?n khách hàng riêng.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT FORM ===== -->
+    <section class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-5">
+                        <h3 class="fw-bold text-center mb-4">G?i yêu c?u h? tr?</h3>
+                        <form>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">H? và tên</label>
+                                    <input type="text" class="form-control" placeholder="Nguy?n V?n A" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control" placeholder="email@example.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">S? ?i?n tho?i</label>
+                                    <input type="tel" class="form-control" placeholder="+84 123 456 789" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Lo?i yêu c?u</label>
+                                    <select class="form-select" required>
+                                        <option value="">-- Ch?n lo?i yêu c?u --</option>
+                                        <option>H? tr? k? thu?t</option>
+                                        <option>T? v?n s?n ph?m</option>
+                                        <option>B?o hành</option>
+                                        <option>Khi?u n?i</option>
+                                        <option>Khác</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">N?i dung</label>
+                                    <textarea class="form-control" rows="5" placeholder="Mô t? chi ti?t yêu c?u c?a b?n..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5" onclick="alert('C?m ?n b?n! Chúng tôi s? ph?n h?i trong th?i gian s?m nh?t.'); return false;">
+                                        <i class="fas fa-paper-plane me-2"></i>G?i yêu c?u
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== LOCATION MAP ===== -->
+    <section class="container my-5">
+        <h2 class="text-center fw-bold mb-5">??a ch? v?n phòng</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-building text-primary me-2"></i>V?n phòng chính - TP.HCM
+                        </h5>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i>123 ???ng Nguy?n V?n Linh, Qu?n 7, TP.HCM</li>
+                            <li class="mb-2"><i class="fas fa-phone me-2 text-primary"></i>+84 123 456 789</li>
+                            <li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i>hcm@yukisora.vn</li>
+                            <li class="mb-2"><i class="fas fa-clock me-2 text-primary"></i>8:00 - 18:00 (T2-T7)</li>
+                        </ul>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.6305!2d106.6922!3d10.7625!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDQ1JzQ1LjAiTiAxMDbCsDQxJzMxLjkiRQ!5e0!3m2!1svi!2s!4v1234567890" 
+                                width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy" class="rounded mt-3"></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-building text-success me-2"></i>Chi nhánh - Hà N?i
+                        </h5>
+                        <ul class="list-unstyled text-muted">
+                            <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-success"></i>456 ???ng Láng, ??ng ?a, Hà N?i</li>
+                            <li class="mb-2"><i class="fas fa-phone me-2 text-success"></i>+84 987 654 321</li>
+                            <li class="mb-2"><i class="fas fa-envelope me-2 text-success"></i>hn@yukisora.vn</li>
+                            <li class="mb-2"><i class="fas fa-clock me-2 text-success"></i>8:00 - 18:00 (T2-T7)</li>
+                        </ul>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.0963!2d105.8045!3d21.0227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDAxJzIxLjciTiAxMDXCsDQ4JzE2LjIiRQ!5e0!3m2!1svi!2s!4v1234567890" 
+                                width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy" class="rounded mt-3"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-dark text-light pt-5 pb-3">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="fw-bold mb-3">YukiSora Technology</h5>
+                    <p class="text-light opacity-75">
+                        ??i tác tin c?y trong chuy?n ??i s? và gi?i pháp công ngh? cho doanh nghi?p Vi?t Nam.
+                    </p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <h6 class="fw-bold mb-3">S?n ph?m</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">Ph?n c?ng</a></li>
+                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">Ph?n m?m</a></li>
+                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">D?ch v?</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h6 class="fw-bold mb-3">H? tr?</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/Support" class="text-light text-decoration-none opacity-75">Liên h?</a></li>
+                        <li class="mb-2"><a href="/Support" class="text-light text-decoration-none opacity-75">FAQ</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none opacity-75">B?o hành</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-bold mb-3">Newsletter</h6>
+                    <p class="text-light opacity-75 small">??ng ký ?? nh?n tin t?c và ?u ?ãi m?i nh?t</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control form-control-sm" placeholder="Email c?a b?n">
+                        <button class="btn btn-primary btn-sm">??ng ký</button>
+                    </form>
+                </div>
+            </div>
+            <hr class="my-4 bg-light opacity-25" />
+            <p class="text-center small mb-0 opacity-75">
+                © 2025 YukiSora Technology. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5);
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

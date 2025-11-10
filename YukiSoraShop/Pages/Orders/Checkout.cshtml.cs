@@ -13,11 +13,13 @@ namespace YukiSoraShop.Pages.Orders
     {
         private readonly IPaymentOrchestrator _payment;
         private readonly IUnitOfWork _uow;
+        private readonly ILogger<OrdersCheckoutModel> _logger;
 
-        public OrdersCheckoutModel(IPaymentOrchestrator payment, IUnitOfWork uow)
+        public OrdersCheckoutModel(IPaymentOrchestrator payment, IUnitOfWork uow, ILogger<OrdersCheckoutModel> logger)
         {
             _payment = payment;
             _uow = uow;
+            _logger = logger;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -31,17 +33,22 @@ namespace YukiSoraShop.Pages.Orders
 
         public decimal? GrandTotal { get; set; }
 
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            _logger.LogInformation("Checkout OnGet: OrderId={OrderId}", OrderId);
+
             if (OrderId <= 0)
             {
-                TempData["Error"] = "Thi?u OrderId";
+                _logger.LogWarning("Checkout OnGet: Missing or invalid OrderId");
+                TempData["Error"] = "Thiếu mã đơn hàng.";
                 return RedirectToPage("/Customer/Catalog");
             }
 
             var order = await _uow.OrderRepository.GetByIdAsync(OrderId);
             if (order == null || order.AccountId != GetCurrentUserId())
             {
+                _logger.LogWarning("Checkout OnGet: Order {OrderId} not found or access denied for user {UserId}", 
+                    OrderId, GetCurrentUserId());
                 TempData["Error"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.";
                 return RedirectToPage("/Customer/MyOrders");
             }
@@ -59,22 +66,30 @@ namespace YukiSoraShop.Pages.Orders
             }
 
             GrandTotal = order.GrandTotal ?? (order.Subtotal + order.ShippingFee);
+            _logger.LogInformation("Checkout OnGet: Order {OrderId} loaded, GrandTotal={GrandTotal}", 
+                OrderId, GrandTotal);
 
             return Page();
         }
 
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostPayAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
+            _logger.LogInformation("Checkout OnPost: OrderId={OrderId}, BankCode={BankCode}, OrderType={OrderType}", 
+                OrderId, BankCode ?? "none", OrderTypeCode);
+
             if (OrderId <= 0)
             {
-                TempData["Error"] = "Thi?u OrderId";
+                _logger.LogWarning("Checkout OnPost: Missing or invalid OrderId");
+                TempData["Error"] = "Thiếu mã đơn hàng.";
                 return RedirectToPage("/Customer/Catalog");
             }
 
             var order = await _uow.OrderRepository.GetByIdAsync(OrderId);
             if (order == null || order.AccountId != GetCurrentUserId())
             {
+                _logger.LogWarning("Checkout OnPost: Order {OrderId} not found or access denied for user {UserId}", 
+                    OrderId, GetCurrentUserId());
                 TempData["Error"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.";
                 return RedirectToPage("/Customer/MyOrders");
             }
@@ -91,17 +106,29 @@ namespace YukiSoraShop.Pages.Orders
                 return RedirectToPage("/Orders/PaymentMethod", new { OrderId });
             }
 
-            var cmd = new CreatePaymentCommand
+            try
             {
-                OrderId = OrderId,
-                BankCode = string.IsNullOrWhiteSpace(BankCode) ? null : BankCode,
-                ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
-                OrderDescription = $"Thanh toan don hang #{OrderId}",
-                OrderTypeCode = OrderTypeCode
-            };
+                var cmd = new CreatePaymentCommand
+                {
+                    OrderId = OrderId,
+                    BankCode = string.IsNullOrWhiteSpace(BankCode) ? null : BankCode,
+                    ClientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                    OrderDescription = $"Thanh toan don hang #{OrderId}",
+                    OrderTypeCode = OrderTypeCode
+                };
 
-            var dto = await _payment.CreateCheckoutAsync(cmd);
-            return Redirect(dto.CheckoutUrl);
+                var dto = await _payment.CreateCheckoutAsync(cmd);
+                _logger.LogInformation("Checkout OnPost: Created VNPay checkout URL for Order {OrderId}", OrderId);
+                
+                return Redirect(dto.CheckoutUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Checkout OnPost: Error creating VNPay checkout for Order {OrderId}", OrderId);
+                TempData["Error"] = "Không thể tạo liên kết thanh toán. Vui lòng thử lại.";
+                GrandTotal = order.GrandTotal ?? (order.Subtotal + order.ShippingFee);
+                return Page();
+            }
         }
 
         private int GetCurrentUserId()

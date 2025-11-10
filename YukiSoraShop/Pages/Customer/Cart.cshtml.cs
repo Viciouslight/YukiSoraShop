@@ -103,7 +103,8 @@ namespace YukiSoraShop.Pages.Customer
                 await LoadFromPersistentCartAsync();
                 
                 _logger.LogInformation("Order {OrderId} created successfully for account {AccountId}", order.Id, accountId);
-                return RedirectToPage("/Orders/PaymentMethod", new { orderId = order.Id });
+                TempData["Success"] = $"✅ Đơn hàng #{order.Id} đã được tạo thành công!";
+                return RedirectToPage("/Orders/PaymentMethod", new { OrderId = order.Id });
             }
             catch (Exception ex)
             {

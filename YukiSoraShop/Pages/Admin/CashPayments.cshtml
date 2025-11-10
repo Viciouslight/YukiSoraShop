@@ -3,6 +3,7 @@
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Xác nhận thanh toán tiền mặt";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
     var antiForgeryToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 
@@ -10,7 +11,7 @@
     <h2 class="mb-0">
         <i class="fas fa-hand-holding-usd me-2"></i> Xác nhận thanh toán tiền mặt
     </h2>
-    <a class="btn btn-outline-secondary" href="/Admin/Dashboard">
+    <a class="btn btn-outline-secondary" asp-page="/Admin/Dashboard">
         <i class="fas fa-arrow-left"></i> Về Dashboard
     </a>
 </div>

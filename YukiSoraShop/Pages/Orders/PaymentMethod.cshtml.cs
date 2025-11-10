@@ -53,15 +53,29 @@ namespace YukiSoraShop.Pages.Orders
 
         public async Task<IActionResult> OnGetAsync()
         {
+            _logger.LogInformation("=== PaymentMethod OnGet START ===");
+            _logger.LogInformation("OrderId received: {OrderId}", OrderId);
+
+            if (OrderId <= 0)
+            {
+                _logger.LogWarning("Invalid OrderId: {OrderId}", OrderId);
+                TempData["Error"] = "Mã đơn hàng không hợp lệ.";
+                return RedirectToPage("/Customer/MyOrders");
+            }
+
             var order = await LoadOrderAsync();
             if (order == null)
             {
-                TempData["Error"] = "Không tìm thấy đơn hàng.";
-                return RedirectToPage("/Customer/Catalog");
+                _logger.LogWarning("Order {OrderId} not found or access denied", OrderId);
+                TempData["Error"] = "Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.";
+                return RedirectToPage("/Customer/MyOrders");
             }
+
+            _logger.LogInformation("Order {OrderId} loaded, Status: {Status}", OrderId, order.Status);
 
             if (EqualsName(order.Status, "Paid"))
             {
+                _logger.LogInformation("Order {OrderId} is already paid", OrderId);
                 TempData["Info"] = "Đơn hàng đã được thanh toán.";
                 return RedirectToPage("/Customer/MyOrders");
             }
@@ -69,36 +83,50 @@ namespace YukiSoraShop.Pages.Orders
             GrandTotal = order.GrandTotal ?? (order.Subtotal + order.ShippingFee);
             IsAwaitingCash = EqualsName(order.Status, "AwaitingCash");
 
+            _logger.LogInformation("Loading payment methods...");
             if (!await LoadPaymentMethodsAsync())
             {
-                TempData["Error"] = "Hiện chưa có phương thức thanh toán nào khả dụng.";
-                return RedirectToPage("/Customer/MyOrders");
+                _logger.LogError("No active payment methods found!");
+                TempData["Error"] = "⚠️ Hiện chưa có phương thức thanh toán nào khả dụng. Vui lòng liên hệ quản trị viên để kích hoạt phương thức thanh toán.";
+                // KHÔNG redirect, hiển thị trang với message
+                PaymentMethods = new List<PaymentMethodOption>();
+                return Page();
             }
+
+            _logger.LogInformation("Found {Count} active payment methods", PaymentMethods.Count);
 
             if (IsAwaitingCash && HasMethod("Cash"))
             {
                 SelectedMethod = "Cash";
+                _logger.LogInformation("Auto-selected Cash (order is AwaitingCash)");
             }
             else if (string.IsNullOrWhiteSpace(SelectedMethod) || !HasMethod(SelectedMethod))
             {
                 SelectedMethod = PaymentMethods.First().Name;
+                _logger.LogInformation("Auto-selected first method: {Method}", SelectedMethod);
             }
 
+            _logger.LogInformation("=== PaymentMethod OnGet END - Displaying page ===");
             return Page();
         }
 
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
+            _logger.LogInformation("=== PaymentMethod OnPost START ===");
+            _logger.LogInformation("OrderId: {OrderId}, SelectedMethod: {Method}", OrderId, SelectedMethod);
+
             var order = await LoadOrderAsync();
             if (order == null)
             {
+                _logger.LogWarning("Order {OrderId} not found on POST", OrderId);
                 TempData["Error"] = "Không tìm thấy đơn hàng.";
-                return RedirectToPage("/Customer/Catalog");
+                return RedirectToPage("/Customer/MyOrders");
             }
 
             if (EqualsName(order.Status, "Paid"))
             {
+                _logger.LogInformation("Order {OrderId} is already paid on POST", OrderId);
                 TempData["Info"] = "Đơn hàng đã được thanh toán.";
                 return RedirectToPage("/Customer/MyOrders");
             }
@@ -108,27 +136,33 @@ namespace YukiSoraShop.Pages.Orders
 
             if (!await LoadPaymentMethodsAsync())
             {
+                _logger.LogError("No active payment methods found on POST!");
                 TempData["Error"] = "Hiện chưa có phương thức thanh toán nào khả dụng.";
-                return RedirectToPage("/Customer/MyOrders");
+                return Page();
             }
 
             if (!HasMethod(SelectedMethod))
             {
+                _logger.LogWarning("Selected method {Method} is not available", SelectedMethod);
                 ModelState.AddModelError(nameof(SelectedMethod), "Phương thức thanh toán không khả dụng.");
                 SelectedMethod = PaymentMethods.First().Name;
             }
 
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("ModelState is invalid");
                 return Page();
             }
 
             if (EqualsName(SelectedMethod, "Cash"))
             {
+                _logger.LogInformation("Processing Cash payment for Order {OrderId}", OrderId);
                 var createdBy = User.Identity?.Name ?? "customer";
                 var result = await _paymentOrchestrator.CreateCashPaymentAsync(OrderId, createdBy);
+                
                 if (result.IsSuccess)
                 {
+                    _logger.LogInformation("Cash payment created successfully for Order {OrderId}", OrderId);
                     try
                     {
                         var orderSnapshot = await _orderService.GetOrderWithDetailsAsync(OrderId);
@@ -154,32 +188,56 @@ namespace YukiSoraShop.Pages.Orders
                     {
                         _logger.LogWarning(broadcastEx, "Failed to broadcast cash order creation for OrderId {OrderId}", OrderId);
                     }
+                    
+                    TempData["SuccessMessage"] = result.Message;
+                    _logger.LogInformation("Redirecting to CashConfirmation for Order {OrderId}", OrderId);
+                    return RedirectToPage("/Orders/CashConfirmation", new { OrderId });
                 }
-                TempData["SuccessMessage"] = result.Message;
-                return RedirectToPage("/Orders/CashConfirmation", new { OrderId });
+                else
+                {
+                    _logger.LogError("Failed to create cash payment: {Message}", result.Message);
+                    TempData["Error"] = result.Message ?? "Không thể tạo thanh toán tiền mặt.";
+                    return Page();
+                }
             }
 
             if (!EqualsName(SelectedMethod, "VNPay"))
             {
+                _logger.LogWarning("Unsupported payment method: {Method}", SelectedMethod);
                 TempData["Error"] = "Phương thức thanh toán chưa được hỗ trợ.";
                 return Page();
             }
 
+            _logger.LogInformation("Redirecting to Checkout (VNPay) for Order {OrderId}", OrderId);
             return RedirectToPage("/Orders/Checkout", new { OrderId });
         }
 
         private async Task<bool> LoadPaymentMethodsAsync()
         {
-            var methods = await _paymentMethodService.GetActiveAsync();
-            PaymentMethods = methods
-                .Select(pm => new PaymentMethodOption
-                {
-                    Id = pm.Id,
-                    Name = pm.Name,
-                    Description = pm.Description ?? string.Empty
-                })
-                .ToList();
-            return PaymentMethods.Count > 0;
+            try
+            {
+                var methods = await _paymentMethodService.GetActiveAsync();
+                PaymentMethods = methods
+                    .Select(pm => new PaymentMethodOption
+                    {
+                        Id = pm.Id,
+                        Name = pm.Name,
+                        Description = pm.Description ?? string.Empty
+                    })
+                    .ToList();
+                
+                _logger.LogInformation("Loaded {Count} payment methods: {Methods}", 
+                    PaymentMethods.Count, 
+                    string.Join(", ", PaymentMethods.Select(m => m.Name)));
+                
+                return PaymentMethods.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading payment methods");
+                PaymentMethods = new List<PaymentMethodOption>();
+                return false;
+            }
         }
 
         private async Task<Domain.Entities.Order?> LoadOrderAsync()
@@ -193,6 +251,8 @@ namespace YukiSoraShop.Pages.Orders
             var userId = GetCurrentUserId();
             if (order.AccountId != userId)
             {
+                _logger.LogWarning("Order {OrderId} belongs to user {OwnerId}, but current user is {CurrentUserId}", 
+                    OrderId, order.AccountId, userId);
                 return null;
             }
 

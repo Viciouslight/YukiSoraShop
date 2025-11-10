@@ -2,14 +2,14 @@
 @model YukiSoraShop.Pages.Admin.PaymentMethodsModel
 @{
     ViewData["Title"] = "Quản lý phương thức thanh toán";
-    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">
         <i class="fas fa-credit-card me-2 text-primary"></i> Quản lý phương thức thanh toán
     </h2>
-    <a class="btn btn-outline-secondary" href="/Admin/Dashboard">
+    <a class="btn btn-outline-secondary" asp-page="/Admin/Dashboard">
         <i class="fas fa-arrow-left"></i> Về Dashboard
     </a>
 </div>
@@ -89,7 +89,8 @@ else
                     <tbody>
                         @foreach (var method in Model.Methods)
                         {
-                            <tr>
+                            var rowClass = method.IsActive ? "table-success-subtle" : "table-secondary-subtle";
+                            <tr class="@rowClass">
                                 <td class="fw-semibold text-muted">#@method.Id</td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -148,21 +149,21 @@ else
                                 </td>
                                 <td class="text-center">
                                     <form method="post" asp-page-handler="SetStatus" class="d-inline" 
-                                          onsubmit="return confirm('@(method.IsActive ? "Bạn có chắc muốn TẮT phương thức này?" : "Bạn có chắc muốn KÍCH HOẠT phương thức này?")');">
+                                          onsubmit="return confirm('@(method.IsActive ? "Bạn có chắc muốn TẮT phương thức này?\n\nKhách hàng sẽ không thể sử dụng phương thức này để thanh toán." : "Bạn có chắc muốn KÍCH HOẠT phương thức này?\n\nKhách hàng sẽ có thể sử dụng phương thức này để thanh toán.")');">
                                         <input type="hidden" name="id" value="@method.Id" />
                                         <input type="hidden" name="isActive" value="@(!method.IsActive)" />
                                         @if (method.IsActive)
                                         {
-                                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                            <button type="submit" class="btn btn-danger btn-sm"
                                                     title="Tắt phương thức này">
-                                                <i class="fas fa-ban me-1"></i>Tạm ngưng
+                                                <i class="fas fa-ban me-1"></i>Tắt
                                             </button>
                                         }
                                         else
                                         {
-                                            <button type="submit" class="btn btn-outline-success btn-sm"
+                                            <button type="submit" class="btn btn-success btn-sm"
                                                     title="Kích hoạt lại phương thức">
-                                                <i class="fas fa-check me-1"></i>Kích hoạt
+                                                <i class="fas fa-check me-1"></i>Bật
                                             </button>
                                         }
                                     </form>
@@ -174,13 +175,24 @@ else
             </div>
         </div>
     </div>
+
+    <!-- Help Section -->
+    <div class="alert alert-info mt-4">
+        <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Hướng dẫn</h6>
+        <ul class="mb-0 small">
+            <li><strong>Đang kích hoạt (màu xanh):</strong> Phương thức này đang khả dụng cho khách hàng</li>
+            <li><strong>Đang tắt (màu xám):</strong> Phương thức này không khả dụng, khách hàng không thể chọn</li>
+            <li>Click nút <strong>"Bật"</strong> hoặc <strong>"Tắt"</strong> để thay đổi trạng thái</li>
+            <li>Khách hàng chỉ nhìn thấy các phương thức <strong>đang kích hoạt</strong> khi thanh toán</li>
+        </ul>
+    </div>
 }
 
 @section Scripts {
     <script>
         // Auto dismiss alerts after 5 seconds
         setTimeout(() => {
-            const alerts = document.querySelectorAll('.alert');
+            const alerts = document.querySelectorAll('.alert-success, .alert-danger');
             alerts.forEach(alert => {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();

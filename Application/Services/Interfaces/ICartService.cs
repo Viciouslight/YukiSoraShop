@@ -16,7 +16,7 @@ namespace Application.Services.Interfaces
         // Persistent cart (Unit of Work + Entities)
         Task<Cart> GetOrCreateCartAsync(int accountId, CancellationToken ct = default);
         Task<IReadOnlyList<CartItem>> GetItemsAsync(int accountId, CancellationToken ct = default);
-        Task AddItemAsync(int accountId, int productId, int quantity = 1, CancellationToken ct = default);
+        Task AddItemAsync(int accountId, int productId, int quantity, CancellationToken ct = default);
         Task UpdateQuantityAsync(int accountId, int productId, int quantity, CancellationToken ct = default);
         Task RemoveItemAsync(int accountId, int productId, CancellationToken ct = default);
         Task ClearAsync(int accountId, CancellationToken ct = default);

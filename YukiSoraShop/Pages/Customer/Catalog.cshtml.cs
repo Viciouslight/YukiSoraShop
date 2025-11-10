@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Application.DTOs.Pagination;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Selecting;
 
 namespace YukiSoraShop.Pages.Customer
 {
@@ -23,14 +23,22 @@ namespace YukiSoraShop.Pages.Customer
         }
 
         public List<ProductDTO> Products { get; set; } = new();
+
         [BindProperty(SupportsGet = true)]
         public int Page { get; set; } = 1;
+
         [BindProperty(SupportsGet = true)]
-        public int Size { get; set; } = Application.DTOs.Pagination.PaginationDefaults.DefaultPageSize;
+        public int Size { get; set; } = PaginationDefaults.DefaultPageSize;
+
         [BindProperty(SupportsGet = true)]
         public string? Search { get; set; }
+
         [BindProperty(SupportsGet = true)]
         public string? Category { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? Sort { get; set; }
+
         public int TotalPages { get; set; }
         public int TotalItems { get; set; }
         public List<SelectListItem> CategoryOptions { get; set; } = new();
@@ -43,24 +51,41 @@ namespace YukiSoraShop.Pages.Customer
                 var page = Page <= 0 ? PaginationDefaults.DefaultPageNumber : Page;
 
                 var paged = await _productService.GetProductsPagedAsync(page, size, Search, Category);
-                Products = paged.Items.ToList();
+                var products = paged.Items.ToList();
+
+                if (!string.IsNullOrEmpty(Sort))
+                {
+                    products = Sort switch
+                    {
+                        "price_asc" => products.OrderBy(p => p.Price).ToList(),
+                        "price_desc" => products.OrderByDescending(p => p.Price).ToList(),
+                        _ => products
+                    };
+                }
+
+                Products = products;
                 TotalPages = paged.TotalPages;
                 TotalItems = paged.TotalItems;
 
-                // Clamp current page to bounds for UI
                 if (TotalPages > 0 && Page > TotalPages) Page = TotalPages;
                 if (Page <= 0) Page = 1;
                 Size = size;
 
-                // Load categories for filter dropdown
                 var cats = await _productService.GetAllCategoriesAsync();
                 CategoryOptions = cats
-                    .Select(c => new SelectListItem { Value = c.CategoryName, Text = c.CategoryName, Selected = c.CategoryName == Category })
+                    .Select(c => new SelectListItem
+                    {
+                        Value = c.CategoryName,
+                        Text = c.CategoryName,
+                        Selected = c.CategoryName == Category
+                    })
                     .ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to load catalog: page={Page}, size={Size}, search={Search}, category={Category}", Page, Size, Search, Category);
+                _logger.LogError(ex, "Failed to load catalog: page={Page}, size={Size}, search={Search}, category={Category}",
+                    Page, Size, Search, Category);
+
                 TempData["Error"] = "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
                 Products = new List<ProductDTO>();
                 TotalPages = 0;
@@ -69,14 +94,79 @@ namespace YukiSoraShop.Pages.Customer
             }
         }
 
-        // Removed sync helper; prefer async methods on service
-
-        [ValidateAntiForgeryToken]
-        public IActionResult OnPostAddToCart(int id)
+        private int GetAccountIdFromUser()
         {
-            // Chỉ cần điều hướng sang ProductDetails
-            return RedirectToPage("/Customer/ProductDetails", new { id });
+            var accountIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(accountIdStr, out var accountId) ? accountId : 0;
         }
 
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OnPostAddToCart(int id, CancellationToken ct = default)
+        {
+            if (id <= 0)
+            {
+                TempData["Error"] = "Sản phẩm không hợp lệ.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+
+            var accountId = GetAccountIdFromUser();
+            if (accountId <= 0)
+            {
+                return RedirectToPage("/Auth/Login");
+            }
+
+            // Role restrictions
+            if (User.IsInRole("Administrator"))
+            {
+                TempData["Error"] = "Tài khoản quản trị không thể thêm sản phẩm vào giỏ hàng.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+
+            if (User.IsInRole("Moderator"))
+            {
+                TempData["Error"] = "Nhân viên không thể thêm sản phẩm vào giỏ hàng.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+
+            try
+            {
+                var product = await _productService.GetProductDtoByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["Error"] = "Sản phẩm không tồn tại.";
+                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                }
+
+                // If product has variants, redirect to details page
+                if (product.ProductDetails != null && product.ProductDetails.Any())
+                {
+                    TempData["Info"] = "Sản phẩm có nhiều biến thể. Vui lòng chọn biến thể trước khi thêm vào giỏ hàng.";
+                    return RedirectToPage("/Customer/ProductDetails", new { id });
+                }
+
+                // Check availability
+                if (!product.IsAvailable || product.Stock <= 0)
+                {
+                    TempData["Error"] = "Sản phẩm tạm thời không có sẵn.";
+                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                }
+
+                // Add to cart (price comes from product entity)
+                await _cartService.AddItemAsync(accountId, id, 1, ct);
+
+                // Update cart count
+                var items = await _cartService.GetItemsAsync(accountId, ct);
+                TempData["CartCount"] = items?.Sum(i => i.Quantity) ?? 0;
+
+                TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to add product {ProductId} to cart for account {AccountId}", id, accountId);
+                TempData["Error"] = "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.";
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+            }
+        }
     }
 }

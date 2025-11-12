@@ -1,7 +1,6 @@
 ﻿using Application.DTOs;
-using Application.DTOs.Pagination;
 using Domain.Entities;
-using System.Collections.Generic;
+using Application.DTOs.Pagination;
 
 namespace Application.Services.Interfaces
 {
@@ -9,11 +8,11 @@ namespace Application.Services.Interfaces
     {
         // DTO methods for display (async)
         Task<List<ProductDTO>> GetAllProductsDtoAsync();
-        Task<PagedResult<ProductDTO>> GetProductsPagedAsync(int pageNumber, int pageSize, string? search = null, string? category = null);
+        Task<PagedResult<ProductDTO>> GetProductsPagedAsync(int pageNumber, int pageSize, string? search = null, string? category = null, decimal? minPrice = null, decimal? maxPrice = null, string? sortBy = null);
         Task<List<ProductDTO>> GetProductsByCategoryAsync(string category);
         Task<List<ProductDTO>> GetProductsByNameAsync(string name);
         Task<ProductDTO?> GetProductDtoByIdAsync(int id);
-
+        Task<List<ProductDTO>> GetHotProductsAsync(int count = 8);
 
         // Entity methods for CRUD operations
         Task<List<Product>> GetAllProductsAsync();
@@ -23,7 +22,7 @@ namespace Application.Services.Interfaces
         Task<bool> CreateProductAsync(Product product);
         Task<bool> UpdateProductAsync(Product product);
         Task<bool> DeleteProductAsync(int id);
-        
+
         // Category methods
         Task<List<Category>> GetAllCategoriesAsync();
         Task<Category?> GetCategoryByIdAsync(int id);

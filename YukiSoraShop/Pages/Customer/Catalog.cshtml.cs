@@ -23,12 +23,13 @@ namespace YukiSoraShop.Pages.Customer
         }
 
         public List<ProductDTO> Products { get; set; } = new();
+        public List<ProductDTO> HotProducts { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
         public int Page { get; set; } = 1;
 
         [BindProperty(SupportsGet = true)]
-        public int Size { get; set; } = PaginationDefaults.DefaultPageSize;
+        public int Size { get; set; } = 12;
 
         [BindProperty(SupportsGet = true)]
         public string? Search { get; set; }
@@ -39,6 +40,12 @@ namespace YukiSoraShop.Pages.Customer
         [BindProperty(SupportsGet = true)]
         public string? Sort { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public decimal? MinPrice { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public decimal? MaxPrice { get; set; }
+
         public int TotalPages { get; set; }
         public int TotalItems { get; set; }
         public List<SelectListItem> CategoryOptions { get; set; } = new();
@@ -47,23 +54,17 @@ namespace YukiSoraShop.Pages.Customer
         {
             try
             {
-                var size = Size <= 0 ? PaginationDefaults.DefaultPageSize : Math.Min(Size, PaginationDefaults.MaxPageSize);
+                var size = Size <= 0 ? 12 : Math.Min(Size, PaginationDefaults.MaxPageSize);
                 var page = Page <= 0 ? PaginationDefaults.DefaultPageNumber : Page;
 
-                var paged = await _productService.GetProductsPagedAsync(page, size, Search, Category);
-                var products = paged.Items.ToList();
+                // Load hot products
+                HotProducts = await _productService.GetHotProductsAsync(8);
 
-                if (!string.IsNullOrEmpty(Sort))
-                {
-                    products = Sort switch
-                    {
-                        "price_asc" => products.OrderBy(p => p.Price).ToList(),
-                        "price_desc" => products.OrderByDescending(p => p.Price).ToList(),
-                        _ => products
-                    };
-                }
-
-                Products = products;
+                // Load products with filters
+                var paged = await _productService.GetProductsPagedAsync(
+                    page, size, Search, Category, MinPrice, MaxPrice, Sort);
+                
+                Products = paged.Items.ToList();
                 TotalPages = paged.TotalPages;
                 TotalItems = paged.TotalItems;
 
@@ -88,6 +89,7 @@ namespace YukiSoraShop.Pages.Customer
 
                 TempData["Error"] = "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
                 Products = new List<ProductDTO>();
+                HotProducts = new List<ProductDTO>();
                 TotalPages = 0;
                 TotalItems = 0;
                 CategoryOptions = new List<SelectListItem>();
@@ -106,7 +108,7 @@ namespace YukiSoraShop.Pages.Customer
             if (id <= 0)
             {
                 TempData["Error"] = "Sản phẩm không hợp lệ.";
-                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
             }
 
             var accountId = GetAccountIdFromUser();
@@ -120,14 +122,14 @@ namespace YukiSoraShop.Pages.Customer
             {
                 _logger.LogWarning("Administrator account {AccountId} attempted to add product to cart", accountId);
                 TempData["Error"] = "Tài khoản quản trị không thể thêm sản phẩm vào giỏ hàng.";
-                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
             }
 
             if (User.IsInRole("Moderator"))
             {
                 _logger.LogWarning("Moderator account {AccountId} attempted to add product to cart", accountId);
                 TempData["Error"] = "Tài khoản nhân viên không thể thêm sản phẩm vào giỏ hàng.";
-                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
             }
 
             try
@@ -136,7 +138,7 @@ namespace YukiSoraShop.Pages.Customer
                 if (product == null)
                 {
                     TempData["Error"] = "Sản phẩm không tồn tại.";
-                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
                 }
 
                 // Check if product has variants
@@ -154,7 +156,7 @@ namespace YukiSoraShop.Pages.Customer
                 if (!product.IsAvailable || product.Stock <= 0)
                 {
                     TempData["Error"] = "Sản phẩm tạm thời không có sẵn.";
-                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                    return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
                 }
 
                 // Add to cart (price comes from product entity)
@@ -166,13 +168,13 @@ namespace YukiSoraShop.Pages.Customer
 
                 _logger.LogInformation("Product {ProductId} added to cart for account {AccountId}", id, accountId);
                 TempData["Success"] = $"Đã thêm \"{product.Name}\" vào giỏ hàng!";
-                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to add product {ProductId} to cart for account {AccountId}", id, accountId);
                 TempData["Error"] = "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.";
-                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort });
+                return RedirectToPage("/Customer/Catalog", new { Page, Size, Search, Category, Sort, MinPrice, MaxPrice });
             }
         }
     }

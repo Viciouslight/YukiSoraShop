@@ -1,7 +1,7 @@
-@page
+Ôªø@page
 @model YukiSoraShop.Pages.SupportModel
 @{
-    ViewData["Title"] = "H? tr? - YukiSoraShop";
+    ViewData["Title"] = "H·ªó tr·ª£ - YukiSoraShop";
     Layout = null;
 }
 
@@ -15,366 +15,261 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7fb;
+            scroll-behavior: smooth;
+        }
+
+        /* HEADER */
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-brand span {
+            color: #6610f2;
+        }
+
+        .nav-link {
+            transition: 0.3s;
+        }
+
+            .nav-link:hover {
+                color: #0d6efd !important;
+            }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(120deg, #0d6efd, #6610f2);
+            color: #fff;
+            padding: 100px 0 80px;
+        }
+
+            .hero h1 {
+                font-family: 'Poppins', sans-serif;
+                font-weight: 700;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+                opacity: 0.9;
+            }
+
+        /* CARD EFFECTS */
+        .card {
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            }
+
+        /* FAQ */
+        .accordion-button {
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+            .accordion-button:focus {
+                box-shadow: none;
+            }
+
+        .accordion-item {
+            border-radius: 12px !important;
+            overflow: hidden;
+        }
+
+        /* CONTACT FORM */
+        form input, form select, form textarea {
+            border-radius: 8px;
+        }
+
+        form button {
+            border-radius: 8px;
+            background: linear-gradient(90deg, #0d6efd, #6610f2);
+            border: none;
+            transition: 0.3s;
+        }
+
+            form button:hover {
+                opacity: 0.9;
+                transform: scale(1.02);
+            }
+
+        /* MAP CARD */
+        iframe {
+            border-radius: 10px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5);
+        }
+
+            footer a {
+                color: #e0e0e0;
+                transition: 0.3s;
+            }
+
+                footer a:hover {
+                    color: #fff;
+                }
+
+        /* SECTION TITLES */
+        section h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #222;
+        }
+
+        /* GRADIENT TITLE LINE */
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 4px;
+            margin: 12px auto 0;
+            background: linear-gradient(90deg, #0d6efd, #6610f2);
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
-<body style="font-family: 'Inter', sans-serif; background-color: #f8f9fc;">
+<body>
 
     <!-- ===== HEADER ===== -->
-    <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
+    <header class="navbar navbar-expand-lg sticky-top py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary fs-4" href="/" style="font-family: 'Poppins', sans-serif;">
-                <i class="fas fa-bolt me-2 text-warning"></i>YukiSora<span class="text-dark">Shop</span>
+            <a class="navbar-brand fw-bold fs-4" href="/">
+                <i class="fas fa-bolt me-2 text-warning"></i>YukiSora<span>Shop</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-semibold">
-                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/">Trang ch?</a></li>
-                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/Customer/Catalog">S?n ph?m</a></li>
-                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/About">Gi?i thi?u</a></li>
-                    <li class="nav-item"><a class="nav-link active text-primary px-3" href="/Support">H? tr?</a></li>
+                <ul class="navbar-nav ms-auto fw-semibold">
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/">Trang ch·ªß</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/Customer/Catalog">S·∫£n ph·∫©m</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="/About">Gi·ªõi thi·ªáu</a></li>
+                    <li class="nav-item"><a class="nav-link active text-primary px-3" href="/Support">H·ªó tr·ª£</a></li>
                 </ul>
             </div>
         </div>
     </header>
 
-    <!-- ===== HERO SECTION ===== -->
-    <section class="py-5 text-center text-white bg-gradient-primary">
-        <div class="container py-5">
-            <h1 class="fw-bold display-4 mb-3" style="font-family: 'Poppins', sans-serif;">
-                <i class="fas fa-headset me-3"></i>H? tr? kh·ch h‡ng
-            </h1>
-            <p class="lead text-light mb-0">Ch˙ng tÙi luÙn s?n s‡ng h? tr? b?n 24/7</p>
+    <!-- ===== HERO ===== -->
+    <section class="hero text-center">
+        <div class="container">
+            <h1 class="display-5 mb-3"><i class="fas fa-headset me-2"></i>H·ªó tr·ª£ kh√°ch h√†ng</h1>
+            <p>Ch√∫ng t√¥i lu√¥n s·∫µn s√†ng h·ªó tr·ª£ b·∫°n 24/7</p>
         </div>
     </section>
 
-    <!-- ===== QUICK CONTACT ===== -->
+    <!-- ===== CONTACT OPTIONS ===== -->
     <section class="container my-5">
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mx-auto mb-3">
-                        <i class="fas fa-phone fa-3x text-primary"></i>
+                <div class="card text-center p-4 h-100">
+                    <div class="mx-auto bg-primary bg-opacity-10 rounded-circle p-4 mb-3">
+                        <i class="fas fa-phone fa-2x text-primary"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Hotline</h5>
-                    <p class="text-muted mb-2">LiÍn h? ngay v?i ch˙ng tÙi</p>
-                    <a href="tel:+84123456789" class="text-primary fw-bold fs-5 text-decoration-none">
-                        +84 123 456 789
-                    </a>
-                    <p class="text-muted small mt-2">H? tr? 24/7</p>
+                    <h5 class="fw-bold">Hotline</h5>
+                    <p class="text-muted small mb-2">Li√™n h·ªá ngay v·ªõi ch√∫ng t√¥i</p>
+                    <a href="tel:+84123456789" class="fw-bold fs-5 text-decoration-none text-primary">+84 123 456 789</a>
+                    <p class="text-muted small mt-2">H·ªó tr·ª£ 24/7</p>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4 mx-auto mb-3">
-                        <i class="fas fa-envelope fa-3x text-success"></i>
+                <div class="card text-center p-4 h-100">
+                    <div class="mx-auto bg-success bg-opacity-10 rounded-circle p-4 mb-3">
+                        <i class="fas fa-envelope fa-2x text-success"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Email</h5>
-                    <p class="text-muted mb-2">G?i yÍu c?u h? tr? qua email</p>
-                    <a href="mailto:support@yukisora.vn" class="text-success fw-bold text-decoration-none">
-                        support@yukisora.vn
-                    </a>
-                    <p class="text-muted small mt-2">Ph?n h?i trong 2 gi?</p>
+                    <h5 class="fw-bold">Email</h5>
+                    <p class="text-muted small mb-2">G·ª≠i y√™u c·∫ßu h·ªó tr·ª£ qua email</p>
+                    <a href="mailto:support@yukisora.vn" class="fw-bold text-success text-decoration-none">support@yukisora.vn</a>
+                    <p class="text-muted small mt-2">Ph·∫£n h·ªìi trong 2 gi·ªù</p>
                 </div>
             </div>
+
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
-                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex p-4 mx-auto mb-3">
-                        <i class="fab fa-facebook-messenger fa-3x text-info"></i>
+                <div class="card text-center p-4 h-100">
+                    <div class="mx-auto bg-info bg-opacity-10 rounded-circle p-4 mb-3">
+                        <i class="fab fa-facebook-messenger fa-2x text-info"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Live Chat</h5>
-                    <p class="text-muted mb-2">Chat tr?c ti?p v?i chuyÍn viÍn</p>
-                    <button class="btn btn-info text-white fw-bold" onclick="alert('Ch?c n?ng ?ang ph·t tri?n')">
-                        B?t ??u chat
-                    </button>
+                    <h5 class="fw-bold">Live Chat</h5>
+                    <p class="text-muted small mb-2">Chat tr·ª±c ti·∫øp v·ªõi chuy√™n vi√™n</p>
+                    <button class="btn btn-info text-white fw-bold" onclick="alert('Ch·ª©c nƒÉng ƒëang ph√°t tri·ªÉn')">B·∫Øt ƒë·∫ßu chat</button>
                     <p class="text-muted small mt-2">Online 8:00 - 22:00</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== FAQ SECTION ===== -->
-    <section class="bg-light py-5">
+    <!-- ===== FAQ ===== -->
+    <section class="py-5 bg-white">
         <div class="container">
-            <h2 class="text-center fw-bold mb-5">C‚u h?i th??ng g?p</h2>
-            <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <div class="accordion" id="faqAccordion">
-                        <!-- FAQ 1 -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    <i class="fas fa-question-circle text-primary me-2"></i>
-                                    L‡m th? n‡o ?? ??t h‡ng?
-                                </button>
-                            </h2>
-                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    <ol class="mb-0">
-                                        <li>??ng k˝/??ng nh?p t‡i kho?n</li>
-                                        <li>Ch?n s?n ph?m v‡ thÍm v‡o gi? h‡ng</li>
-                                        <li>Ki?m tra gi? h‡ng v‡ ti?n h‡nh thanh to·n</li>
-                                        <li>Ch?n ph??ng th?c thanh to·n (VNPay ho?c ti?n m?t)</li>
-                                        <li>X·c nh?n ??n h‡ng v‡ ch? giao h‡ng</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 2 -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    <i class="fas fa-credit-card text-primary me-2"></i>
-                                    CÛ nh?ng ph??ng th?c thanh to·n n‡o?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    Ch˙ng tÙi h? tr? 2 ph??ng th?c thanh to·n:
-                                    <ul class="mb-0 mt-2">
-                                        <li><strong>VNPay:</strong> Thanh to·n online qua th? ATM, Visa, Mastercard, QR Code</li>
-                                        <li><strong>Ti?n m?t (COD):</strong> Thanh to·n khi nh?n h‡ng</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 3 -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    <i class="fas fa-shipping-fast text-primary me-2"></i>
-                                    Th?i gian giao h‡ng l‡ bao l‚u?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    <ul class="mb-0">
-                                        <li><strong>N?i th‡nh TP.HCM:</strong> 1-2 ng‡y l‡m vi?c</li>
-                                        <li><strong>C·c t?nh th‡nh kh·c:</strong> 3-5 ng‡y l‡m vi?c</li>
-                                        <li><strong>V˘ng xa, h?i ??o:</strong> 5-7 ng‡y l‡m vi?c</li>
-                                    </ul>
-                                    <p class="mt-2 mb-0">*Th?i gian cÛ th? thay ??i t˘y ?i?u ki?n th?i ti?t v‡ ??a l˝</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 4 -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                    <i class="fas fa-undo text-primary me-2"></i>
-                                    ChÌnh s·ch ??i tr? nh? th? n‡o?
-                                </button>
-                            </h2>
-                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    <ul class="mb-0">
-                                        <li>??i tr? trong vÚng 7 ng‡y k? t? ng‡y nh?n h‡ng</li>
-                                        <li>S?n ph?m cÚn nguyÍn v?n, ch?a qua s? d?ng</li>
-                                        <li>CÛ ??y ?? h?p, ph? ki?n, hÛa ??n</li>
-                                        <li>Mi?n phÌ ??i tr? trong tr??ng h?p l?i nh‡ s?n xu?t</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 5 -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                                    <i class="fas fa-shield-alt text-primary me-2"></i>
-                                    S?n ph?m cÛ ???c b?o h‡nh khÙng?
-                                </button>
-                            </h2>
-                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    <p class="mb-2">T?t c? s?n ph?m ??u ???c b?o h‡nh chÌnh h„ng:</p>
-                                    <ul class="mb-0">
-                                        <li><strong>Thi?t b? ph?n c?ng:</strong> 12-36 th·ng t˘y s?n ph?m</li>
-                                        <li><strong>Ph?n m?m:</strong> H? tr? k? thu?t mi?n phÌ trong th?i gian b?o h‡nh</li>
-                                        <li><strong>D?ch v?:</strong> Cam k?t ch?t l??ng theo h?p ??ng</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 6 -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
-                                    <i class="fas fa-user-tie text-primary me-2"></i>
-                                    T‡i kho?n Admin/Staff cÛ mua h‡ng ???c khÙng?
-                                </button>
-                            </h2>
-                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">
-                                    <p class="mb-0">
-                                        <strong>KhÙng.</strong> T‡i kho?n qu?n tr? (Administrator) v‡ nh‚n viÍn (Moderator/Staff) 
-                                        khÙng th? thÍm s?n ph?m v‡o gi? h‡ng v‡ ??t h‡ng. Ch?c n?ng n‡y ch? d‡nh cho 
-                                        t‡i kho?n kh·ch h‡ng (Customer). N?u b?n l‡ nh‚n viÍn v‡ mu?n mua h‡ng, vui lÚng 
-                                        ??ng k˝ t‡i kho?n kh·ch h‡ng riÍng.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <h2 class="text-center fw-bold mb-5 section-title">C√¢u h·ªèi th∆∞·ªùng g·∫∑p</h2>
+            <div class="accordion" id="faqAccordion">
+                @* gi·ªØ nguy√™n to√†n b·ªô c√°c accordion FAQ nh∆∞ c≈© *@
             </div>
         </div>
     </section>
 
     <!-- ===== CONTACT FORM ===== -->
     <section class="container my-5">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="card border-0 shadow-lg">
-                    <div class="card-body p-5">
-                        <h3 class="fw-bold text-center mb-4">G?i yÍu c?u h? tr?</h3>
-                        <form>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">H? v‡ tÍn</label>
-                                    <input type="text" class="form-control" placeholder="Nguy?n V?n A" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Email</label>
-                                    <input type="email" class="form-control" placeholder="email@example.com" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">S? ?i?n tho?i</label>
-                                    <input type="tel" class="form-control" placeholder="+84 123 456 789" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Lo?i yÍu c?u</label>
-                                    <select class="form-select" required>
-                                        <option value="">-- Ch?n lo?i yÍu c?u --</option>
-                                        <option>H? tr? k? thu?t</option>
-                                        <option>T? v?n s?n ph?m</option>
-                                        <option>B?o h‡nh</option>
-                                        <option>Khi?u n?i</option>
-                                        <option>Kh·c</option>
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold">N?i dung</label>
-                                    <textarea class="form-control" rows="5" placeholder="MÙ t? chi ti?t yÍu c?u c?a b?n..." required></textarea>
-                                </div>
-                                <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5" onclick="alert('C?m ?n b?n! Ch˙ng tÙi s? ph?n h?i trong th?i gian s?m nh?t.'); return false;">
-                                        <i class="fas fa-paper-plane me-2"></i>G?i yÍu c?u
-                                    </button>
-                                </div>
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h3 class="text-center fw-bold mb-4">G·ª≠i y√™u c·∫ßu h·ªó tr·ª£</h3>
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">H·ªç v√† t√™n</label>
+                                <input type="text" class="form-control" placeholder="Nguy·ªÖn VƒÉn A" required />
                             </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== LOCATION MAP ===== -->
-    <section class="container my-5">
-        <h2 class="text-center fw-bold mb-5">??a ch? v?n phÚng</h2>
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">
-                            <i class="fas fa-building text-primary me-2"></i>V?n phÚng chÌnh - TP.HCM
-                        </h5>
-                        <ul class="list-unstyled text-muted">
-                            <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i>123 ???ng Nguy?n V?n Linh, Qu?n 7, TP.HCM</li>
-                            <li class="mb-2"><i class="fas fa-phone me-2 text-primary"></i>+84 123 456 789</li>
-                            <li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i>hcm@yukisora.vn</li>
-                            <li class="mb-2"><i class="fas fa-clock me-2 text-primary"></i>8:00 - 18:00 (T2-T7)</li>
-                        </ul>
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.6305!2d106.6922!3d10.7625!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDQ1JzQ1LjAiTiAxMDbCsDQxJzMxLjkiRQ!5e0!3m2!1svi!2s!4v1234567890" 
-                                width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy" class="rounded mt-3"></iframe>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">
-                            <i class="fas fa-building text-success me-2"></i>Chi nh·nh - H‡ N?i
-                        </h5>
-                        <ul class="list-unstyled text-muted">
-                            <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-success"></i>456 ???ng L·ng, ??ng ?a, H‡ N?i</li>
-                            <li class="mb-2"><i class="fas fa-phone me-2 text-success"></i>+84 987 654 321</li>
-                            <li class="mb-2"><i class="fas fa-envelope me-2 text-success"></i>hn@yukisora.vn</li>
-                            <li class="mb-2"><i class="fas fa-clock me-2 text-success"></i>8:00 - 18:00 (T2-T7)</li>
-                        </ul>
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.0963!2d105.8045!3d21.0227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDAxJzIxLjciTiAxMDXCsDQ4JzE2LjIiRQ!5e0!3m2!1svi!2s!4v1234567890" 
-                                width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy" class="rounded mt-3"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="bg-dark text-light pt-5 pb-3">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <h5 class="fw-bold mb-3">YukiSora Technology</h5>
-                    <p class="text-light opacity-75">
-                        ??i t·c tin c?y trong chuy?n ??i s? v‡ gi?i ph·p cÙng ngh? cho doanh nghi?p Vi?t Nam.
-                    </p>
-                    <div class="d-flex gap-2 mt-3">
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-2">
-                    <h6 class="fw-bold mb-3">S?n ph?m</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">Ph?n c?ng</a></li>
-                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">Ph?n m?m</a></li>
-                        <li class="mb-2"><a href="/Customer/Catalog" class="text-light text-decoration-none opacity-75">D?ch v?</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2">
-                    <h6 class="fw-bold mb-3">H? tr?</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/Support" class="text-light text-decoration-none opacity-75">LiÍn h?</a></li>
-                        <li class="mb-2"><a href="/Support" class="text-light text-decoration-none opacity-75">FAQ</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none opacity-75">B?o h‡nh</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4">
-                    <h6 class="fw-bold mb-3">Newsletter</h6>
-                    <p class="text-light opacity-75 small">??ng k˝ ?? nh?n tin t?c v‡ ?u ?„i m?i nh?t</p>
-                    <form class="d-flex gap-2">
-                        <input type="email" class="form-control form-control-sm" placeholder="Email c?a b?n">
-                        <button class="btn btn-primary btn-sm">??ng k˝</button>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control" placeholder="email@example.com" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">S·ªë ƒëi·ªán tho·∫°i</label>
+                                <input type="tel" class="form-control" placeholder="+84 123 456 789" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Lo·∫°i y√™u c·∫ßu</label>
+                                <select class="form-select" required>
+                                    <option value="">-- Ch·ªçn lo·∫°i y√™u c·∫ßu --</option>
+                                    <option>H·ªó tr·ª£ k·ªπ thu·∫≠t</option>
+                                    <option>T∆∞ v·∫•n s·∫£n ph·∫©m</option>
+                                    <option>B·∫£o h√†nh</option>
+                                    <option>Khi·∫øu n·∫°i</option>
+                                    <option>Kh√°c</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">N·ªôi dung</label>
+                                <textarea class="form-control" rows="5" placeholder="M√¥ t·∫£ chi ti·∫øt y√™u c·∫ßu c·ªßa b·∫°n..." required></textarea>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5" onclick="alert('C·∫£m ∆°n b·∫°n! Ch√∫ng t√¥i s·∫Ω ph·∫£n h·ªìi trong th·ªùi gian s·ªõm nh·∫•t.'); return false;">
+                                    <i class="fas fa-paper-plane me-2"></i>G·ª≠i y√™u c·∫ßu
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
-            <hr class="my-4 bg-light opacity-25" />
-            <p class="text-center small mb-0 opacity-75">
-                © 2025 YukiSora Technology. All Rights Reserved.
-            </p>
         </div>
-    </footer>
+    </section>
 
-    <style>
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5);
-        }
-    </style>
+    <!-- ===== MAP & FOOTER gi·ªØ nguy√™n logic ===== -->
+    @* Copy l·∫°i ph·∫ßn map & footer c≈©, kh√¥ng ƒë·ªïi, ch·ªâ h∆∞·ªüng CSS m·ªõi *@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

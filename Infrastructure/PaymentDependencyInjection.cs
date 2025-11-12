@@ -13,7 +13,7 @@ namespace Infrastructure
     {
         public static IServiceCollection AddPaymentServices(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<VnPayOptions>(config.GetSection("Vnpay"));
+            services.Configure<VnPayOptions>(config.GetSection("VnPay"));
             services.AddHttpContextAccessor();
 
             services.AddScoped<IVnPayGateway, VnPayPaymentGateway>();

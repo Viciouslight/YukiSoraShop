@@ -17,6 +17,15 @@ namespace Application.Extensions
             var c = category.Trim().ToLowerInvariant();
             return query.Where(p => (p.CategoryName ?? string.Empty).ToLower() == c);
         }
+
+        public static IQueryable<Product> FilterByPriceRange(this IQueryable<Product> query, decimal? minPrice, decimal? maxPrice)
+        {
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice.Value);
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            return query;
+        }
     }
 }
 

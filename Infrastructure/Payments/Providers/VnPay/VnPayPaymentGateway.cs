@@ -49,10 +49,10 @@ namespace Infrastructure.Payments.Providers.VnPay
             vnp.AddRequestData("vnp_ReturnUrl", _opt.vnp_ReturnUrl);
             vnp.AddRequestData("vnp_TxnRef", txnRef);
 
-            if (!string.IsNullOrWhiteSpace(bankCode))
-            {
-                vnp.AddRequestData("vnp_BankCode", bankCode);
-            }
+            //if (!string.IsNullOrWhiteSpace(bankCode))
+            //{
+            //    vnp.AddRequestData("vnp_BankCode", bankCode);
+            //}
 
             var url = vnp.CreateRequestUrl(_opt.vnp_BaseUrl, _opt.vnp_HashSecret);
 

@@ -27,15 +27,53 @@ namespace Application.Services
             return await query.ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<PagedResult<ProductDTO>> GetProductsPagedAsync(int pageNumber, int pageSize, string? search = null, string? category = null)
+        public async Task<PagedResult<ProductDTO>> GetProductsPagedAsync(
+            int pageNumber, 
+            int pageSize, 
+            string? search = null, 
+            string? category = null, 
+            decimal? minPrice = null, 
+            decimal? maxPrice = null, 
+            string? sortBy = null)
         {
-            var filter = new PaginationFilter { PageNumber = pageNumber, PageSize = pageSize, Search = search, Category = category };
+            var filter = new PaginationFilter { 
+                PageNumber = pageNumber, 
+                PageSize = pageSize, 
+                Search = search, 
+                Category = category 
+            };
+            
             var query = _uow.ProductRepository.GetAllQueryable("ProductDetails")
                 .FilterBySearch(filter.Search)
                 .FilterByCategory(filter.Category)
-                .OrderByDescending(p => p.Id)
+                .FilterByPriceRange(minPrice, maxPrice);
+
+            // Apply sorting
+            query = sortBy?.ToLower() switch
+            {
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "name_asc" => query.OrderBy(p => p.ProductName),
+                "name_desc" => query.OrderByDescending(p => p.ProductName),
+                "newest" => query.OrderByDescending(p => p.CreatedAt),
+                _ => query.OrderByDescending(p => p.Id)
+            };
+
+            var projected = query.ProjectTo<ProductDTO>(_mapper.ConfigurationProvider);
+            return await projected.ToPagedResultAsync(filter.PageNumber, filter.PageSize);
+        }
+
+        public async Task<List<ProductDTO>> GetHotProductsAsync(int count = 8)
+        {
+            // Get products with highest stock or recently created as "hot" products
+            var query = _uow.ProductRepository.GetAllQueryable("ProductDetails")
+                .Where(p => p.StockQuantity > 0)
+                .OrderByDescending(p => p.StockQuantity)
+                .ThenByDescending(p => p.CreatedAt)
+                .Take(count)
                 .ProjectTo<ProductDTO>(_mapper.ConfigurationProvider);
-            return await query.ToPagedResultAsync(filter.PageNumber, filter.PageSize);
+            
+            return await query.ToListAsync();
         }
 
         public async Task<ProductDTO?> GetProductDtoByIdAsync(int id)

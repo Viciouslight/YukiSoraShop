@@ -1,8 +1,30 @@
+@inject Application.Services.Interfaces.ICartService CartService
+@using System.Security.Claims
+
 @{
     var isAuthenticated = User?.Identity?.IsAuthenticated == true;
     var userName = User?.Identity?.Name ?? "";
     var isAdmin = User?.IsInRole("Administrator") == true;
     var isStaff = User?.IsInRole("Moderator") == true;
+
+    // Get cart count for authenticated customers
+    var cartCount = 0;
+    if (isAuthenticated && !isAdmin && !isStaff)
+    {
+        var accountIdStr = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(accountIdStr, out var accountId) && accountId > 0)
+        {
+            try
+            {
+                var items = await CartService.GetItemsAsync(accountId);
+                cartCount = items?.Sum(i => i.Quantity) ?? 0;
+            }
+            catch
+            {
+                cartCount = 0;
+            }
+        }
+    }
 }
 
 <!-- LEFT NAVIGATION -->
@@ -126,7 +148,14 @@
             <li class="nav-item ms-2">
                 <a class="nav-link fw-semibold position-relative" asp-page="/Customer/Cart">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1" id="cartCount">0</span>
+                    @if (cartCount > 0)
+                    {
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" id="cartCount">@cartCount</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary position-absolute top-0 start-100 translate-middle rounded-pill" id="cartCount">0</span>
+                    }
                 </a>
             </li>
         }

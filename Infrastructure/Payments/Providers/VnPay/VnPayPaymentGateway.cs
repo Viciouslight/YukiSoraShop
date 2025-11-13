@@ -3,6 +3,7 @@ using Application.Payments.Interfaces;
 using Infrastructure.Payments.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text;
@@ -12,10 +13,16 @@ namespace Infrastructure.Payments.Providers.VnPay
     public sealed class VnPayPaymentGateway : IVnPayGateway
     {
         private readonly VnPayOptions _opt;
+        private readonly ILogger<VnPayPaymentGateway> _logger;
+        private static readonly HashSet<string> AllowedBankCodes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "VNPAYQR", "VNBANK", "INTCARD"
+        };
 
-        public VnPayPaymentGateway(IOptions<VnPayOptions> opt)
+        public VnPayPaymentGateway(IOptions<VnPayOptions> opt, ILogger<VnPayPaymentGateway> logger)
         {
             _opt = opt.Value;
+            _logger = logger;
         }
 
         public Task<PaymentCheckoutDTO> GenerateCheckoutUrlAsync(
@@ -49,12 +56,18 @@ namespace Infrastructure.Payments.Providers.VnPay
             vnp.AddRequestData("vnp_ReturnUrl", _opt.vnp_ReturnUrl);
             vnp.AddRequestData("vnp_TxnRef", txnRef);
 
-            //if (!string.IsNullOrWhiteSpace(bankCode))
-            //{
-            //    vnp.AddRequestData("vnp_BankCode", bankCode);
-            //}
+            if (!string.IsNullOrWhiteSpace(bankCode))
+            {
+                var code = bankCode.Trim().ToUpperInvariant();
+                if (AllowedBankCodes.Contains(code))
+                {
+                    vnp.AddRequestData("vnp_BankCode", code);
+                }
+            }
 
             var url = vnp.CreateRequestUrl(_opt.vnp_BaseUrl, _opt.vnp_HashSecret);
+            _logger?.LogInformation("Generated VNPay checkout URL for Order {OrderId} (TxnRef={TxnRef}, Amount={Amount}): {Url}",
+                orderId, txnRef, amountVnd, url);
 
             return Task.FromResult(new PaymentCheckoutDTO
             {

@@ -64,6 +64,31 @@ public class PaymentMethodServiceIntegrationTests
         Assert.Equal("VNPay", active[0].Name);
     }
 
+    [Fact]
+    public async Task SetStatusAsync_ReactivatesInactiveMethod()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(databaseName: $"Reactivate-{Guid.NewGuid()}")
+            .Options;
+
+        var context = new AppDbContext(options);
+        await SeedAsync(context);
+
+        var paymentMethodRepository = new PaymentMethodRepository(context);
+        var uow = new TestUnitOfWork(context, paymentMethodRepository);
+        IPaymentMethodService service = new PaymentMethodService(uow);
+
+        await service.SetStatusAsync(1, false, "admin-off");
+
+        var result = await service.SetStatusAsync(1, true, "admin-on");
+        await context.Entry(await context.PaymentMethods.FindAsync(1)).ReloadAsync();
+
+        Assert.True(result);
+        var method = await context.PaymentMethods.FirstAsync(pm => pm.Id == 1);
+        Assert.True(method.IsActive);
+        Assert.Equal("admin-on", method.ModifiedBy);
+    }
+
     private static async Task SeedAsync(AppDbContext context)
     {
         context.PaymentMethods.AddRange(

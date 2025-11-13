@@ -7,6 +7,8 @@ using Infrastructure.Payments.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Infrastructure.Payments.Providers
 {
@@ -36,32 +38,43 @@ namespace Infrastructure.Payments.Providers
 
             var amountVnd = order.GrandTotal!.Value;
 
-            var method = await EnsurePaymentMethodAsync("VNPay", "VNPay payment gateway", ct);
-            var payment = new Payment
+            await using var transaction = await _uow.BeginTransactionAsync();
+            try
             {
-                OrderId = order.Id,
-                PaymentMethodId = method.Id,
-                Amount = amountVnd,
-                Currency = "VND",
-                PaymentStatus = PaymentStatus.Pending,
-            };
-            await _uow.PaymentRepository.AddAsync(payment);
+                var method = await EnsurePaymentMethodAsync("VNPay", "VNPay payment gateway", ct);
+                var payment = new Payment
+                {
+                    OrderId = order.Id,
+                    PaymentMethodId = method.Id,
+                    Amount = amountVnd,
+                    Currency = "VND",
+                    PaymentStatus = PaymentStatus.Pending,
+                };
+                await _uow.PaymentRepository.AddAsync(payment);
 
-            var ip = _http.HttpContext is null ? command.ClientIp : _http.HttpContext.Connection.RemoteIpAddress?.ToString() ?? command.ClientIp;
+                var rawIp = _http.HttpContext is null ? command.ClientIp : _http.HttpContext.Connection.RemoteIpAddress?.ToString() ?? command.ClientIp;
+                var ip = NormalizeClientIp(rawIp);
 
-            var checkout = await _vnPayGateway.GenerateCheckoutUrlAsync(
-                orderId: order.Id,
-                amountVnd: amountVnd,
-                clientIp: ip,
-                bankCode: command.BankCode,
-                orderDesc: command.OrderDescription,
-                orderTypeCode: command.OrderTypeCode,
-                ct: ct
-            );
+                var checkout = await _vnPayGateway.GenerateCheckoutUrlAsync(
+                    orderId: order.Id,
+                    amountVnd: amountVnd,
+                    clientIp: ip,
+                    bankCode: command.BankCode,
+                    orderDesc: command.OrderDescription,
+                    orderTypeCode: command.OrderTypeCode,
+                    ct: ct
+                );
 
-            await _uow.SaveChangesAsync();
-            _logger.LogInformation("Generated checkout URL for order {OrderId}", order.Id);
-            return checkout;
+                await _uow.SaveChangesAsync();
+                _logger.LogInformation("Generated checkout URL for order {OrderId}", order.Id);
+                await transaction.CommitAsync();
+                return checkout;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<PaymentResultDTO> HandleCallbackAsync(IQueryCollection query, CancellationToken ct = default)
@@ -75,42 +88,42 @@ namespace Infrastructure.Payments.Providers
             try
             {
 
-            var payment = await _uow.PaymentRepository.FindOneAsync(
-                p => p.OrderId == order.Id && p.PaymentStatus == PaymentStatus.Pending, includeProperties: "PaymentMethod");
+                var payment = await _uow.PaymentRepository.FindOneAsync(
+                    p => p.OrderId == order.Id && p.PaymentStatus == PaymentStatus.Pending, includeProperties: "PaymentMethod");
 
-            if (payment is null)
-            {
-                var method = await EnsurePaymentMethodAsync("VNPay", "VNPay payment gateway", ct);
-                payment = new Payment
+                if (payment is null)
                 {
-                    OrderId = order.Id,
-                    PaymentMethodId = method.Id,
-                    Amount = result.Amount,
-                    Currency = result.Currency,
-                    PaymentStatus = PaymentStatus.Pending,
-                };
-                await _uow.PaymentRepository.AddAsync(payment);
-            }
+                    var method = await EnsurePaymentMethodAsync("VNPay", "VNPay payment gateway", ct);
+                    payment = new Payment
+                    {
+                        OrderId = order.Id,
+                        PaymentMethodId = method.Id,
+                        Amount = result.Amount,
+                        Currency = result.Currency,
+                        PaymentStatus = PaymentStatus.Pending,
+                    };
+                    await _uow.PaymentRepository.AddAsync(payment);
+                }
 
-            payment.PaymentStatus = result.Status;
-            payment.TransactionRef = result.TransactionRef;
-            payment.RawCallbackJson = result.RawQuery;
+                payment.PaymentStatus = result.Status;
+                payment.TransactionRef = result.TransactionRef;
+                payment.RawCallbackJson = result.RawQuery;
 
-            if (result.IsSuccess)
-            {
-                order.Status = "Paid";
-                await _uow.SaveChangesAsync();
-                _logger.LogInformation("Payment succeeded for order {OrderId}", result.OrderId);
+                if (result.IsSuccess)
+                {
+                    order.Status = "Paid";
+                    await _uow.SaveChangesAsync();
+                    _logger.LogInformation("Payment succeeded for order {OrderId}", result.OrderId);
 
-                // 👉 Tạo invoice ngay sau khi thanh toán thành công (idempotent)
-                await _invoiceService.CreateInvoiceFromOrder(order.Id, ct);
-                _logger.LogInformation("Order {OrderId} marked as paid and invoice created", order.Id);
-            }
-            else
-            {
-                await _uow.SaveChangesAsync();
-                _logger.LogWarning("Payment failed for order {OrderId}: {Message}", result.OrderId, result.Message);
-            }
+                    // 👉 Tạo invoice ngay sau khi thanh toán thành công (idempotent)
+                    await _invoiceService.CreateInvoiceFromOrder(order.Id, ct);
+                    _logger.LogInformation("Order {OrderId} marked as paid and invoice created", order.Id);
+                }
+                else
+                {
+                    await _uow.SaveChangesAsync();
+                    _logger.LogWarning("Payment failed for order {OrderId}: {Message}", result.OrderId, result.Message);
+                }
 
                 await tx.CommitAsync(ct);
                 return result;
@@ -308,6 +321,39 @@ namespace Infrastructure.Payments.Providers
                 await _uow.SaveChangesAsync();
             }
             return pm;
+        }
+
+        private static string NormalizeClientIp(string? ip)
+        {
+            const string fallback = "127.0.0.1";
+
+            if (string.IsNullOrWhiteSpace(ip))
+            {
+                return fallback;
+            }
+
+            if (!IPAddress.TryParse(ip, out var parsed))
+            {
+                return fallback;
+            }
+
+            if (parsed.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return parsed.ToString();
+            }
+
+            if (parsed.Equals(IPAddress.IPv6Loopback))
+            {
+                return fallback;
+            }
+
+            if (parsed.IsIPv4MappedToIPv6)
+            {
+                return parsed.MapToIPv4().ToString();
+            }
+
+            // VNPay currently expects IPv4 addresses – degrade to loopback for other IPv6 inputs
+            return fallback;
         }
     }
 }

@@ -151,10 +151,10 @@ else
                                     <form method="post" asp-page-handler="SetStatus" class="d-inline" 
                                           onsubmit="return confirm('@(method.IsActive ? "Bạn có chắc muốn TẮT phương thức này?\n\nKhách hàng sẽ không thể sử dụng phương thức này để thanh toán." : "Bạn có chắc muốn KÍCH HOẠT phương thức này?\n\nKhách hàng sẽ có thể sử dụng phương thức này để thanh toán.")');">
                                         <input type="hidden" name="id" value="@method.Id" />
-                                        <input type="hidden" name="isActive" value="@(!method.IsActive)" />
                                         @if (method.IsActive)
                                         {
                                             <button type="submit" class="btn btn-danger btn-sm"
+                                                    name="isActive" value="false"
                                                     title="Tắt phương thức này">
                                                 <i class="fas fa-ban me-1"></i>Tắt
                                             </button>
@@ -162,6 +162,7 @@ else
                                         else
                                         {
                                             <button type="submit" class="btn btn-success btn-sm"
+                                                    name="isActive" value="true"
                                                     title="Kích hoạt lại phương thức">
                                                 <i class="fas fa-check me-1"></i>Bật
                                             </button>

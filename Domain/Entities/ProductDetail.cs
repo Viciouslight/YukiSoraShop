@@ -25,8 +25,6 @@ namespace Domain.Entities
         [StringLength(255, ErrorMessage = "Xuất xứ tối đa 255 ký tự.")]
         public string? Origin { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập URL hình ảnh.")]
-        [Url(ErrorMessage = "URL hình ảnh không hợp lệ.")]
         public string? ImageUrl { get; set; }
         
         [StringLength(2000, ErrorMessage = "Mô tả tối đa 2000 ký tự.")]
@@ -35,7 +33,7 @@ namespace Domain.Entities
         [Range(0, 999999999, ErrorMessage = "Giá phụ thêm không hợp lệ.")]
         public decimal? AdditionalPrice { get; set; }
 
-        public virtual Product Product { get; set; } = null!;
+        public virtual Product? Product { get; set; }
     }
 
 }

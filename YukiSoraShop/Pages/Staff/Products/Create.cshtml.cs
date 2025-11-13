@@ -2,6 +2,7 @@ using Application.Services.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -84,8 +85,9 @@ namespace YukiSoraShop.Pages.Staff.Products
                     return Page();
                 }
 
-                foreach (var detail in ProductDetails)
+                for (var i = 0; i < ProductDetails.Count; i++)
                 {
+                    var detail = ProductDetails[i];
                     bool allEmpty =
                         string.IsNullOrWhiteSpace(detail.Color) &&
                         string.IsNullOrWhiteSpace(detail.Size) &&
@@ -103,8 +105,20 @@ namespace YukiSoraShop.Pages.Staff.Products
                         return Page();
                     }
 
-                    if (!TryValidateModel(detail))
+                    var prefix = $"{nameof(ProductDetails)}[{i}]";
+                    ModelState.Remove($"{prefix}.Product");
+                    if (!TryValidateModel(detail, prefix))
                     {
+                        var fieldPrefix = prefix;
+                        var detailErrors = ModelState
+                            .Where(kvp => kvp.Key.StartsWith(fieldPrefix, StringComparison.OrdinalIgnoreCase))
+                            .SelectMany(kvp => kvp.Value?.Errors ?? Enumerable.Empty<ModelError>())
+                            .Select(e => e.ErrorMessage)
+                            .ToList();
+                        foreach (var error in detailErrors)
+                        {
+                            _logger.LogWarning("Product detail validation error (index {Index}): {Message}", i, error);
+                        }
                         TempData["Error"] = "Vui lòng kiểm tra lại thông tin chi tiết sản phẩm.";
                         await LoadCategoryOptions();
                         return Page();

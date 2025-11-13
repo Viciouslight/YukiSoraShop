@@ -71,7 +71,8 @@
             <div class="card-body" id="product-details-container">
                 @for (int i = 0; i < Model.ProductDetails.Count; i++)
                 {
-                    <div class="border rounded-3 p-3 mb-3 bg-light-subtle product-detail-item position-relative">
+                    <div class="border rounded-3 p-3 mb-3 bg-light-subtle product-detail-item position-relative" data-detail-index="@i">
+                        <input type="hidden" name="ProductDetails.Index" value="@i" />
                         <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-detail">
                             <i class="fas fa-times"></i>
                         </button>
@@ -131,40 +132,54 @@
         const container = document.getElementById('product-details-container');
         const addBtn = document.getElementById('add-detail');
 
-        addBtn.addEventListener('click', () => {
-            const index = container.children.length;
-            const template = `
-                <div class="border rounded-3 p-3 mb-3 bg-light-subtle product-detail-item position-relative">
-                    <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-detail">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <input name="ProductDetails[${index}].Color" class="form-control" placeholder="Màu sắc" />
-                        </div>
-                        <div class="col-md-6">
-                            <input name="ProductDetails[${index}].Size" class="form-control" placeholder="Kích thước" />
-                        </div>
-                        <div class="col-md-6">
-                            <input name="ProductDetails[${index}].Material" class="form-control" placeholder="Chất liệu" />
-                        </div>
-                        <div class="col-md-6">
-                            <input name="ProductDetails[${index}].Origin" class="form-control" placeholder="Xuất xứ" />
-                        </div>
-                        <div class="col-md-6">
-                            <input name="ProductDetails[${index}].ImageUrl" class="form-control" placeholder="URL hình ảnh" />
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text">₫</span>
-                                <input name="ProductDetails[${index}].AdditionalPrice" class="form-control" placeholder="Giá phụ thêm" type="number" step="0.01" />
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <textarea name="ProductDetails[${index}].Description" class="form-control" rows="2" placeholder="Mô tả chi tiết"></textarea>
+        const getNextDetailIndex = () => {
+            const indexInputs = Array.from(container.querySelectorAll('input[name="ProductDetails.Index"]'))
+                .map(input => parseInt(input.value, 10))
+                .filter(Number.isFinite);
+            if (indexInputs.length === 0) {
+                return 0;
+            }
+            return Math.max(...indexInputs) + 1;
+        };
+
+        let nextDetailIndex = getNextDetailIndex();
+
+        const buildDetailTemplate = (index) => `
+            <div class="border rounded-3 p-3 mb-3 bg-light-subtle product-detail-item position-relative" data-detail-index="${index}">
+                <input type="hidden" name="ProductDetails.Index" value="${index}" />
+                <button type="button" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 btn-remove-detail">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <input name="ProductDetails[${index}].Color" class="form-control" placeholder="Màu sắc" />
+                    </div>
+                    <div class="col-md-6">
+                        <input name="ProductDetails[${index}].Size" class="form-control" placeholder="Kích thước" />
+                    </div>
+                    <div class="col-md-6">
+                        <input name="ProductDetails[${index}].Material" class="form-control" placeholder="Chất liệu" />
+                    </div>
+                    <div class="col-md-6">
+                        <input name="ProductDetails[${index}].Origin" class="form-control" placeholder="Xuất xứ" />
+                    </div>
+                    <div class="col-md-6">
+                        <input name="ProductDetails[${index}].ImageUrl" class="form-control" placeholder="URL hình ảnh" />
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">₫</span>
+                            <input name="ProductDetails[${index}].AdditionalPrice" class="form-control" placeholder="Giá phụ thêm" type="number" step="0.01" />
                         </div>
                     </div>
-                </div>`;
+                    <div class="col-12">
+                        <textarea name="ProductDetails[${index}].Description" class="form-control" rows="2" placeholder="Mô tả chi tiết"></textarea>
+                    </div>
+                </div>
+            </div>`;
+
+        addBtn.addEventListener('click', () => {
+            const template = buildDetailTemplate(nextDetailIndex++);
             container.insertAdjacentHTML('beforeend', template);
         });
 

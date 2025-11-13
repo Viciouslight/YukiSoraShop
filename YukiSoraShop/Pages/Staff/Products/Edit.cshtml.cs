@@ -56,7 +56,17 @@ namespace YukiSoraShop.Pages.Staff.Products
 
                 Product.CategoryName = (category.CategoryName ?? string.Empty).Trim();
 
-                ModelState.Clear();
+                // Xóa validation errors của ProductDetails khỏi ModelState
+                var productDetailsKeys = ModelState.Keys
+                    .Where(k => k.StartsWith("ProductDetails"))
+                    .ToList();
+                
+                foreach (var key in productDetailsKeys)
+                {
+                    ModelState.Remove(key);
+                }
+
+                // Chỉ validate Product entity
                 if (!TryValidateModel(Product, nameof(Product)))
                 {
                     var errors = ModelState
@@ -76,6 +86,9 @@ namespace YukiSoraShop.Pages.Staff.Products
                 Product.ModifiedAt = DateTime.UtcNow;
                 Product.ModifiedBy = username;
 
+                // Lọc các ProductDetails có ít nhất một trường được điền
+                var validProductDetails = new List<ProductDetail>();
+                
                 foreach (var detail in ProductDetails)
                 {
                     bool hasAnyField = !string.IsNullOrWhiteSpace(detail.Color) ||
@@ -88,12 +101,24 @@ namespace YukiSoraShop.Pages.Staff.Products
 
                     if (hasAnyField)
                     {
+                        // Gán ProductId cho biến thể
+                        detail.ProductId = Product.Id;
+                        
+                        // Nếu là biến thể mới (Id = 0), set CreatedAt/CreatedBy
+                        if (detail.Id == 0)
+                        {
+                            detail.CreatedAt = DateTime.UtcNow;
+                            detail.CreatedBy = username;
+                        }
+                        
                         detail.ModifiedAt = DateTime.UtcNow;
                         detail.ModifiedBy = username;
+                        
+                        validProductDetails.Add(detail);
                     }
                 }
 
-                Product.ProductDetails = ProductDetails;
+                Product.ProductDetails = validProductDetails;
 
                 var success = await _productService.UpdateProductAsync(Product);
 
@@ -112,6 +137,7 @@ namespace YukiSoraShop.Pages.Staff.Products
                 TempData["Error"] = "Đã xảy ra lỗi. Vui lòng thử lại.";
             }
 
+            await LoadCategoryOptions();
             return Page();
         }
 

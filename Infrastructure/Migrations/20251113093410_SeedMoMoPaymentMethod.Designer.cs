@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113093410_SeedMoMoPaymentMethod")]
+    partial class SeedMoMoPaymentMethod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Application.Models.Account", b =>
+            modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,12 +33,23 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -45,6 +59,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -88,10 +106,14 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 1,
+                            Address = "",
+                            AvatarUrl = "",
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedBy = "System",
+                            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             FullName = "Administrator",
+                            Gender = "",
                             IsDeleted = false,
                             IsExternal = false,
                             ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -105,10 +127,14 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 2,
+                            Address = "",
+                            AvatarUrl = "",
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedBy = "System",
+                            DateOfBirth = new DateTime(1992, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "staff@gmail.com",
                             FullName = "Staff Member",
+                            Gender = "",
                             IsDeleted = false,
                             IsExternal = false,
                             ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -122,10 +148,14 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 3,
+                            Address = "",
+                            AvatarUrl = "",
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedBy = "System",
+                            DateOfBirth = new DateTime(1995, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "customer@gmail.com",
                             FullName = "Customer User",
+                            Gender = "",
                             IsDeleted = false,
                             IsExternal = false,
                             ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -138,7 +168,7 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Application.Models.Cart", b =>
+            modelBuilder.Entity("Domain.Entities.Cart", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -173,7 +203,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("Application.Models.CartItem", b =>
+            modelBuilder.Entity("Domain.Entities.CartItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -216,7 +246,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("Application.Models.Category", b =>
+            modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -264,7 +294,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
-            modelBuilder.Entity("Application.Models.Invoice", b =>
+            modelBuilder.Entity("Domain.Entities.Invoice", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -310,7 +340,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Invoices");
                 });
 
-            modelBuilder.Entity("Application.Models.InvoiceDetail", b =>
+            modelBuilder.Entity("Domain.Entities.InvoiceDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -361,7 +391,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("InvoiceDetails");
                 });
 
-            modelBuilder.Entity("Application.Models.Order", b =>
+            modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -412,7 +442,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Application.Models.OrderDetail", b =>
+            modelBuilder.Entity("Domain.Entities.OrderDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -461,7 +491,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("OrderDetails");
                 });
 
-            modelBuilder.Entity("Application.Models.Payment", b =>
+            modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -517,7 +547,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("Application.Models.PaymentMethod", b =>
+            modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -533,7 +563,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -595,7 +626,7 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Application.Models.Product", b =>
+            modelBuilder.Entity("Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -619,7 +650,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -636,7 +668,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
@@ -651,7 +684,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Application.Models.ProductDetail", b =>
+            modelBuilder.Entity("Domain.Entities.ProductDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -710,9 +743,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
@@ -720,7 +750,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("ProductDetails", (string)null);
                 });
 
-            modelBuilder.Entity("Application.Models.Role", b =>
+            modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -797,9 +827,9 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Application.Models.Account", b =>
+            modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
-                    b.HasOne("Application.Models.Role", "Role")
+                    b.HasOne("Domain.Entities.Role", "Role")
                         .WithMany("Accounts")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -809,9 +839,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Application.Models.Cart", b =>
+            modelBuilder.Entity("Domain.Entities.Cart", b =>
                 {
-                    b.HasOne("Application.Models.Account", "Account")
+                    b.HasOne("Domain.Entities.Account", "Account")
                         .WithMany("Carts")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -820,15 +850,15 @@ namespace Infrastructure.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("Application.Models.CartItem", b =>
+            modelBuilder.Entity("Domain.Entities.CartItem", b =>
                 {
-                    b.HasOne("Application.Models.Cart", "Cart")
+                    b.HasOne("Domain.Entities.Cart", "Cart")
                         .WithMany("CartItems")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Application.Models.Product", "Product")
+                    b.HasOne("Domain.Entities.Product", "Product")
                         .WithMany("CartItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -839,9 +869,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Application.Models.Invoice", b =>
+            modelBuilder.Entity("Domain.Entities.Invoice", b =>
                 {
-                    b.HasOne("Application.Models.Order", "Order")
+                    b.HasOne("Domain.Entities.Order", "Order")
                         .WithMany("Invoices")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -850,9 +880,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Application.Models.InvoiceDetail", b =>
+            modelBuilder.Entity("Domain.Entities.InvoiceDetail", b =>
                 {
-                    b.HasOne("Application.Models.Invoice", "Invoice")
+                    b.HasOne("Domain.Entities.Invoice", "Invoice")
                         .WithMany("InvoiceDetails")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -861,9 +891,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Invoice");
                 });
 
-            modelBuilder.Entity("Application.Models.Order", b =>
+            modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.HasOne("Application.Models.Account", "Account")
+                    b.HasOne("Domain.Entities.Account", "Account")
                         .WithMany("Orders")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -872,15 +902,15 @@ namespace Infrastructure.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("Application.Models.OrderDetail", b =>
+            modelBuilder.Entity("Domain.Entities.OrderDetail", b =>
                 {
-                    b.HasOne("Application.Models.Order", "Order")
+                    b.HasOne("Domain.Entities.Order", "Order")
                         .WithMany("OrderDetails")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Application.Models.Product", "Product")
+                    b.HasOne("Domain.Entities.Product", "Product")
                         .WithMany("OrderDetails")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -891,15 +921,15 @@ namespace Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Application.Models.Payment", b =>
+            modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("Application.Models.Order", "Order")
+                    b.HasOne("Domain.Entities.Order", "Order")
                         .WithMany("Payments")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Application.Models.PaymentMethod", "PaymentMethod")
+                    b.HasOne("Domain.Entities.PaymentMethod", "PaymentMethod")
                         .WithMany("Payments")
                         .HasForeignKey("PaymentMethodId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -910,9 +940,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("PaymentMethod");
                 });
 
-            modelBuilder.Entity("Application.Models.Product", b =>
+            modelBuilder.Entity("Domain.Entities.Product", b =>
                 {
-                    b.HasOne("Application.Models.Category", "Category")
+                    b.HasOne("Domain.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -922,9 +952,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Application.Models.ProductDetail", b =>
+            modelBuilder.Entity("Domain.Entities.ProductDetail", b =>
                 {
-                    b.HasOne("Application.Models.Product", "Product")
+                    b.HasOne("Domain.Entities.Product", "Product")
                         .WithMany("ProductDetails")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -934,29 +964,29 @@ namespace Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Application.Models.Account", b =>
+            modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
                     b.Navigation("Carts");
 
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("Application.Models.Cart", b =>
+            modelBuilder.Entity("Domain.Entities.Cart", b =>
                 {
                     b.Navigation("CartItems");
                 });
 
-            modelBuilder.Entity("Application.Models.Category", b =>
+            modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("Application.Models.Invoice", b =>
+            modelBuilder.Entity("Domain.Entities.Invoice", b =>
                 {
                     b.Navigation("InvoiceDetails");
                 });
 
-            modelBuilder.Entity("Application.Models.Order", b =>
+            modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.Navigation("Invoices");
 
@@ -965,12 +995,12 @@ namespace Infrastructure.Migrations
                     b.Navigation("Payments");
                 });
 
-            modelBuilder.Entity("Application.Models.PaymentMethod", b =>
+            modelBuilder.Entity("Domain.Entities.PaymentMethod", b =>
                 {
                     b.Navigation("Payments");
                 });
 
-            modelBuilder.Entity("Application.Models.Product", b =>
+            modelBuilder.Entity("Domain.Entities.Product", b =>
                 {
                     b.Navigation("CartItems");
 
@@ -979,7 +1009,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("ProductDetails");
                 });
 
-            modelBuilder.Entity("Application.Models.Role", b =>
+            modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
                     b.Navigation("Accounts");
                 });

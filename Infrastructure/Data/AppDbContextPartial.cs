@@ -1,4 +1,4 @@
-using Application.Models;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -122,6 +122,10 @@ public partial class AppDbContext
                     Email = "admin@gmail.com",
                     Password = "admin123",
                     PhoneNumber = "0123456789",
+                    Address = "",
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    Gender = "",
+                    AvatarUrl = "",
                     RoleId = 2, // Administrator role
                     Status = "Active",
                     IsExternal = false,
@@ -140,6 +144,10 @@ public partial class AppDbContext
                     Email = "staff@gmail.com",
                     Password = "staff123",
                     PhoneNumber = "0123456788",
+                    Address = "",
+                    DateOfBirth = new DateTime(1992, 1, 1),
+                    Gender = "",
+                    AvatarUrl = "",
                     RoleId = 3, // Moderator role
                     Status = "Active",
                     IsExternal = false,
@@ -158,6 +166,10 @@ public partial class AppDbContext
                     Email = "customer@gmail.com",
                     Password = "customer123",
                     PhoneNumber = "0123456787",
+                    Address = "",
+                    DateOfBirth = new DateTime(1995, 1, 1),
+                    Gender = "",
+                    AvatarUrl = "",
                     RoleId = 1, // Customer role
                     Status = "Active",
                     IsExternal = false,
@@ -197,6 +209,58 @@ public partial class AppDbContext
 
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(500);
+        });
+
+        // Configure payment methods and seed defaults
+        modelBuilder.Entity<PaymentMethod>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("PaymentMethods");
+
+            entity.Property(e => e.Name)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255);
+
+            entity.HasData(
+                new
+                {
+                    Id = 1,
+                    Name = "VNPay",
+                    Description = "VNPay payment gateway",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System",
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new
+                {
+                    Id = 2,
+                    Name = "Cash",
+                    Description = "Thanh toán tiền mặt",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System",
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                },
+                new
+                {
+                    Id = 3,
+                    Name = "MoMo",
+                    Description = "MoMo payment gateway",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "System",
+                    ModifiedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    ModifiedBy = "System",
+                    IsDeleted = false
+                }
+            );
         });
     }
 }
